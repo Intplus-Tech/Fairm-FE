@@ -4,16 +4,36 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 import PenDetailsTable from "./PenDetailsTable";
 
-export default function BroilerRow({ row }: any) {
+/* ✅ Strongly typed row data */
+interface BroilerRowData {
+  id: number;
+  date: string;
+  pens: number;
+  stock: string;
+  mortality: number;
+  culls: number;
+  feed: number;
+  water: number;
+  weight: number;
+  alert: "Critical" | "Warning";
+}
+
+/* ✅ Typed props */
+interface BroilerRowProps {
+  row: BroilerRowData;
+}
+
+export default function BroilerRow({ row }: BroilerRowProps) {
   const [open, setOpen] = useState(false);
 
   return (
     <>
       <tr className={`${open ? "bg-gray-50" : ""}`}>
-        <td>
+        <td className="w-10">
           <button
             onClick={() => setOpen(!open)}
-            className={`p-1 rounded ${open ? "bg-[#4A3AFF] text-white" : "bg-gray-100"}`}
+            className={`p-1 rounded ${open ? "bg-[#4A3AFF] text-white" : "bg-gray-100"
+              }`}
           >
             {open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
           </button>
@@ -30,7 +50,9 @@ export default function BroilerRow({ row }: any) {
         <td>
           <span className="flex items-center gap-2">
             <span
-              className={`w-3 h-3 rounded-full ${row.alert === "Critical" ? "bg-red-500" : "bg-yellow-400"
+              className={`w-3 h-3 rounded-full ${row.alert === "Critical"
+                  ? "bg-red-500"
+                  : "bg-yellow-400"
                 }`}
             />
             {row.alert}

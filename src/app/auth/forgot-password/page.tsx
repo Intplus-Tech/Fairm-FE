@@ -1,6 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,13 +16,35 @@ import {
 import { ArrowLeft } from "lucide-react";
 
 export default function ForgotPassword() {
+  const router = useRouter();
+
+  const [email, setEmail] = useState("");
+
+  // email validation
+  const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const isFormValid = email.trim().length > 0 && isEmailValid;
+
+  const handleResetPassword = () => {
+    if (!email.trim()) {
+      alert("Email is required.");
+      return;
+    }
+
+    if (!isEmailValid) {
+      alert("Please enter a valid email address.");
+      return;
+    }
+
+    // ✅ validation passed
+    // endpoint will be connected here later
+    router.push("/auth/password-reset");
+  };
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-transparent px-4">
-
       {/* Wrapper to anchor arrow to card */}
       <div className="relative w-full max-w-lg md:max-w-xl">
-
-        {/* Back arrow — aligned with card */}
+        {/* Back arrow */}
         <Link
           href="/auth/login"
           className="absolute -top-10 left-2 flex items-center gap-2 text-gray-700 hover:text-[#4A3AFF] transition-colors"
@@ -28,13 +53,7 @@ export default function ForgotPassword() {
           <span className="text-sm font-medium">Back</span>
         </Link>
 
-        <Card
-          className="
-            w-full
-            bg-transparent
-          backdrop-blur-lg
-          "
-        >
+        <Card className="w-full bg-transparent backdrop-blur-lg">
           {/* Header */}
           <CardHeader className="pb-3">
             <CardTitle className="text-2xl text-start font-semibold">
@@ -52,19 +71,21 @@ export default function ForgotPassword() {
                 type="email"
                 placeholder="admin@fairm.com"
                 className="bg-white"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
               />
             </div>
 
             {/* Button */}
-            <Link href="/auth/password-reset" className="block pt-2">
-              <Button
-                className="w-full py-3 text-white"
-                style={{ backgroundColor: "#4A3AFF" }}
-              >
-                Reset My Password
-              </Button>
-            </Link>
-            
+            <Button
+              onClick={handleResetPassword}
+              disabled={!isFormValid}
+              className="w-full py-3 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{ backgroundColor: "#4A3AFF" }}
+            >
+              Reset My Password
+            </Button>
           </CardContent>
         </Card>
       </div>
