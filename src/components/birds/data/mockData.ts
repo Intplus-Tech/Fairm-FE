@@ -1,0 +1,26 @@
+export const broilerData = [
+  {
+    id: 1,
+    date: "Jan 12, 2026",
+    pens: 3,
+    stock: "12,981",
+    mortality: 81,
+    culls: 42,
+    feed: 230,
+    water: 0,
+    weight: 3.45,
+    alert: "Critical",
+  },
+  {
+    id: 2,
+    date: "Jan 12, 2026",
+    pens: 5,
+    stock: "12,981",
+    mortality: 81,
+    culls: 42,
+    feed: 230,
+    water: 0,
+    weight: 3.45,
+    alert: "Warning",
+  },
+];
