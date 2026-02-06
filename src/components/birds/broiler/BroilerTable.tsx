@@ -5,17 +5,31 @@ import BroilerRow from "./BroilerRow";
 import Pagination from "./Pagination";
 import { broilerData } from "../data/mockData";
 
-
 export default function BroilerTable() {
   const [page, setPage] = useState(1);
 
   return (
     <div className="space-y-4">
-      <div className="overflow-x-auto">
-        <table className="min-w-[1100px] w-full text-sm">
+      {/* horizontal scroll without visible scrollbar */}
+      <div className="overflow-x-auto scrollbar-hide">
+        <table className="min-w-[1100px] w-full text-sm table-fixed">
+          {/* COLUMN ALIGNMENT */}
+          <colgroup>
+            <col className="w-10" />
+            <col />
+            <col />
+            <col />
+            <col />
+            <col />
+            <col />
+            <col />
+            <col />
+            <col />
+          </colgroup>
+
           <thead className="bg-gray-50 text-[#1C155F]">
             <tr>
-              <th className="w-10"></th>
+              <th></th>
               <th>Date</th>
               <th>No of Pens</th>
               <th>Opening Stock</th>

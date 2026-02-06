@@ -3,8 +3,20 @@ export default function PenDetailsTable() {
     <div className="border rounded-xl p-4 bg-white">
       <h4 className="font-medium mb-3">Pen Details</h4>
 
-      <div className="overflow-x-auto">
-        <table className="min-w-[900px] w-full text-sm">
+      <div className="overflow-x-auto scrollbar-hide">
+        <table className="min-w-[900px] w-full text-sm table-fixed">
+          <colgroup>
+            <col />
+            <col />
+            <col />
+            <col />
+            <col />
+            <col />
+            <col />
+            <col />
+            <col />
+          </colgroup>
+
           <thead className="bg-gray-50">
             <tr>
               <th>Pen Name</th>

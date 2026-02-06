@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Bell, Search, Menu, User, LogOut, Plus, ChevronDown } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 import { useLayout } from "../../../context/layout-context";
 import Logo from "@/components/brand/logo";
@@ -9,11 +10,23 @@ import Word from "../brand/word";
 
 export default function AdminNavbar() {
   const { dispatch } = useLayout();
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
-  // Close dropdown when clicking outside
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isFarmDropdownOpen, setIsFarmDropdownOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const [selectedFarm, setSelectedFarm] = useState("Abuja farm");
+
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const farmDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Mock farms (until endpoint is ready)
+  const farms = ["Abuja farm", "Lagos farm", "Ibadan farm"];
+
+  
+
+  // Close dropdowns when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -22,14 +35,36 @@ export default function AdminNavbar() {
       ) {
         setIsDropdownOpen(false);
       }
+
+      if (
+        farmDropdownRef.current &&
+        !farmDropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsFarmDropdownOpen(false);
+      }
     }
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleLogout = async () => {
+  const handleLogout = () => {
     setIsLoggingOut(true);
+
+    // simulate logout cleanup
+    setTimeout(() => {
+      router.push("/auth/login");
+    }, 500);
+  };
+
+  const handleAddNewPen = () => {
+    // endpoint not ready — keep logic clean and extendable
+    router.push("/bird/broilers"); // or any route you prefer later
+  };
+
+  const handleFarmSelect = (farm: string) => {
+    setSelectedFarm(farm);
+    setIsFarmDropdownOpen(false);
   };
 
   return (
@@ -50,7 +85,7 @@ export default function AdminNavbar() {
         </div>
       </div>
 
-      {/* SEARCH (desktop only) */}
+      {/* SEARCH */}
       <div className="hidden md:flex flex-1 px-4 max-w-[290px]">
         <div className="relative w-full">
           <Search
@@ -60,51 +95,62 @@ export default function AdminNavbar() {
           <input
             placeholder="Search for Flocks , Pen or Inventory"
             className="w-full h-[44px] pl-12 pr-4 rounded-xl bg-[#EFEFEF] outline-none transition-all focus:ring-2 focus:ring-primary/50"
-            aria-label="Search"
           />
         </div>
       </div>
 
       {/* RIGHT */}
       <div className="flex items-center gap-2 sm:gap-4 shrink-0">
-        {/* Mobile search */}
-        <button
-          className="md:hidden p-2 rounded-full hover:bg-gray-100 transition-colors"
-          aria-label="Search"
-        >
+        <button className="md:hidden p-2 rounded-full hover:bg-gray-100">
           <Search size={20} />
         </button>
 
-        {/* Notifications */}
-        <button
-          className="relative p-2 rounded-full hover:bg-gray-100 transition-colors"
-          aria-label="Notifications"
-        >
+        <button className="relative p-2 rounded-full hover:bg-gray-100">
           <Bell size={22} />
           <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
         </button>
 
         {/* Add New Pen */}
         <div className="hidden sm:block">
-          <button className="bg-[#4A3AFF] flex items-center px-3 py-1 rounded-lg text-white gap-2 whitespace-nowrap">
+          <button
+            onClick={handleAddNewPen}
+            className="bg-[#4A3AFF] flex items-center px-3 py-1 rounded-lg text-white gap-2 whitespace-nowrap"
+          >
             <Plus className="h-[12px] w-[12px]" />
             <span className="text-sm">Add New Pen</span>
           </button>
         </div>
 
         {/* Farm selector */}
-        <div className="hidden sm:flex border-gray-500 border rounded-lg w-32 items-center justify-between px-2 py-1">
-          <span className="text-[13px] truncate">Abuja farm</span>
-          <ChevronDown className="w-4 h-4 shrink-0" />
+        <div className="relative hidden sm:flex" ref={farmDropdownRef}>
+          <button
+            onClick={() => setIsFarmDropdownOpen(!isFarmDropdownOpen)}
+            className="border-gray-500 border rounded-lg w-32 items-center justify-between px-2 py-1 flex"
+          >
+            <span className="text-[13px] truncate">{selectedFarm}</span>
+            <ChevronDown className="w-4 h-4 shrink-0" />
+          </button>
+
+          {isFarmDropdownOpen && (
+            <div className="absolute top-full mt-1 w-full bg-white border rounded-lg shadow z-50">
+              {farms.map((farm) => (
+                <button
+                  key={farm}
+                  onClick={() => handleFarmSelect(farm)}
+                  className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100"
+                >
+                  {farm}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* User Dropdown */}
         <div className="relative shrink-0" ref={dropdownRef}>
           <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="flex items-center gap-2 p-2 rounded-full hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50"
-            aria-label="User menu"
-            aria-expanded={isDropdownOpen}
+            className="flex items-center gap-2 p-2 rounded-full hover:bg-gray-100"
           >
             <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
               <User className="h-5 w-5 text-white" />
@@ -117,7 +163,7 @@ export default function AdminNavbar() {
               <button
                 onClick={handleLogout}
                 disabled={isLoggingOut}
-                className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-50 transition-colors"
+                className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-50"
               >
                 <LogOut className="h-4 w-4" />
                 {isLoggingOut ? "Logging out..." : "Logout"}

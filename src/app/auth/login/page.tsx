@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,12 +13,49 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+
 import { Eye, EyeOff } from "lucide-react";
 import Logo from "@/components/brand/logo";
 import Word from "@/components/brand/word";
 
 export default function LoginPage() {
+  const router = useRouter();
+
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  // validation rules
+  const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const isPasswordValid = password.trim().length >= 6;
+
+  const isFormValid = isEmailValid && isPasswordValid;
+
+  const handleLogin = () => {
+    if (!email.trim()) {
+      alert("Email is required.");
+      return;
+    }
+
+    if (!isEmailValid) {
+      alert("Please enter a valid email address.");
+      return;
+    }
+
+    if (!password.trim()) {
+      alert("Password is required.");
+      return;
+    }
+
+    if (!isPasswordValid) {
+      alert("Password must be at least 6 characters.");
+      return;
+    }
+
+    // ✅ all validations passed
+    // endpoint will be added here later
+    router.push("/dashboard");
+  };
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-transparent px-4">
@@ -27,15 +66,7 @@ export default function LoginPage() {
       </div>
 
       {/* Card */}
-      <Card
-        className="
-          w-full
-          max-w-lg
-          md:max-w-xl
-          bg-transparent
-          backdrop-blur-lg
-        "
-      >
+      <Card className="w-full max-w-lg md:max-w-xl bg-transparent backdrop-blur-lg">
         <CardHeader className="space-y-2 pb-4">
           <CardTitle className="text-2xl text-start font-semibold">
             Login to Your FAIRM Dashboard
@@ -43,7 +74,6 @@ export default function LoginPage() {
         </CardHeader>
 
         <CardContent className="px-6 md:px-8 pb-8 space-y-4">
-          {/* Form block (moved slightly up) */}
           <div className="space-y-6">
             {/* Email */}
             <div className="space-y-1">
@@ -51,6 +81,9 @@ export default function LoginPage() {
               <Input
                 id="email"
                 type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="admin@fairm.com"
                 className="bg-white"
               />
@@ -63,7 +96,11 @@ export default function LoginPage() {
               <div className="relative">
                 <Input
                   id="password"
+                  required
                   type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your password"
                   className="bg-white pr-10"
                 />
 
@@ -100,15 +137,15 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* Login button → Dashboard */}
-          <Link href="/dashboard" className="block">
-            <Button
-              className="w-full py-3 text-white"
-              style={{ backgroundColor: "#4A3AFF" }}
-            >
-              Login
-            </Button>
-          </Link>
+          {/* Login button */}
+          <Button
+            onClick={handleLogin}
+            disabled={!isFormValid}
+            className="w-full py-5 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{ backgroundColor: "#4A3AFF" }}
+          >
+            Login
+          </Button>
         </CardContent>
       </Card>
     </main>
