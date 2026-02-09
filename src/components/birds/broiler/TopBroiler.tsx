@@ -1,10 +1,13 @@
-import { Bird, LucideVan } from "lucide-react";
-import { Card } from "../ui/card";
+import { Card } from "@/components/ui/card";
+import { AlertTriangle, Bird, Info, UserPlus, } from "lucide-react";
 
-export default function TopBird() {
+
+export default function TopBroiler() {
   return (
     <div className="w-full">
-      
+      <div className="pb-5">
+        <p className="font-semibold p-1">Good Morning, John.</p>
+      </div>
 
       {/* Cards container */}
       <div
@@ -19,10 +22,10 @@ export default function TopBird() {
         <Card className="w-[218px] h-[114px] p-2 shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1">
-              <Bird />
-              <p className="text-[12px] font-semibold">Total Live Birds</p>
+              <Bird className="text-[#4A3AFF]  h-[18px] w-[18px] border border-[#4A3AFF1A] rounded-full bg-[#4A3AFF1A]"/>
+              <p className="text-[12px] font-semibold">Total Birds</p>
             </div>
-            <LucideVan />
+            <Info className="h-[14px] w-[14px] text-[#141B34]"/>
           </div>
 
           <div>
@@ -36,10 +39,10 @@ export default function TopBird() {
         <Card className="w-[218px] h-[114px] p-2 shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1">
-              <Bird />
+              <Bird className="text-[#4A3AFF]  h-[18px] w-[18px] border border-[#4A3AFF1A] rounded-full bg-[#4A3AFF1A]" />
               <p className="text-[12px] font-semibold">Total Mortality</p>
             </div>
-            <LucideVan />
+            <Info className="h-[14px] w-[14px] text-[#141B34]" />
           </div>
 
           <div>
@@ -53,9 +56,10 @@ export default function TopBird() {
         <Card className="w-[218px] h-[114px] p-2 shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1">
-              <p className="text-[12px] font-semibold">Farm Staff</p>
+              <Bird className="text-[#4A3AFF]  h-[18px] w-[18px] border border-[#4A3AFF1A] rounded-full bg-[#4A3AFF1A]" />
+              <p className="text-[12px] font-semibold">Total Alive Bird</p>
             </div>
-            <LucideVan />
+            <Info className="h-[14px] w-[14px] text-[#141B34]" />
           </div>
 
           <div>
@@ -68,8 +72,11 @@ export default function TopBird() {
 
         <Card className="w-[218px] h-[114px] p-2 shrink-0">
           <div className="flex items-center justify-between">
-            <p className="text-[12px] font-semibold">Active Breaches</p>
-            <LucideVan />
+            <div className="flex items-center gap-1">
+              <Bird className="text-[#4A3AFF]  h-[18px] w-[18px] border border-[#4A3AFF1A] rounded-full bg-[#4A3AFF1A]" />
+              <p className="text-[12px] font-semibold">Net Profit</p>
+            </div>
+            <Info className="h-[14px] w-[14px] text-[#141B34]" />
           </div>
 
           <div>
