@@ -18,43 +18,85 @@ import { Eye, EyeOff } from "lucide-react";
 import Logo from "@/components/brand/logo";
 import Word from "@/components/brand/word";
 
+import type { ApiErrorResponse } from "@/types/auth";
+import { AxiosError } from "axios";
+import { authService } from "../../../../services/auth.service";
+import { tokenStorage } from "@/lib/api/token";
+
 export default function LoginPage() {
   const router = useRouter();
 
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   // validation rules
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const isPasswordValid = password.trim().length >= 6;
 
-  const isFormValid = isEmailValid && isPasswordValid;
+  const isFormValid = isEmailValid && isPasswordValid && !isLoading;
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
+    // Clear previous errors
+    setErrorMessage(null);
+
     if (!email.trim()) {
-      alert("Email is required.");
+      setErrorMessage("Email is required.");
       return;
     }
 
     if (!isEmailValid) {
-      alert("Please enter a valid email address.");
+      setErrorMessage("Please enter a valid email address.");
       return;
     }
 
     if (!password.trim()) {
-      alert("Password is required.");
+      setErrorMessage("Password is required.");
       return;
     }
 
     if (!isPasswordValid) {
-      alert("Password must be at least 6 characters.");
+      setErrorMessage("Password must be at least 6 characters.");
       return;
     }
 
-    // ✅ all validations passed
-    // endpoint will be added here later
-    router.push("/dashboard");
+    setIsLoading(true);
+
+    try {
+      const response = await authService.login({
+        email,
+        password,
+      });
+
+      // Store tokens
+      tokenStorage.set(response.data.token);
+      tokenStorage.setRefresh(response.data.refreshToken);
+
+      // Navigate only on success
+      router.push("/dashboard");
+    } catch (err) {
+      const error = err as AxiosError<ApiErrorResponse>;
+
+      if (error.response?.data) {
+        const { statusCode, message } = error.response.data;
+
+        if (statusCode === 400) {
+          setErrorMessage(message || "Invalid login details.");
+          return;
+        }
+
+        if (statusCode === 401) {
+          setErrorMessage("Invalid email or password.");
+          return;
+        }
+      }
+
+      setErrorMessage("Something went wrong. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -137,6 +179,11 @@ export default function LoginPage() {
             </div>
           </div>
 
+          {/* Error message (UI only, no popup, no overlay) */}
+          {errorMessage && (
+            <p className="text-sm text-red-600 mt-2">{errorMessage}</p>
+          )}
+
           {/* Login button */}
           <Button
             onClick={handleLogin}
@@ -144,7 +191,7 @@ export default function LoginPage() {
             className="w-full py-5 text-white disabled:opacity-50 disabled:cursor-not-allowed"
             style={{ backgroundColor: "#4A3AFF" }}
           >
-            Login
+            {isLoading ? "Logging in..." : "Login"}
           </Button>
         </CardContent>
       </Card>

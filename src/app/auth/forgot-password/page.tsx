@@ -15,29 +15,59 @@ import {
 } from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
 
+import { authService } from "../../../../services/auth.service";
+import type { ApiErrorResponse } from "@/types/auth";
+import { AxiosError } from "axios";
+
 export default function ForgotPassword() {
   const router = useRouter();
 
   const [email, setEmail] = useState("");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   // email validation
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  const isFormValid = email.trim().length > 0 && isEmailValid;
+  const isFormValid = email.trim().length > 0 && isEmailValid && !isLoading;
 
-  const handleResetPassword = () => {
+  const handleResetPassword = async () => {
+    setErrorMessage(null);
+
     if (!email.trim()) {
-      alert("Email is required.");
+      setErrorMessage("Email is required.");
       return;
     }
 
     if (!isEmailValid) {
-      alert("Please enter a valid email address.");
+      setErrorMessage("Please enter a valid email address.");
       return;
     }
 
-    // ✅ validation passed
-    // endpoint will be connected here later
-    router.push("/auth/password-reset");
+    setIsLoading(true);
+
+    try {
+      await authService.forgotPassword({ email });
+
+      /**
+       * IMPORTANT:
+       * Backend ALWAYS returns ok (even if email doesn't exist)
+       * This prevents account enumeration.
+       *
+       * So we ALWAYS proceed to the next step.
+       */
+      router.push("/auth/password-reset");
+    } catch (err) {
+      const error = err as AxiosError<ApiErrorResponse>;
+
+      if (error.response?.data?.message) {
+        setErrorMessage(error.response.data.message);
+        return;
+      }
+
+      setErrorMessage("Unable to request password reset. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -77,6 +107,11 @@ export default function ForgotPassword() {
               />
             </div>
 
+            {/* Error message (UI only, no popup, no overlay) */}
+            {errorMessage && (
+              <p className="text-sm text-red-600">{errorMessage}</p>
+            )}
+
             {/* Button */}
             <Button
               onClick={handleResetPassword}
@@ -84,7 +119,7 @@ export default function ForgotPassword() {
               className="w-full py-3 text-white disabled:opacity-50 disabled:cursor-not-allowed"
               style={{ backgroundColor: "#4A3AFF" }}
             >
-              Reset My Password
+              {isLoading ? "Sending OTP..." : "Reset My Password"}
             </Button>
           </CardContent>
         </Card>
