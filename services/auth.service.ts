@@ -13,17 +13,11 @@ export const authService = {
     return api.post<LoginResponse>("/auth/login", payload).then(res => res.data);
   },
 
-  forgotPassword(
-    payload: ForgotPasswordRequest
-  ): Promise<ForgotPasswordResponse> {
-    return api
-      .post<ForgotPasswordResponse>("/auth/forgot-password", payload)
-      .then(res => res.data);
+  forgotPassword(payload: ForgotPasswordRequest): Promise<ForgotPasswordResponse> {
+    return api.post<ForgotPasswordResponse>("/auth/forgot-password", payload).then(res => res.data);
   },
 
   verifyOtp(payload: VerifyOtpRequest): Promise<VerifyOtpResponse> {
-    return api
-      .post<VerifyOtpResponse>("/auth/verify-otp", payload)
-      .then(res => res.data);
+    return api.post<VerifyOtpResponse>("/auth/verify-otp", payload).then(res => res.data);
   },
 };

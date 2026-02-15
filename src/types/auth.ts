@@ -43,17 +43,6 @@ export interface ForgotPasswordResponse {
   };
 }
 
-export interface ApiErrorResponse {
-  ok: false;
-  message: string;
-  statusCode: number;
-  timestamp: string;
-  path: string;
-  method: string;
-}
-
-// types/auth.ts
-
 export interface VerifyOtpRequest {
   email: string;
   otp: string;

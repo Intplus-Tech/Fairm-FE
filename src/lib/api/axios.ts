@@ -1,28 +1,26 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import { tokenStorage } from "./token";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://fairm-be.onrender.com";
 const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION ?? "/api/v1";
 
-// Extend AxiosRequestConfig to include _retry
 export interface CustomAxiosRequestConfig extends AxiosRequestConfig {
   _retry?: boolean;
 }
 
-// Type your token refresh response
 interface RefreshTokenResponse {
   accessToken: string;
 }
 
 export const api = axios.create({
-  baseURL: `${BASE_URL}${API_VERSION}`,
+  baseURL: `${BASE_URL}${API_VERSION}`, // https://fairm-be.onrender.com/api/v1
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-// Request interceptor
+// Request interceptor: add access token
 api.interceptors.request.use(
   (config) => {
     const token = tokenStorage.get();
@@ -34,19 +32,13 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor
+// Response interceptor: refresh token on 401
 api.interceptors.response.use(
   (response: AxiosResponse) => response,
   async (error: AxiosError<unknown, CustomAxiosRequestConfig>) => {
-    // Make sure originalRequest exists and is typed correctly
     const originalRequest = error.config as CustomAxiosRequestConfig | undefined;
+    if (!originalRequest) return Promise.reject(error);
 
-    if (!originalRequest) {
-      // If no config, just reject
-      return Promise.reject(error);
-    }
-
-    // Handle 401 errors
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
@@ -58,29 +50,21 @@ api.interceptors.response.use(
         );
 
         const newAccessToken = res.data.accessToken;
-
         if (!newAccessToken) {
           tokenStorage.clear();
-          if (typeof window !== "undefined") {
-            window.location.href = "/auth/login";
-          }
+          if (typeof window !== "undefined") window.location.href = "/auth/login";
           return Promise.reject(error);
         }
 
         tokenStorage.set(newAccessToken);
-
-        // Update header safely
         if (originalRequest.headers) {
           originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         }
 
-        // Retry original request
         return api(originalRequest);
       } catch (refreshError) {
         tokenStorage.clear();
-        if (typeof window !== "undefined") {
-          window.location.href = "/auth/login";
-        }
+        if (typeof window !== "undefined") window.location.href = "/auth/login";
         return Promise.reject(refreshError);
       }
     }
