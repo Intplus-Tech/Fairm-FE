@@ -3,7 +3,7 @@
 import { useState } from "react";
 import ThresholdSettings from "./ThresholdSettings";
 import clsx from "clsx";
-import UserRoles from "./UserRoles";
+import UserRoles from "./user-roles/UserRoles";
 import SecuritySettings from "./SecuritySettings";
 
 type Tab = "threshold" | "roles" | "security";
