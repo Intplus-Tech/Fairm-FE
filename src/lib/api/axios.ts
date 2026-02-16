@@ -13,26 +13,26 @@ interface RefreshTokenResponse {
 }
 
 export const api = axios.create({
-  baseURL: `${BASE_URL}${API_VERSION}`, // https://fairm-be.onrender.com/api/v1
+  baseURL: `${BASE_URL}${API_VERSION}`,
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-// Request interceptor: add access token
+// Request interceptor
 api.interceptors.request.use(
   (config) => {
     const token = tokenStorage.get();
     if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`;
+      config.headers["Authorization"] = `Bearer ${token}`;
     }
     return config;
   },
   (error) => Promise.reject(error)
 );
 
-// Response interceptor: refresh token on 401
+// Response interceptor for token refresh
 api.interceptors.response.use(
   (response: AxiosResponse) => response,
   async (error: AxiosError<unknown, CustomAxiosRequestConfig>) => {
@@ -58,7 +58,7 @@ api.interceptors.response.use(
 
         tokenStorage.set(newAccessToken);
         if (originalRequest.headers) {
-          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+          originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
         }
 
         return api(originalRequest);

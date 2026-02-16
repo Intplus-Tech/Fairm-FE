@@ -39,61 +39,30 @@ export default function LoginPage() {
   const isFormValid = isEmailValid && isPasswordValid && !isLoading;
 
   const handleLogin = async () => {
-    // Clear previous errors
     setErrorMessage(null);
 
-    if (!email.trim()) {
-      setErrorMessage("Email is required.");
-      return;
-    }
-
-    if (!isEmailValid) {
-      setErrorMessage("Please enter a valid email address.");
-      return;
-    }
-
-    if (!password.trim()) {
-      setErrorMessage("Password is required.");
-      return;
-    }
-
-    if (!isPasswordValid) {
-      setErrorMessage("Password must be at least 6 characters.");
-      return;
-    }
+    if (!email.trim()) return setErrorMessage("Email is required.");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return setErrorMessage("Please enter a valid email.");
+    if (!password.trim()) return setErrorMessage("Password is required.");
+    if (password.length < 6) return setErrorMessage("Password must be at least 6 characters.");
 
     setIsLoading(true);
 
     try {
-      const response = await authService.login({
-        email,
-        password,
-      });
+      const response = await authService.login({ email, password });
 
       // Store tokens
       tokenStorage.set(response.data.token);
       tokenStorage.setRefresh(response.data.refreshToken);
 
-      // Navigate only on success
       router.push("/dashboard");
     } catch (err) {
       const error = err as AxiosError<ApiErrorResponse>;
+      const message = error.response?.data?.message;
 
-      if (error.response?.data) {
-        const { statusCode, message } = error.response.data;
-
-        if (statusCode === 400) {
-          setErrorMessage(message || "Invalid login details.");
-          return;
-        }
-
-        if (statusCode === 401) {
-          setErrorMessage("Invalid email or password.");
-          return;
-        }
-      }
-
-      setErrorMessage("Something went wrong. Please try again.");
+      if (error.response?.status === 400) setErrorMessage(message || "Invalid login details.");
+      else if (error.response?.status === 401) setErrorMessage("Invalid email or password.");
+      else setErrorMessage("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
     }
