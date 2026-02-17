@@ -1,5 +1,5 @@
 // lib/api/handleApiError.ts
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 
 interface ApiError {
   message?: string;
