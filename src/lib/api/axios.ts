@@ -14,7 +14,7 @@ interface RefreshTokenResponse {
 
 export const api = axios.create({
   baseURL: `${BASE_URL}${API_VERSION}`,
-  withCredentials: true,
+  withCredentials: false,
   headers: {
     "Content-Type": "application/json",
   },
