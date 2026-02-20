@@ -1,6 +1,7 @@
 "use client";
 
 import { alertsData } from "./data/mockDashboardData";
+
 export default function AlertsTable() {
   return (
     <div className="bg-white rounded-xl p-4 shadow-sm overflow-x-auto">
@@ -9,21 +10,21 @@ export default function AlertsTable() {
       <table className="w-full text-sm">
         <thead className="text-left text-gray-500">
           <tr>
-            <th>Date</th>
-            <th>Status</th>
-            <th>Issue</th>
-            <th>Description</th>
+            <th className="py-4">Date</th>
+            <th className="py-4">Status</th>
+            <th className="py-4">Issue</th>
+            <th className="py-4">Description</th>
           </tr>
         </thead>
-        <tbody >
-          {alertsData.map((alert) =>( 
-            <tr key={alert.id} className="border-t ">
-              <td className="p-2">{alert.date}</td>
-              <td className={alert.status === "Critical" ? "text-red-500" : "text-yellow-500"}>
+        <tbody>
+          {alertsData.map((alert) => (
+            <tr key={alert.id} className="border-t">
+              <td className="py-4 px-2">{alert.date}</td>
+              <td className={`py-4 px-2 ${alert.status === "Critical" ? "text-red-500" : "text-yellow-500"}`}>
                 {alert.status}
               </td>
-              <td>{alert.issue}</td>
-              <td>{alert.description}</td>
+              <td className="py-4 px-2">{alert.issue}</td>
+              <td className="py-4 px-2">{alert.description}</td>
             </tr>
           ))}
         </tbody>

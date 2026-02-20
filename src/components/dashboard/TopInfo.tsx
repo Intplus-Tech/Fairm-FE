@@ -1,4 +1,4 @@
-import { AlertTriangle, Bird, Info, UserPlus, } from "lucide-react";
+import { AlertTriangle, Bird, Info, UserPlus } from "lucide-react";
 import { Card } from "../ui/card";
 
 export default function TopInfo() {
@@ -9,81 +9,90 @@ export default function TopInfo() {
           Good Morning, John.
         </p>
       </div>
+
       {/* Cards container */}
-      <div
-        className="
-          flex gap-2
-          overflow-x-auto
-          whitespace-nowrap
-          scrollbar-hide
-          md:overflow-visible
-        "
-      >
-        <Card className="w-[218px] h-[114px] p-2 shrink-0">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1">
-              <Bird className="text-[#4A3AFF]  h-[18px] w-[18px] border border-[#4A3AFF1A] rounded-full bg-[#4A3AFF1A]"/>
-              <p className="text-[12px] font-semibold">Total Live Birds</p>
+      <div className="flex gap-2 overflow-x-auto whitespace-nowrap scrollbar-hide md:overflow-visible">
+        {/* Card 1 */}
+        <Card className="w-[70vw] sm:w-[300px] md:w-[320px] lg:w-[290px] h-[170px] p-5 shrink-0">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center justify-center h-12 w-12 rounded-full border border-[#4A3AFF1A] bg-[#4A3AFF1A]">
+                <Bird className="h-6 w-6 text-[#4A3AFF]" />
+              </div>
+              <p className="text-sm font-semibold">Total Live Birds</p>
             </div>
-            <Info className="h-[14px] w-[14px] text-[#141B34]"/>
+            <Info className="h-5 w-5 text-[#141B34]" />
           </div>
 
           <div>
-            <p className="text-[18px] font-bold">0</p>
-            <div className="text-[10px] font-semibold">
+            <p className="text-[22px] font-bold">0</p>
+            <p className="text-xs font-semibold text-muted-foreground">
               Current bird count
-            </div>
+            </p>
           </div>
         </Card>
 
-        <Card className="w-[218px] h-[114px] p-2 shrink-0">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1">
-              <Bird className="text-[#FF0004] h-[18px] w-[18px] border border-[#FF00041A] rounded-full bg-[#FF00041A] "/>
-              <p className="text-[12px] font-semibold">Total Mortality</p>
+        {/* Card 2 */}
+        <Card className="w-[70vw] sm:w-[300px] md:w-[320px] lg:w-[290px] h-[170px] p-5 shrink-0">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center justify-center h-12 w-12 rounded-full border border-[#FF00041A] bg-[#FF00041A]">
+                <Bird className="h-6 w-6 text-[#FF0004]" />
+              </div>
+              <p className="text-sm font-semibold">Total Mortality</p>
             </div>
-            <Info className="h-[14px] w-[14px] text-[#141B34]" />
+            <Info className="h-5 w-5 text-[#141B34]" />
           </div>
 
           <div>
-            <p className="text-[18px] font-bold">0</p>
-            <div className="text-[10px] font-semibold">
+            <p className="text-[22px] font-bold">0</p>
+            <p className="text-xs font-semibold text-muted-foreground">
               Current bird count
-            </div>
+            </p>
           </div>
         </Card>
 
-        <Card className="w-[218px] h-[114px] p-2 shrink-0">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1">
-              <UserPlus size={18} className="text-[#4A3AFF] border border-[#4A3AFF1A] rounded-full bg-[#4A3AFF1A]" />
-              <p className="text-[12px] font-semibold">Farm Staff</p>
+        {/* Card 3 */}
+        <Card className="w-[80vw] sm:w-[300px] md:w-[320px] lg:w-[280px] h-[170px] p-5 shrink-0">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center justify-center h-12 w-12 rounded-full border border-[#4A3AFF1A] bg-[#4A3AFF1A]">
+                <UserPlus className="h-6 w-6 text-[#4A3AFF]" />
+              </div>
+              <p className="text-sm font-semibold">Farm Staff</p>
             </div>
-            <Info className="h-[14px] w-[14px] text-[#141B34]" />
+            <Info className="h-5 w-5 text-[#141B34]" />
           </div>
 
           <div>
-            <p className="text-[18px] font-bold">0</p>
-            <div className="text-[10px] font-semibold">
+            <p className="text-[22px] font-bold">0</p>
+            <p className="text-xs font-semibold text-muted-foreground">
               Current bird count
-            </div>
+            </p>
           </div>
         </Card>
 
-        <Card className="w-[218px] h-[114px] p-2 shrink-0">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1">
-              <AlertTriangle size={18} className="text-[#FF0004] border border-[#FF00041A] rounded-full bg-[#FF00041A]"/>
-              <p className="text-[12px] font-semibold">Active Breaches</p>
+        {/* Card 4 */}
+        <Card className="w-[80vw] sm:w-[300px] md:w-[320px] lg:w-[280px] h-[170px] p-5 shrink-0">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center justify-center h-12 w-12 rounded-full border border-[#FF00041A] bg-[#FF00041A]">
+                <AlertTriangle className="h-6 w-6 text-[#FF0004]" />
+              </div>
+              <p className="text-sm font-semibold">Active Breaches</p>
             </div>
-            <Info className="h-[14px] w-[14px] text-[#141B34]" />
+            <Info className="h-5 w-5 text-[#141B34]" />
           </div>
 
           <div>
-            <p className="text-[18px] font-bold">0</p>
-            <div className="text-[10px] font-semibold">
-              Current bird count
+            <div className="flex items-center gap-2">
+              <p className="text-[22px] font-bold">0</p>
+              <p className="text-[#FF0004] bg-[#FF00041A] text-[10px] p-1">Critical</p>
             </div>
+           
+            <p className="text-xs font-semibold text-muted-foreground">
+              Current bird count
+            </p>
           </div>
         </Card>
       </div>

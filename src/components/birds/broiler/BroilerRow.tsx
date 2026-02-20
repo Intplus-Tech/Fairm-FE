@@ -29,7 +29,8 @@ export default function BroilerRow({ row }: BroilerRowProps) {
   return (
     <>
       <tr className={`${open ? "bg-gray-50" : ""}`}>
-        <td className="w-10">
+        {/* Button column */}
+        <td className="w-10 px-2 py-2 text-center">
           <button
             onClick={() => setOpen(!open)}
             className={`p-1 rounded ${open ? "bg-[#4A3AFF] text-white" : "bg-gray-100"
@@ -39,15 +40,15 @@ export default function BroilerRow({ row }: BroilerRowProps) {
           </button>
         </td>
 
-        <td>{row.date}</td>
-        <td>{row.pens}</td>
-        <td>{row.stock}</td>
-        <td>{row.mortality}</td>
-        <td>{row.culls}</td>
-        <td>{row.feed}</td>
-        <td>{row.water}</td>
-        <td>{row.weight}</td>
-        <td>
+        <td className="px-2 py-2">{row.date}</td>
+        <td className="px-2 py-2">{row.pens}</td>
+        <td className="px-2 py-2">{row.stock}</td>
+        <td className="px-2 py-2">{row.mortality}</td>
+        <td className="px-2 py-2">{row.culls}</td>
+        <td className="px-2 py-2">{row.feed}</td>
+        <td className="px-2 py-2">{row.water}</td>
+        <td className="px-2 py-2">{row.weight}</td>
+        <td className="px-2 py-2">
           <span className="flex items-center gap-2">
             <span
               className={`w-3 h-3 rounded-full ${row.alert === "Critical"
