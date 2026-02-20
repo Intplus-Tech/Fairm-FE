@@ -217,10 +217,6 @@ export default function AppSidebar() {
           })}
         </nav>
 
-        {/* AI BUTTON */}
-        <div className="pt-4">
-         <AskFairmAIButton/>
-        </div>
       </aside>
     </>
   );

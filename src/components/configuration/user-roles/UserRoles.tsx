@@ -24,7 +24,7 @@ export default function UserRoles() {
 
         <button
           onClick={() => setOpenCreateRole(true)}
-          className="rounded-md bg-primary px-4 py-2 text-sm text-white hover:bg-primary/90"
+          className="rounded-md bg-[#4A3AFF] px-4 py-2 text-sm text-white hover:bg-blue-700"
         >
           + Create Role
         </button>

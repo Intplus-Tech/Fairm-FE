@@ -16,14 +16,22 @@ export default function InviteUserModal({
   const [phone, setPhone] = useState("");
   const [role, setRole] = useState("");
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  async function handleSubmit(e: React.FormEvent) {
+  e.preventDefault();
 
-    // Backend invite user endpoint goes here
-    // Example: await inviteUser({ fullName, email, phone, role });
+  const res = await fetch("/api/demo/invite", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ fullName, email, phone, role }),
+  });
 
-    onSuccess();
-  }
+  const data = await res.json();
+
+  console.log("Invite link (demo):", data.inviteLink);
+
+  onSuccess();
+}
+
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
@@ -131,7 +139,7 @@ export default function InviteUserModal({
             </button>
             <button
               type="submit"
-              className="rounded-md bg-primary px-4 py-2 text-sm text-white hover:bg-primary/90"
+              className="rounded-md bg-[#4A3AFF] px-4 py-2 text-sm text-white hover:bg-blue-700"
             >
               Send Invitation
             </button>

@@ -1,4 +1,4 @@
-
+"use client";
 
 import UserTable from "./userTable";
 
@@ -17,14 +17,14 @@ export default function UserManagement({ onInvite }: { onInvite: () => void }) {
           </button>
           <button
             onClick={onInvite}
-            className="rounded-md bg-primary px-4 py-2 text-sm text-white"
+            className="rounded-md bg-[#4A3AFF] px-4 py-2 text-sm text-white"
           >
             + Invite New User
           </button>
         </div>
       </div>
 
-     <UserTable/>
+      <UserTable />
     </div>
   );
 }

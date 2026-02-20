@@ -58,9 +58,9 @@ export default function AdminNavbar() {
   };
 
   const handleAddNewPen = () => {
-    // endpoint not ready — keep logic clean and extendable
-    router.push("/bird/broilers"); // or any route you prefer later
+    window.dispatchEvent(new CustomEvent("open-add-pen-modal"));
   };
+
 
   const handleFarmSelect = (farm: string) => {
     setSelectedFarm(farm);
@@ -105,7 +105,7 @@ export default function AdminNavbar() {
           <Search size={20} />
         </button>
 
-        <button className="relative p-2 rounded-full hover:bg-gray-100">
+        <button className="relative p-2 rounded-full bg-[#F1F0FB] hover:bg-gray-100">
           <Bell size={22} />
           <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
         </button>
@@ -114,7 +114,7 @@ export default function AdminNavbar() {
         <div className="hidden sm:block">
           <button
             onClick={handleAddNewPen}
-            className="bg-[#4A3AFF] flex items-center px-3 py-1 rounded-lg text-white gap-2 whitespace-nowrap"
+            className="bg-[#4A3AFF] flex items-center px-4 py-2 rounded-lg text-white gap-2 whitespace-nowrap"
           >
             <Plus className="h-[12px] w-[12px]" />
             <span className="text-sm">Add New Pen</span>
@@ -125,7 +125,7 @@ export default function AdminNavbar() {
         <div className="relative hidden sm:flex" ref={farmDropdownRef}>
           <button
             onClick={() => setIsFarmDropdownOpen(!isFarmDropdownOpen)}
-            className="border-gray-500 border rounded-lg w-32 items-center justify-between px-2 py-1 flex"
+            className="border-[#D9DBE9] border rounded-lg w-32 items-center justify-between px-4 py-2 flex"
           >
             <span className="text-[13px] truncate">{selectedFarm}</span>
             <ChevronDown className="w-4 h-4 shrink-0" />
@@ -150,9 +150,9 @@ export default function AdminNavbar() {
         <div className="relative shrink-0" ref={dropdownRef}>
           <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="flex items-center gap-2 p-2 rounded-full hover:bg-gray-100"
+            className="flex items-center gap-2 p-2 bg-[#FFFFFF] rounded-full hover:bg-gray-100"
           >
-            <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
+            <div className="h-8 w-8 rounded-full bg-[#F1F0FB] flex items-center justify-center">
               <User className="h-5 w-5 text-white" />
             </div>
             <ChevronDown />

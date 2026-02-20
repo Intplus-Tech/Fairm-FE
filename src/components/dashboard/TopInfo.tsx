@@ -5,9 +5,10 @@ export default function TopInfo() {
   return (
     <div className="w-full">
       <div className="pb-5">
-        <p className="font-semibold p-1">Good Morning, John.</p>
+        <p className="text-2xl font-semibold p-1 text-[#170F49]">
+          Good Morning, John.
+        </p>
       </div>
-
       {/* Cards container */}
       <div
         className="
