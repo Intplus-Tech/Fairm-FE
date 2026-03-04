@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,19 +14,25 @@ import {
 import { Eye, EyeOff } from "lucide-react";
 import Logo from "@/components/brand/logo";
 import Word from "@/components/brand/word";
+import { authService } from "../../../../services/auth.service";
 
-export default function NewpasswordPage() {
+export default function NewPasswordPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const email = searchParams.get("email");
+  const otp = searchParams.get("otp")
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
   const [rePassword, setRePassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   // basic validations
   const isPasswordValid = password.trim().length >= 6;
   const doPasswordsMatch = password === rePassword;
   const isFormValid = isPasswordValid && doPasswordsMatch;
 
-  const handleCreateNewPassword = () => {
+  const handleCreateNewPassword = async () => {
     if (!password.trim()) {
       alert("Password is required.");
       return;
@@ -47,10 +53,36 @@ export default function NewpasswordPage() {
       return;
     }
 
+    if (!email || !otp) {
+      setErrorMessage("Invalid password reset session. Please restart the process.");
+      return;
+    }
+
     // ✅ All validation passed
     // Here you can call your API to save password
     // After success, redirect to login page
-    router.push("/auth/login");
+
+    try {
+      setLoading(true);
+
+      await authService.resetPassword({
+        email,
+        otp,
+        newPassword: password
+      });
+
+      router.push("/auth/login");
+    } catch (error: unknown) {
+      let message = "Invalid or expired OTP. Please try again.";
+      if (error instanceof Error) message = error.message || message;
+      else if (typeof error === "object" && error !== null) {
+        const err = error as { response?: { data?: { message?: string } } };
+        if (err.response?.data?.message) message = err.response.data.message;
+      }
+      setErrorMessage(message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -118,14 +150,19 @@ export default function NewpasswordPage() {
             </div>
           </div>
 
+            {/* Error message (UI only, no popup, no overlay) */}
+            {errorMessage && (
+              <p className="text-sm text-red-600 mt-2">{errorMessage}</p>
+            )}
+
           {/* Create New Password Button */}
           <Button
             onClick={handleCreateNewPassword}
-            disabled={!isFormValid}
+            disabled={!isFormValid || loading}
             className="w-full py-5 text-white disabled:opacity-50 disabled:cursor-not-allowed"
             style={{ backgroundColor: "#4A3AFF" }}
           >
-            Create New Password
+            {loading ? "Create New Password..." : "Create New Password"}
           </Button>
         </CardContent>
       </Card>

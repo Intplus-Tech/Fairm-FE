@@ -54,3 +54,16 @@ export interface VerifyOtpResponse {
     ok: true;
   };
 }
+
+export interface ResetPassword {
+  email: string;
+  otp: string;
+  newPassword: string;
+}
+
+export interface ResetPasswordResponse {
+  ok: true;
+  data: {
+    ok: true;
+  };
+}
