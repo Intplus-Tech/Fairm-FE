@@ -1,12 +1,59 @@
 "use client";
 
+import { useState } from "react";
+import { thresholdsService } from "@/../services/threshold.service";
+
+const ageRanges = [
+  "0-20 weeks",
+  "21-40 weeks",
+  "41-60 weeks",
+  "61+ weeks",
+];
+
 export default function DefaultThresholdForm({
+  farmId,
   onBack,
   onComplete,
 }: {
+  farmId: string; 
   onBack: () => void;
   onComplete: () => void;
 }) {
+    const [form, setForm] = useState({
+    useIndustryBenchmarks: true,
+    useSystemThreshold: false,
+    mortalityRate: { warning: 0, critical: 0 },
+    temperatureRange: { min: 0, max: 0 },
+    feedConsumptionDeviation: {
+      lowerLimit: { warning: 0, critical: 0 },
+      upperLimit: { warning: 0, critical: 0 },
+    },
+    eggProductionPerBird: ageRanges.map((age) => ({
+      ageRange: age,
+      eggsPerWeek: 0,
+    })),
+    farmId
+  });
+
+  console.log("Form: ",form)
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async () => {
+    try {
+      setLoading(true);
+      await thresholdsService.create(form);
+      onComplete();
+    } catch (err) {
+      const message =
+          err instanceof Error ? err.message : "An unexpected error occurred";
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="flex flex-col max-h-[85vh] rounded-lg bg-transparent border-2 border-[#EFF0F6] p-6">
       {/* HEADER */}
@@ -19,12 +66,27 @@ export default function DefaultThresholdForm({
         {/* Toggles */}
         <div className="space-y-2 text-sm">
           <label className="flex items-center gap-2">
-            <input type="checkbox" defaultChecked />
+            <input type="checkbox"
+            checked={form.useIndustryBenchmarks}
+              onChange={(e) =>
+                setForm((prev) => ({
+                  ...prev,
+                  useIndustryBenchmarks: e.target.checked,
+                }))
+              } />
             Use Industry benchmarks
           </label>
 
           <label className="flex items-center gap-2">
-            <input type="checkbox" />
+            <input type="checkbox" 
+            checked={form.useSystemThreshold}
+              onChange={(e) =>
+                setForm((prev) => ({
+                  ...prev,
+                  useSystemThreshold: e.target.checked,
+                }))
+              }
+               />
             Use System Threshold
           </label>
         </div>
@@ -33,8 +95,24 @@ export default function DefaultThresholdForm({
         <div>
           <h3 className="font-medium mb-2">Mortality Rate *</h3>
           <div className="grid grid-cols-2 gap-4">
-            <input className="border rounded-lg px-3 py-2 text-sm" />
-            <input className="border rounded-lg px-3 py-2 text-sm" />
+            {(["warning", "critical"] as const).map((type) => (
+              <input
+                key={type}
+                type="number"
+                value={form.mortalityRate[type]}
+                onChange={(e) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    mortalityRate: {
+                      ...prev.mortalityRate,
+                      [type]: Number(e.target.value),
+                    },
+                  }))
+                }
+                className="border rounded-lg px-3 py-2 text-sm"
+                placeholder={type}
+              />
+            ))}
           </div>
         </div>
 
@@ -44,8 +122,24 @@ export default function DefaultThresholdForm({
             Temperature Range (°C) *
           </h3>
           <div className="grid grid-cols-2 gap-4">
-            <input className="border rounded-lg px-3 py-2 text-sm" />
-            <input className="border rounded-lg px-3 py-2 text-sm" />
+            {(["min", "max"] as const).map((key) => (
+              <input
+                key={key}
+                type="number"
+                value={form.temperatureRange[key]}
+                onChange={(e) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    temperatureRange: {
+                      ...prev.temperatureRange,
+                      [key]: Number(e.target.value),
+                    },
+                  }))
+                }
+                className="border rounded-lg px-3 py-2 text-sm"
+                placeholder={key}
+              />
+            ))}
           </div>
         </div>
 
@@ -54,10 +148,34 @@ export default function DefaultThresholdForm({
           <h3 className="font-medium mb-2">
             Feed Consumption Deviation *
           </h3>
-          <div className="grid grid-cols-2 gap-4">
-            <input className="border rounded-lg px-3 py-2 text-sm" />
-            <input className="border rounded-lg px-3 py-2 text-sm" />
-          </div>
+          {(["lowerLimit", "upperLimit"] as const).map((limitType) => (
+            <div key={limitType} className="space-y-2">
+              <p className="text-sm font-medium capitalize">{limitType}</p>
+              <div className="grid grid-cols-2 gap-4">
+                {(["warning", "critical"] as const).map((level) => (
+                  <input
+                    key={level}
+                    type="number"
+                    value={form.feedConsumptionDeviation[limitType][level]}
+                    onChange={(e) =>
+                      setForm((prev) => ({
+                        ...prev,
+                        feedConsumptionDeviation: {
+                          ...prev.feedConsumptionDeviation,
+                          [limitType]: {
+                            ...prev.feedConsumptionDeviation[limitType],
+                            [level]: Number(e.target.value),
+                          },
+                        },
+                      }))
+                    }
+                    className="border rounded-lg px-3 py-2 text-sm"
+                    placeholder={`${limitType} ${level}`}
+                  />
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
 
         {/* Egg Production */}
@@ -67,28 +185,36 @@ export default function DefaultThresholdForm({
           </h3>
 
           <div className="space-y-2 text-sm">
-            {[
-              "18–20 weeks",
-              "21–30 weeks",
-              "31–50 weeks",
-              "51–72 weeks",
-              "72+ weeks",
-            ].map((age) => (
+            {form.eggProductionPerBird.map((item, index) => (
               <div
-                key={age}
+                key={item.ageRange}
                 className="grid grid-cols-2 gap-4 items-center"
               >
-                <span>{age}</span>
+                <span>{item.ageRange}</span>
                 <input
-                  value="12"
-                  disabled
-                  className="border rounded-lg px-3 py-2 bg-gray-100"
+                  type="number"
+                  value={item.eggsPerWeek}
+                  onChange={(e) => {
+                    const value = Number(e.target.value);
+                    setForm((prev) => {
+                      const updated = [...prev.eggProductionPerBird];
+                      updated[index] = { ...updated[index], eggsPerWeek: value };
+                      return { ...prev, eggProductionPerBird: updated };
+                    });
+                  }}
+                  className="border rounded-lg px-3 py-2 text-sm"
                 />
               </div>
             ))}
           </div>
         </div>
       </div>
+
+      {error && (
+        <p className="text-red-500 text-sm mb-2">
+          {error}
+        </p>
+      )}
 
       {/* FOOTER */}
       <div className="flex justify-end gap-3 border-t pt-4">
@@ -100,10 +226,11 @@ export default function DefaultThresholdForm({
         </button>
 
         <button
-          onClick={onComplete}
+          onClick={handleSubmit}
           className="bg-[#4A3AFF] text-white px-5 py-2 rounded-lg"
+          disabled={loading}
         >
-          Save & Activate
+          {loading ? "Saving..." : "Save & Activate"}
         </button>
       </div>
     </div>
