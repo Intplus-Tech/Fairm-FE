@@ -1,14 +1,88 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { departmentService } from "../../../services/department.service";
+import { positionService } from "../../../services/position.service";
+import { EmployeeRequest } from "@/types/employee";
+import { DepartmentResponse } from "@/types/department";
+import { PositionResponse } from "@/types/position";
+import { employeeService } from "../../../services/employee.service";
+
 
 export default function AddEmployeeModal({
   onClose,
 }: {
   onClose: () => void;
 }) {
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+  const [form, setForm] = useState<EmployeeRequest>({
+    firstName: "",
+    lastName: "",
+    email: "",
+    age: 0,
+    departmentId: "",
+    positionId: "",
+    dob: new Date,
+    phoneNumber: 0,
+    salary: 0,
+  });
+
+  const [departments, setDepartments] = useState<DepartmentResponse[]>([]);
+  const [positions, setPositions] = useState<PositionResponse[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [deptRes, posRes] = await Promise.all([
+          departmentService.list(),
+          positionService.list(),
+        ]);
+
+        setDepartments(deptRes);
+        setPositions(posRes);
+      } catch (err) {
+        console.error();
+              const message =
+        err instanceof Error ? err.message : "Failed to load departments/positions";
+      setError(message);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleChange = (
+      field: keyof EmployeeRequest,
+      value: string | number
+    ) => {
+      setForm((prev) => ({
+        ...prev,
+        [field]: field === "dob" ? new Date(value) : value,
+      }));
+  };
+
+  const handleSubmit = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      await employeeService.create(form);
+
+      onClose();
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Failed to create employee";
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
       {/* Modal container */}
@@ -43,32 +117,41 @@ export default function AddEmployeeModal({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1">
                 <Label>First Name</Label>
-                <Input placeholder="John" />
+                <Input placeholder="John" 
+                  value={form.firstName}
+                  onChange={(e) => handleChange("firstName", e.target.value)}
+                   />
               </div>
 
               <div className="space-y-1">
                 <Label>Last Name</Label>
-                <Input placeholder="Doe" />
+                <Input placeholder="Doe"
+                value={form.lastName}
+                  onChange={(e) => handleChange("lastName", e.target.value)}
+                   />
               </div>
 
               <div className="space-y-1">
                 <Label>Email</Label>
-                <Input type="email" placeholder="john@farm.com" />
+                <Input type="email" placeholder="john@farm.com"
+                  value={form.email}
+                  onChange={(e) => handleChange("email", (e.target.value))}
+                  />
               </div>
 
               <div className="space-y-1">
                 <Label>Phone Number</Label>
-                <Input placeholder="080xxxxxxxx" />
-              </div>
-
-              <div className="space-y-1">
-                <Label>Date Joined</Label>
-                <Input type="date" />
+                <Input placeholder="080xxxxxxxx" 
+                  value={form.phoneNumber}
+                  onChange={(e) => handleChange("phoneNumber", Number(e.target.value))}/>
               </div>
 
               <div className="space-y-1">
                 <Label>Age</Label>
-                <Input type="number" placeholder="35" />
+                <Input type="number" placeholder="35" 
+                  value={form.age}
+                  onChange={(e) => handleChange("age", Number(e.target.value))}
+                 />
               </div>
             </div>
           </section>
@@ -80,17 +163,41 @@ export default function AddEmployeeModal({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1">
                 <Label>Department</Label>
-                <Input placeholder="Management" />
+                <select
+                  className="w-full border rounded-md p-2"
+                  value={form.departmentId}
+                  onChange={(e) => handleChange("departmentId", e.target.value)}
+                >
+                  <option value="">Select Department</option>
+                  {departments.map((dept) => (
+                    <option key={dept._id} value={dept._id}>
+                      {dept.name}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className="space-y-1">
                 <Label>Position</Label>
-                <Input placeholder="Supervisor" />
+                <select
+                  className="w-full border rounded-md p-2"
+                  value={form.positionId}
+                  onChange={(e) => handleChange("positionId", e.target.value)}
+                >
+                  <option value="">Select Position</option>
+                  {positions.map((pos) => (
+                    <option key={pos._id} value={pos._id}>
+                      {pos.name}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className="space-y-1">
                 <Label>Salary</Label>
-                <Input placeholder="₦120,000" />
+                <Input placeholder="₦120,000"
+                  value={form.salary}
+                  onChange={(e) => handleChange("salary", Number(e.target.value))} />
               </div>
 
               <div className="space-y-1">
@@ -101,13 +208,22 @@ export default function AddEmployeeModal({
           </section>
         </div>
 
+        {error && (
+          <p className="text-red-500 text-sm mb-2">
+            {error}
+          </p>
+        )}
+
         {/* Footer */}
         <div className="px-6 py-4 border-t flex justify-end gap-3">
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button className="bg-[#5B5AF7] hover:bg-[#4a49e6]">
-            Add Employee
+          <Button 
+            onClick={handleSubmit}
+            disabled={loading}
+            className="bg-[#5B5AF7] hover:bg-[#4a49e6]">
+              {loading ? "Creating..." : "Add Employee"}
           </Button>
         </div>
       </div>

@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Employee } from "./types";
 import EmployeeRow from "./EmployeeRow";
+import { EmployeeResponse } from "@/types/employee";
 
 interface Props {
-  employees: Employee[];
+  employees: EmployeeResponse[];
 }
 
 export default function EmployeeTable({ employees }: Props) {
@@ -29,11 +29,11 @@ export default function EmployeeTable({ employees }: Props) {
         <tbody>
           {employees.map(emp => (
             <EmployeeRow
-              key={emp.id}
+              key={emp._id}
               employee={emp}
-              expanded={expandedId === emp.id}
+              expanded={expandedId === emp._id}
               onToggle={() =>
-                setExpandedId(expandedId === emp.id ? null : emp.id)
+                setExpandedId(expandedId === emp._id ? null : emp._id)
               }
             />
           ))}

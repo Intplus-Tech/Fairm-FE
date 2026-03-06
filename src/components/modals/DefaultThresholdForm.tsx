@@ -35,8 +35,6 @@ export default function DefaultThresholdForm({
     farmId
   });
 
-  console.log("Form: ",form)
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

@@ -1,85 +1,32 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import EmployeeTable from "./EmployeeTable";
 import AddEmployeeModal from "./AddEmployeeModal";
-import { Employee } from "./types";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 import Pagination from "../birds/broiler/Pagination";
+import { employeeService } from "../../../services/employee.service";
+import { EmployeeResponse } from "@/types/employee";
 
-const employees: Employee[] = [
-  {
-    id: "STF-0001",
-    name: "David Omoye",
-    position: "Manager",
-    department: "Mgt.",
-    status: "Active",
-    joined: "Aug 2024",
-    phone: "08052223344",
-    age: 38,
-    salary: 120800,
-    attendance: 85,
-    overAttendance: 72,
-  },
-  {
-    id: "STF-0002",
-    name: "Azeez Rauf",
-    position: "Supervisor",
-    department: "Mgt.",
-    status: "Active",
-    joined: "Aug 2024",
-    phone: "08052223344",
-    age: 38,
-    salary: 120800,
-    attendance: 85,
-    overAttendance: 72,
-  },
-  {
-    id: "STF-0003",
-    name: "Iyanu Ahmed",
-    position: "Supervisor",
-    department: "Mgt.",
-    status: "Active",
-    joined: "Aug 2024",
-    phone: "08052223344",
-    age: 38,
-    salary: 120800,
-    attendance: 85,
-    overAttendance: 72,
-  },
-  {
-    id: "STF-0004",
-    name: "Adebare David",
-    position: "Supervisor",
-    department: "Mgt.",
-    status: "Active",
-    joined: "Aug 2024",
-    phone: "08052223344",
-    age: 38,
-    salary: 120800,
-    attendance: 85,
-    overAttendance: 72,
-  },
-  {
-    id: "STF-0005",
-    name: "June Benedicts",
-    position: "Supervisor",
-    department: "Mgt.",
-    status: "Active",
-    joined: "Aug 2024",
-    phone: "08052223344",
-    age: 38,
-    salary: 120800,
-    attendance: 85,
-    overAttendance: 72,
-  },
-
-];
 
 export default function EmployeePage() {
   const [open, setOpen] = useState(false);
   const [page, setPage] = useState(1);
+  const [employees, setEmployees] = useState<EmployeeResponse[]>([])
+
+useEffect(() => {
+  const fetchDepartments = async () => {
+    try {
+      const res = await employeeService.list();
+      setEmployees(res);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  fetchDepartments();
+}, []);
 
   return (
     <section className="space-y-6">

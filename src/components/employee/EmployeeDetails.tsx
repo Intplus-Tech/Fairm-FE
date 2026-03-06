@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { ToggleRight, ToggleLeft } from "lucide-react";
-import { Employee } from "./types";
+import { EmployeeResponse } from "@/types/employee";
 
-export default function EmployeeDetails({ employee }: { employee: Employee }) {
+
+export default function EmployeeDetails({ employee }: { employee: EmployeeResponse }) {
   const [isActive, setIsActive] = useState(true);
 
   return (
@@ -39,8 +40,11 @@ export default function EmployeeDetails({ employee }: { employee: Employee }) {
       </div>
 
       <div className="grid grid-cols-2 gap-4 text-sm">
-        <Detail label="Joined" value={employee.joined} />
-        <Detail label="Contact Number" value={employee.phone} />
+        <Detail label="Joined" value=  {new Date(employee.createdAt).toLocaleDateString("en-US", {
+              month: "long",
+              year: "numeric",
+              })} />
+        <Detail label="Contact Number" value={employee.phoneNumber} />
         <Detail label="Age" value={employee.age.toString()} />
         <Detail label="Salary" value={`₦${employee.salary.toLocaleString()}`} />
         <Detail
@@ -56,7 +60,7 @@ export default function EmployeeDetails({ employee }: { employee: Employee }) {
   );
 }
 
-function Detail({ label, value }: { label: string; value: string }) {
+function Detail({ label, value }: { label: string; value: string | number }) {
   return (
     <div className="flex justify-between border-b pb-2">
       <span className="text-muted-foreground">{label}</span>
