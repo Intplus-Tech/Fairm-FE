@@ -21,7 +21,7 @@ const FLOCK_OPTIONS = ["Layers", "Pullets", "Noilers", "Broilers"];
 
 /* ---------------- Main Modal ---------------- */
 
-export default function ThresholdModal({ onClose,onComplete }: { onClose: () => void, onComplete: () => void }) 
+export default function ThresholdModal({ onClose }: { onClose: () => void }) 
 {
     const [form, setForm] = useState({
     useIndustryBenchmarks: true,
@@ -46,7 +46,7 @@ export default function ThresholdModal({ onClose,onComplete }: { onClose: () => 
     try {
       setLoading(true);
       await thresholdsService.create(form);
-      onComplete();
+      onClose()
     } catch (err) {
       const message =
           err instanceof Error ? err.message : "An unexpected error occurred";
