@@ -1,11 +1,11 @@
 "use client";
 
-import { Employee } from "./types";
+import { EmployeeResponse } from "@/types/employee";
 import EmployeeDetails from "./EmployeeDetails";
 import { ChevronDown } from "lucide-react";
 
 interface Props {
-  employee: Employee;
+  employee: EmployeeResponse;
   expanded: boolean;
   onToggle: () => void;
 }
@@ -25,17 +25,17 @@ export default function EmployeeRow({ employee, expanded, onToggle }: Props) {
               className={`transition-transform ${expanded ? "rotate-180" : ""
                 }`}
             />
-            <span>{employee.id}</span>
+            <span>{"EMP-" + employee._id.slice(-6)}</span>
           </div>
         </td>
 
-        <td className="p-4 font-medium">{employee.name}</td>
-        <td className="p-4">{employee.position}</td>
-        <td className="p-4">{employee.department}</td>
+        <td className="p-4 font-medium">{employee.userId?.firstName} {employee.userId?.lastName}</td>
+        <td className="p-4">{employee.positionId?.name}</td>
+        <td className="p-4">{employee.departmentId?.name}</td>
 
         {/* Status (chevron removed from here) */}
         <td className="p-4">
-          <span className="text-green-600">{employee.status}</span>
+          <span className="text-green-600">{employee.userId?.status}</span>
         </td>
       </tr>
 

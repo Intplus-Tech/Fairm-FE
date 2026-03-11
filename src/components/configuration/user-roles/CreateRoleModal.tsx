@@ -2,6 +2,8 @@
 
 import { X, ChevronDown } from "lucide-react";
 import { useState } from "react";
+import { rolesService } from "../../../../services/role.service";
+import { RoleFeature, RolePermission } from "@/types/role";
 
 interface CreateRoleModalProps {
   onClose: () => void;
@@ -20,10 +22,23 @@ const MODULES = [
   "Daily Report Entry",
 ];
 
+const MODULE_FEATURE_MAP: Record<string, RoleFeature> = {
+  "Threshold Config": "threshold_config",
+  "Financial/Sales": "financial_sales",
+  "Employee Management": "employee_management",
+  "Daily Farm Logs": "daily_farm_logs",
+  "Inventory/Stock": "inventory_stock",
+  "Uniformity (Pullets)": "uniformity",
+  "Daily Report Entry": "daily_report_entry",
+};
+
 export default function CreateRoleModal({
   onClose,
   onSuccess,
 }: CreateRoleModalProps) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
   const [roleName, setRoleName] = useState("");
   const [permissions, setPermissions] = useState<Record<string, Permission>>(
     () =>
@@ -37,6 +52,34 @@ export default function CreateRoleModal({
       ...prev,
       [module]: value,
     }));
+  };
+
+  const handleCreateRole = async () => {
+    setLoading(true);
+
+    try {
+      const configs = MODULES.map((module) => ({
+        feature: MODULE_FEATURE_MAP[module],
+        permission: permissions[module].toLowerCase() as RolePermission,
+      }));
+
+      const roleRes = await rolesService.create({
+        name: roleName,
+        config: configs,
+      });
+      console.log("Hey",roleRes)
+
+      onSuccess();
+      onClose();
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "An unexpected error occurred";
+
+      setError(message);
+      console.error("Failed to create role", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -115,6 +158,12 @@ export default function CreateRoleModal({
           </div>
         </div>
 
+        {error && (
+          <p className="text-red-500 text-sm mb-2">
+            {error}
+          </p>
+        )}
+
         {/* Footer */}
         <div className="flex flex-col-reverse gap-3 border-t px-6 py-4 sm:flex-row sm:justify-end">
           <button
@@ -127,10 +176,12 @@ export default function CreateRoleModal({
 
           <button
             type="button"
-            onClick={onSuccess}
+            onClick={handleCreateRole}
+            disabled={loading}
             className="rounded-lg bg-blue-600 px-5 py-2 text-sm font-medium text-white hover:bg-primary/90"
           >
             Create Role
+            {loading ? "Creating..." : "Create Role"}
           </button>
         </div>
       </div>

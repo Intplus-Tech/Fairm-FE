@@ -19,6 +19,7 @@ export default function OTPVerificationClient() {
   const [otp, setOtp] = useState<string[]>(Array(CODE_LENGTH).fill(""));
   const [loading, setLoading] = useState(false);
   const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>, idx: number) => {
     const value = e.target.value.replace(/\D/, "");
@@ -55,13 +56,15 @@ export default function OTPVerificationClient() {
   const isFormValid = otp.every(digit => digit !== "");
 
   const handleVerify = async () => {
+    setErrorMessage(null)
+
     if (!email) {
-      alert("Email not found. Please restart password reset.");
+      setErrorMessage("Email not found. Please restart password reset.");
       return;
     }
 
     if (!isFormValid) {
-      alert("Please enter the full 6-digit code.");
+      setErrorMessage("Please enter the full 6-digit code.");
       return;
     }
 
@@ -74,7 +77,7 @@ export default function OTPVerificationClient() {
         otp: otpCode,
       });
 
-      router.push(`/auth/new-password?email=${encodeURIComponent(email)}`);
+      router.push(`/auth/new-password?email=${encodeURIComponent(email)}&otp=${otpCode}`);
     } catch (error: unknown) {
       let message = "Invalid or expired OTP. Please try again.";
       if (error instanceof Error) message = error.message || message;
@@ -82,7 +85,7 @@ export default function OTPVerificationClient() {
         const err = error as { response?: { data?: { message?: string } } };
         if (err.response?.data?.message) message = err.response.data.message;
       }
-      alert(message);
+      setErrorMessage(message);
     } finally {
       setLoading(false);
     }
@@ -125,6 +128,11 @@ export default function OTPVerificationClient() {
                 ))}
               </div>
             </div>
+
+            {/* Error message (UI only, no popup, no overlay) */}
+            {errorMessage && (
+              <p className="text-sm text-red-600 mt-2">{errorMessage}</p>
+            )}
 
             <Button
               onClick={handleVerify}
