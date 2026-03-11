@@ -1,25 +1,45 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Pagination from "../birds/broiler/Pagination";
 import { Button } from "../ui/button";
-
-const rows = Array.from({ length: 5 }).map(() => ({
-  category: "12,981",
-  name: "Disinfectant (5L)",
-  opening: 100,
-  stockIn: "+50",
-  stockOut: "-25",
-  closing: 125,
-  value: "₦400,000",
-}));
+import { InventoryResponse } from "@/types/inventory";
+import { inventoriesService } from "../../../services/inventory.service";
 
 
 export default function StockReport() {
   const [page, setPage] = useState(1);
+    const [rows, setRows] = useState<InventoryResponse[]>([]);
+    const [loading, setLoading] = useState(false);
+    // const [filter, setFilter] = useState<string>("All");
+
+      useEffect(() => {
+    const fetchInventory = async () => {
+      try {
+        setLoading(true);
+
+        const data = await inventoriesService.list();
+
+        setRows(data);
+      } catch (error) {
+        console.error("Failed to fetch inventory", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchInventory();
+  }, []);
+
+  // const filters = ["All", "Feed", "Vaccine", "Product"];
 
   return (
     <div className="bg-white rounded-2xl p-6 space-y-4">
+      {loading && (
+        <p className="text-sm text-muted-foreground">
+          Loading inventory...
+        </p>
+      )}
       <div className="flex justify-between items-center">
         <div className="">
           <h2 className="font-semibold">Stock Report</h2>
@@ -57,15 +77,15 @@ export default function StockReport() {
             </tr>
           </thead>
           <tbody>
-            {rows.map((row, i) => (
-              <tr key={i} className="border-b last:border-0">
+            {rows.map((row) => (
+              <tr key={row._id} className="border-b last:border-0">
                 <td className="py-3">{row.category}</td>
                 <td>{row.name}</td>
-                <td>{row.opening}</td>
-                <td>{row.stockIn}</td>
-                <td>{row.stockOut}</td>
-                <td>{row.closing}</td>
-                <td>{row.value}</td>
+                <td>-</td>
+                <td>-</td>
+                <td>100</td>
+                <td>123</td>
+                <td>230000</td>
               </tr>
             ))}
           </tbody>

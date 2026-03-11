@@ -1,9 +1,12 @@
 import { api } from "@/lib/api/axios";
-import { InventoryRequest } from "@/types/inventory";
+import { InventoryRequest, InventoryResponse } from "@/types/inventory";
+import { PaginatedResponse } from ".";
 
 export const inventoriesService = {
   list() {
-    return api.get<{ data: InventoryRequest[] }>("/inventory");
+    return api
+      .get<{ data: PaginatedResponse<InventoryResponse> }>("/inventory")
+      .then((res) => res.data.data.data);
   },
 
   create(payload: InventoryRequest) {

@@ -8,6 +8,10 @@ import type {
   VerifyOtpResponse,
   ResetPassword,
   ResetPasswordResponse,
+  ChangePassword,
+  ChangePasswordResponse,
+  InviteUser,
+  InviteUserResponse,
 } from "@/types/auth";
 
 export const authService = {
@@ -34,6 +38,18 @@ export const authService = {
   resetPassword(payload: ResetPassword): Promise<ResetPasswordResponse> {
     return api
       .post<ResetPasswordResponse>("/auth/reset-password", payload)
+      .then((res) => res.data);
+  },
+
+  changePassword(payload: ChangePassword): Promise<ChangePasswordResponse> {
+    return api
+      .post<ChangePasswordResponse>("/auth/change-password", payload)
+      .then((res) => res.data);
+  },
+
+  inviteUser(payload: InviteUser): Promise<InviteUserResponse> {
+    return api
+      .post<InviteUserResponse>("/user/invite", payload)
       .then((res) => res.data);
   },
 };

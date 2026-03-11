@@ -5,6 +5,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ChevronDown } from "lucide-react";
+import { thresholdsService } from "@/../services/threshold.service";
+
+const ageRanges = [
+  "16-20 weeks",
+  "21-40 weeks",
+  "41-60 weeks",
+  "61+ weeks",
+];
+
 
 /* ---------------- Constants ---------------- */
 
@@ -12,7 +21,51 @@ const FLOCK_OPTIONS = ["Layers", "Pullets", "Noilers", "Broilers"];
 
 /* ---------------- Main Modal ---------------- */
 
-export default function ThresholdModal({ onClose }: { onClose: () => void }) {
+export default function ThresholdModal({ onClose,onComplete }: { onClose: () => void, onComplete: () => void }) 
+{
+    const [form, setForm] = useState({
+    useIndustryBenchmarks: true,
+    useSystemThreshold: false,
+    mortalityRate: { warning: 0, critical: 0 },
+    temperatureRange: { min: 0, max: 0 },
+    feedConsumptionDeviation: {
+      lowerLimit: { warning: 0, critical: 0 },
+      upperLimit: { warning: 0, critical: 0 },
+    },
+    eggProductionPerBird: ageRanges.map((age) => ({
+      ageRange: age,
+      eggsPerWeek: 0,
+    })),
+    // farmId
+  });
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async () => {
+    try {
+      setLoading(true);
+      await thresholdsService.create(form);
+      onComplete();
+    } catch (err) {
+      const message =
+          err instanceof Error ? err.message : "An unexpected error occurred";
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleChange = (
+    field: string,
+    value: number | string | boolean
+  ) => {
+    setForm((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 rounded-2xl">
       <div className="bg-white w-full max-w-[703px] max-h-[90vh] rounded-xl shadow-lg flex flex-col">
@@ -43,18 +96,44 @@ export default function ThresholdModal({ onClose }: { onClose: () => void }) {
 
           {/* Benchmark */}
           <div className="flex items-center gap-2 text-sm">
-            <input type="checkbox" className="h-4 w-4" />
+            <input type="checkbox"
+              checked={form.useIndustryBenchmarks}
+            onChange={(e) =>
+              handleChange("useIndustryBenchmarks", e.target.checked)
+            }
+            className="h-4 w-4" />
             <span>Use industry benchmark</span>
           </div>
 
           {/* Mortality */}
           <Section title="Mortality Rate">
-            <TwoInputs />
+            <TwoInputs
+              min={form.mortalityRate.warning}
+              max={form.mortalityRate.critical}
+              onChange={(min, max) =>
+                setForm((prev) => ({
+                  ...prev,
+                  mortalityRate: {
+                    warning: min,
+                    critical: max,
+                  },
+                }))
+              }
+            />
           </Section>
 
           {/* Temperature */}
           <Section title="Temperature Range (°C)">
-            <TwoInputs />
+          <TwoInputs
+            min={form.temperatureRange.min}
+            max={form.temperatureRange.max}
+            onChange={(min, max) =>
+              setForm((prev) => ({
+                ...prev,
+                temperatureRange: { min, max },
+              }))
+            }
+          />
           </Section>
 
           {/* Feed Consumption */}
@@ -62,43 +141,89 @@ export default function ThresholdModal({ onClose }: { onClose: () => void }) {
             <p className="text-sm text-muted-foreground">
               Lower Limit (Health / Water Check)
             </p>
-            <TwoInputs />
+            <TwoInputs
+              min={form.feedConsumptionDeviation.lowerLimit.warning}
+              max={form.feedConsumptionDeviation.lowerLimit.critical}
+              onChange={(min, max) =>
+                setForm((prev) => ({
+                  ...prev,
+                  feedConsumptionDeviation: {
+                    ...prev.feedConsumptionDeviation,
+                    lowerLimit: {
+                      warning: min,
+                      critical: max,
+                    },
+                  },
+                }))
+              }
+            />
 
             <p className="text-sm text-muted-foreground mt-3">
               Upper Limit (Waste / Theft Check)
             </p>
-            <TwoInputs />
+            <TwoInputs
+              min={form.feedConsumptionDeviation.upperLimit.warning}
+              max={form.feedConsumptionDeviation.upperLimit.critical}
+              onChange={(min, max) =>
+                setForm((prev) => ({
+                  ...prev,
+                  feedConsumptionDeviation: {
+                    ...prev.feedConsumptionDeviation,
+                    upperLimit: {
+                      warning: min,
+                      critical: max,
+                    },
+                  },
+                }))
+              }
+            />
           </Section>
 
           {/* Egg Production */}
           <Section title="Egg Production / Bird">
-            {[
-              "16 – 20 weeks",
-              "21 – 25 weeks",
-              "26 – 30 weeks",
-              "31 – 35 weeks",
-            ].map(label => (
-              <div
-                key={label}
-                className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center"
-              >
-                <p className="text-sm">{label}</p>
-                <Input
-                  placeholder="0.04"
-                  className="
+            {form.eggProductionPerBird.map((item, index) => (
+            <div
+              key={item.ageRange}
+              className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center"
+            >
+              <p className="text-sm">{item.ageRange}</p>
+
+              <Input
+              className="
                     text-right
                     placeholder:text-right
                     placeholder:text-muted-foreground
                     placeholder:italic
                   "
-                />
-              </div>
-            ))}
+                type="number"
+                value={item.eggsPerWeek}
+                onChange={(e) => {
+                  const value = Number(e.target.value);
+
+                  setForm((prev) => {
+                    const updated = [...prev.eggProductionPerBird];
+                    updated[index].eggsPerWeek = value;
+
+                    return {
+                      ...prev,
+                      eggProductionPerBird: updated,
+                    };
+                  });
+                }}
+              />
+            </div>
+          ))}
           </Section>
 
           {/* Final thresholds */}
          
         </div>
+
+          {error && (
+            <p className="text-red-500 text-sm mb-2">
+              {error}
+            </p>
+          )}
 
         {/* Footer */}
         <div className="px-6 py-4 border-t sticky bottom-0 bg-white flex flex-wrap justify-end gap-3">
@@ -110,8 +235,12 @@ export default function ThresholdModal({ onClose }: { onClose: () => void }) {
             Save & Create New Flock
           </Button>
 
-          <Button className="bg-[#5B4DFF]">
-            Save & Activate
+          <Button 
+            onClick={handleSubmit}
+            disabled={loading}
+            className="bg-[#5B4DFF]"
+            >
+            {loading ? "Saving..." : "Save & Activate"}
           </Button>
         </div>
       </div>
@@ -215,30 +344,36 @@ function Section({
   );
 }
 
-function TwoInputs() {
+function TwoInputs({
+  min,
+  max,
+  onChange,
+}: {
+  min: number;
+  max: number;
+  onChange: (min: number, max: number) => void;
+}) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <div className="space-y-1">
         <p className="text-sm">Min</p>
         <Input
+          type="number"
+          value={min}
+          onChange={(e) => onChange(Number(e.target.value), max)}
           placeholder="0.04"
-          className="
-            text-right
-            placeholder:text-right
-            placeholder:text-muted-foreground
-          "
+          className="text-right placeholder:text-right"
         />
       </div>
 
       <div className="space-y-1">
         <p className="text-sm">Max</p>
         <Input
+          type="number"
+          value={max}
+          onChange={(e) => onChange(min, Number(e.target.value))}
           placeholder="0.04"
-          className="
-            text-right
-            placeholder:text-right
-            placeholder:text-muted-foreground
-          "
+          className="text-right placeholder:text-right"
         />
       </div>
     </div>

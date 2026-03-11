@@ -15,3 +15,15 @@ export interface InventoryRequest {
   supplier: string;
   expiryDate: Date;
 }
+
+export interface InventoryResponse {
+  _id: string;
+  name: string;
+  category: InventoryCategory;
+  description: string;
+  unitOfMeasurement: InventoryUnit;
+  supplier: string;
+  expiryDate: Date;
+  createdAt: string;
+  updatedAt: string;
+}
