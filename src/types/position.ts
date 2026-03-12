@@ -1,4 +1,4 @@
-export interface DepartmentResponse {
+export interface PositionResponse {
   _id: string;
   name: string;
   description: string;

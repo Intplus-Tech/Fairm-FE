@@ -4,6 +4,8 @@ import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import PasswordSuccessToast from "./PasswordSuccessToast";
 import clsx from "clsx";
+import { authService } from "../../../services/auth.service"
+import { ChangePassword } from "@/types/auth";
 
 export default function ChangePasswordForm() {
   const [showNew, setShowNew] = useState(false);
@@ -11,13 +13,19 @@ export default function ChangePasswordForm() {
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const [form, setForm] = useState({
+  email: "",
+  password: "",
+  newPassword: "",
+  });
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
       // 🔹 Simulate API call (replace with real one)
-      await new Promise((res) => setTimeout(res, 1200));
+      await authService.changePassword(form);
 
       setSuccess(true);
     } catch {
@@ -26,6 +34,14 @@ export default function ChangePasswordForm() {
       setLoading(false);
     }
   };
+
+  
+  const handleChange = (field: keyof ChangePassword, value: string) => {
+        setForm((prev) => ({
+          ...prev,
+          [field]: value,
+        }));
+      };
 
   return (
     <>
@@ -43,8 +59,31 @@ export default function ChangePasswordForm() {
             type="email"
             placeholder="Enter your email address"
             required
+            value={form.email}
+            onChange={(e) => handleChange("email", e.target.value)}
             className="w-full rounded-lg border px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
           />
+        </div>
+
+        <div className="space-y-1">
+          <label className="text-sm font-medium">Old Password</label>
+            <div className="relative">
+            <input
+              type={showNew ? "text" : "password"}
+              placeholder="Enter your old password"
+              required
+              value={form.password}
+              onChange={(e) => handleChange("password", e.target.value)}
+              className="w-full rounded-lg border px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+          <button
+              type="button"
+              onClick={() => setShowNew(!showNew)}
+              className="absolute right-3 top-2.5 text-muted-foreground"
+            >
+              {showNew ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
+          </div>
         </div>
 
         {/* New Password */}
@@ -55,6 +94,8 @@ export default function ChangePasswordForm() {
               type={showNew ? "text" : "password"}
               placeholder="Enter New Password"
               required
+              value={form.newPassword}
+              onChange={(e) => handleChange("newPassword", e.target.value)}
               className="w-full rounded-lg border px-4 py-2 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
             />
             <button

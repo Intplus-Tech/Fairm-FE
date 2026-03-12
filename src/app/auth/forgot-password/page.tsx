@@ -55,7 +55,7 @@ export default function ForgotPassword() {
        *
        * So we ALWAYS proceed to the next step.
        */
-      router.push("/auth/password-reset");
+      router.push(`/auth/password-reset?email=${encodeURIComponent(email)}`);
     } catch (err) {
       const error = err as AxiosError<ApiErrorResponse>;
 

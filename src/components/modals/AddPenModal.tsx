@@ -10,6 +10,7 @@ export default function AddPenModal() {
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<1 | 2>(1);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  const [farmId, setFarmId] = useState<string | null>(null);
 
   useEffect(() => {
     const handler = () => setOpen(true);
@@ -42,15 +43,17 @@ export default function AddPenModal() {
 
         {step === 1 && (
          <AddPenForm
-            onNext={() => {
+            onNext={(newFarmId: string) => {
+              setFarmId(newFarmId);
               markComplete(1);
               setStep(2);
             }}
           />
         )}
 
-        {step === 2 && (
+        {step === 2 && farmId && (
           <DefaultThresholdForm
+            farmId={farmId}
             onBack={() => setStep(1)}
             onComplete={() => {
               markComplete(2);
