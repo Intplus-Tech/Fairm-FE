@@ -15,7 +15,8 @@ import type {
 } from "@/types/auth";
 
 export const authService = {
-  login: (payload: LoginRequest): Promise<LoginResponse> => {
+
+  login(payload: LoginRequest): Promise<LoginResponse> {
     return api.post<LoginResponse>("/auth/login", payload).then(res => res.data);
   },
 
@@ -47,7 +48,7 @@ export const authService = {
 
   inviteUser(payload: InviteUser): Promise<InviteUserResponse> {
     return api
-      .post<InviteUserResponse>("/user/invite", payload)
+      .post<InviteUserResponse>("/users/invite", payload)
       .then((res) => res.data);
   },
 };
