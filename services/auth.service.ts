@@ -49,7 +49,7 @@ export const authService = {
 
   inviteUser(payload: InviteUser): Promise<InviteUserResponse> {
     return api
-      .post<InviteUserResponse>("/user/invite", payload)
+      .post<InviteUserResponse>("/users/invite", payload)
       .then((res) => res.data);
   },
 };

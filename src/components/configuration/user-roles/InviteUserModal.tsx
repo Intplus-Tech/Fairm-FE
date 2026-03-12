@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { authService } from "../../../../services/auth.service";
 
 interface InviteUserModalProps {
   onClose: () => void;
@@ -11,25 +12,35 @@ export default function InviteUserModal({
   onClose,
   onSuccess,
 }: InviteUserModalProps) {
-  const [fullName, setFullName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [role, setRole] = useState("");
 
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
   async function handleSubmit(e: React.FormEvent) {
   e.preventDefault();
+  setError(null);
 
-  const res = await fetch("/api/demo/invite", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ fullName, email, phone, role }),
-  });
+  try {
+     await authService.inviteUser({
+      firstName,
+      lastName,
+      email,
+      role: "staff",
+    })
 
-  const data = await res.json();
-
-  console.log("Invite link (demo):", data.inviteLink);
-
-  onSuccess();
+    onSuccess();
+  } catch (err: unknown) {
+  const message =
+      err instanceof Error ? err.message : "An unexpected error occurred";
+  setError(message);
+} finally {
+  setLoading(false);
+}
 }
 
 
@@ -65,11 +76,24 @@ export default function InviteUserModal({
                 Full Name <span className="text-red-500">*</span>
               </label>
               <input
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
                 required
                 className="w-full rounded-md border px-3 py-2 text-sm"
-                placeholder="Jane Stone"
+                placeholder="Jane"
+              />
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-medium">
+                Last Name <span className="text-red-500">*</span>
+              </label>
+              <input
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                required
+                className="w-full rounded-md border px-3 py-2 text-sm"
+                placeholder="Stone"
               />
             </div>
 
@@ -128,6 +152,12 @@ export default function InviteUserModal({
             </select>
           </div>
 
+          {error && (
+            <p className="text-red-500 text-sm mb-2">
+              {error}
+            </p>
+          )}
+
           {/* Actions */}
           <div className="flex justify-end gap-3 pt-4">
             <button
@@ -139,9 +169,12 @@ export default function InviteUserModal({
             </button>
             <button
               type="submit"
+              onClick={handleSubmit}
+              disabled={loading}
               className="rounded-md bg-[#4A3AFF] px-4 py-2 text-sm text-white hover:bg-blue-700"
             >
               Send Invitation
+              {loading ? "Send..." : "Send Invitation"}
             </button>
           </div>
         </form>
