@@ -18,20 +18,22 @@ export default function MortalityChart() {
       title="Mortality Rate"
       actions={<select className="border rounded-md px-2 py-1 text-sm"><option>Days</option></select>}
     >
-      <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={mortalityData}>
-          <XAxis dataKey="day" />
-          <YAxis />
-          <Tooltip />
-          <Line
-            type="monotone"
-            dataKey="value"
-            stroke="#FF0000"
-            strokeWidth={2}
-            dot
-          />
-        </LineChart>
-      </ResponsiveContainer>
+      <div className="h-[250px] w-full">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={mortalityData}>
+            <XAxis dataKey="day" />
+            <YAxis />
+            <Tooltip />
+            <Line
+              type="monotone"
+              dataKey="value"
+              stroke="#FF0000"
+              strokeWidth={2}
+              dot
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
     </ChartCard>
   );
 }

@@ -25,17 +25,20 @@ export default function EggHealthChart() {
         </div>
       }
     >
-      <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={eggHealthData}>
-          <XAxis dataKey="day" />
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          <Line dataKey="good" stroke="green" />
-          <Line dataKey="cracked" stroke="gold" />
-          <Line dataKey="soft" stroke="red" />
-        </LineChart>
-      </ResponsiveContainer>
+        <div className="h-[250px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={eggHealthData}>
+              <XAxis dataKey="day" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line dataKey="good" stroke="green" />
+              <Line dataKey="cracked" stroke="gold" />
+              <Line dataKey="soft" stroke="red" />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+
     </ChartCard>
   );
 }

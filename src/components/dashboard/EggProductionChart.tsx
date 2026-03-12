@@ -23,14 +23,16 @@ export default function EggProductionChart() {
         </div>
       }
     >
-      <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={eggProductionData}>
-          <XAxis dataKey="day" />
-          <YAxis />
-          <Tooltip />
-          <Line type="monotone" dataKey="value" stroke="#6C63FF" strokeWidth={2} />
-        </LineChart>
-      </ResponsiveContainer>
+      <div className="h-[250px] w-full">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={eggProductionData}>
+            <XAxis dataKey="day" />
+            <YAxis />
+            <Tooltip />
+            <Line type="monotone" dataKey="value" stroke="#6C63FF" strokeWidth={2} />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
     </ChartCard>
   );
 }

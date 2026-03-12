@@ -2,17 +2,16 @@
 
 import { Sparkles } from "lucide-react";
 
-export default function AskFairmAIButton() {
+type Props = {
+  onClick: () => void;
+};
+
+export default function AskFairmAIButton({ onClick }: Props) {
   return (
     <button
-      className="
-        fixed bottom-6 right-6
-        flex items-center gap-2
-        px-4 py-3 rounded-full
-        text-white shadow-lg
-      "
+      onClick={onClick}
+      className="flex items-center gap-2 px-4 py-3 rounded-full text-white shadow-lg"
       style={{ backgroundColor: "#531599" }}
-      onClick={() => alert("AI assistant coming soon")}
     >
       <Sparkles size={16} />
       Ask FAIRM AI
