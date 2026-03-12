@@ -11,19 +11,17 @@ interface AcceptInvitePageProps {
 export default function AcceptInvitePage({
   searchParams,
 }: AcceptInvitePageProps) {
-  const { token, email, name } = searchParams;
+  const token = searchParams?.token;
+  const email = searchParams?.email ?? "";
+  const name = searchParams?.name ?? "";
 
-  // If token is missing, redirect to login
   if (!token) {
     redirect("/auth/login");
   }
 
-  // Redirect to register-invite page
   redirect(
     `/auth/register-invite?token=${encodeURIComponent(
       token
-    )}&email=${encodeURIComponent(email ?? "")}&name=${encodeURIComponent(
-      name ?? ""
-    )}`
+    )}&email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}`
   );
 }

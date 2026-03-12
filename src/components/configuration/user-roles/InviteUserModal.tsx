@@ -17,32 +17,37 @@ export default function InviteUserModal({
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [role, setRole] = useState("");
+  const [error, setError] = useState<string>(""); 
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  async function handleSubmit(e: React.FormEvent) {
+ async function handleSubmit(e: React.FormEvent) {
   e.preventDefault();
-  setError(null);
+
+  // Combine firstName and lastName
+  const fullName = `${firstName} ${lastName}`.trim();
 
   try {
-     await authService.inviteUser({
-      firstName,
-      lastName,
-      email,
-      role: "staff",
-    })
+    const res = await fetch("/api/demo/invite", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ fullName, email, phone, role }),
+    });
 
+    const data = await res.json();
+
+    if (!res.ok) {
+      // Set error message
+      setError(data.message || "Failed to send invite.");
+      return;
+    }
+
+    console.log("Invite link (demo):", data.inviteLink);
+    setError(""); // Clear any previous error
     onSuccess();
-  } catch (err: unknown) {
-  const message =
-      err instanceof Error ? err.message : "An unexpected error occurred";
-  setError(message);
-} finally {
-  setLoading(false);
+  } catch (err) {
+    setError("Something went wrong. Please try again.");
+    console.error(err);
+  }
 }
-}
-
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
@@ -93,7 +98,7 @@ export default function InviteUserModal({
                 onChange={(e) => setLastName(e.target.value)}
                 required
                 className="w-full rounded-md border px-3 py-2 text-sm"
-                placeholder="Stone"
+                placeholder="Jane Stone"
               />
             </div>
 
@@ -107,7 +112,7 @@ export default function InviteUserModal({
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 className="w-full rounded-md border px-3 py-2 text-sm"
-                placeholder="jane@gmail.com"
+                placeholder=""
               />
               <p className="mt-1 text-xs text-muted-foreground">
                 Used for login and notifications
@@ -133,6 +138,7 @@ export default function InviteUserModal({
             <label className="mb-1 block text-sm font-medium">
               User Role <span className="text-red-500">*</span>
             </label>
+
             <select
               value={role}
               onChange={(e) => setRole(e.target.value)}
@@ -140,15 +146,10 @@ export default function InviteUserModal({
               className="w-full rounded-md border px-3 py-2 text-sm"
             >
               <option value="">Select</option>
-              <option value="Owner">
-                Owner – Full Visibility & System Configuration
-              </option>
-              <option value="Admin">
-                Admin – Operations, Stock & Staff Oversight
-              </option>
-              <option value="Farm Manager">
-                Farm Manager – Data Entry & Local Inventory
-              </option>
+              <option value="owner">Owner</option>
+              <option value="admin">Admin</option>
+              <option value="manager">Manager</option>
+              <option value="entry_officer">Entry Officer</option>
             </select>
           </div>
 
@@ -167,14 +168,12 @@ export default function InviteUserModal({
             >
               Cancel
             </button>
+
             <button
               type="submit"
-              onClick={handleSubmit}
-              disabled={loading}
               className="rounded-md bg-[#4A3AFF] px-4 py-2 text-sm text-white hover:bg-blue-700"
             >
               Send Invitation
-              {loading ? "Send..." : "Send Invitation"}
             </button>
           </div>
         </form>

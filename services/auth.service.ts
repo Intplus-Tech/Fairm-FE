@@ -16,9 +16,7 @@ import type {
 
 export const authService = {
   login(payload: LoginRequest): Promise<LoginResponse> {
-    return api
-      .post<LoginResponse>("/auth/login", payload)
-      .then((res) => res.data);
+    return api.post<LoginResponse>("/auth/login", payload).then(res => res.data);
   },
 
   forgotPassword(
@@ -53,3 +51,4 @@ export const authService = {
       .then((res) => res.data);
   },
 };
+

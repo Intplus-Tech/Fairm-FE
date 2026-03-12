@@ -11,6 +11,10 @@ export default function InviteRegisterForm() {
   const token = params.get("token");
   const email = params.get("email") ?? "";
   const name = params.get("name") ?? "";
+  const role = params.get("role") ?? "";
+
+ 
+
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -34,30 +38,41 @@ export default function InviteRegisterForm() {
     !loading;
 
   async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!isFormValid) return;
+  e.preventDefault();
+  if (!isFormValid) return;
 
-    setError("");
+  setError("");
 
-    try {
-      setLoading(true);
-      await new Promise((resolve) => setTimeout(resolve, 800));
-      router.replace("/auth/login");
-    } catch {
-      setError("Something went wrong. Please try again.");
+  try {
+    setLoading(true);
+
+    const res = await fetch("/api/demo/setup-account", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        token,
+        email,
+        role,
+        password,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      setError(data.message || "Setup failed");
       setLoading(false);
+      return;
     }
-  }
 
-  if (!token) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F6F7FB]">
-        <p className="text-sm text-red-500">
-          Invalid or expired invitation link.
-        </p>
-      </div>
-    );
+    router.replace("/auth/login");
+  } catch {
+    setError("Something went wrong.");
+    setLoading(false);
   }
+}
 
   return (
     <div className="min-h-screen bg-[#F6F7FB] flex flex-col items-center justify-center py-10 px-4">
@@ -89,6 +104,8 @@ export default function InviteRegisterForm() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
 
+          {/* PASSWORD */}
+
           <div>
             <label className="text-sm font-medium">
               Password <span className="text-red-500">*</span>
@@ -113,6 +130,8 @@ export default function InviteRegisterForm() {
             </div>
           </div>
 
+          {/* CONFIRM PASSWORD */}
+
           <div>
             <label className="text-sm font-medium">
               Confirm Password <span className="text-red-500">*</span>
@@ -135,20 +154,6 @@ export default function InviteRegisterForm() {
                 {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
-          </div>
-
-          <div className="text-sm space-y-2 pt-2">
-            <p className={hasMinLength ? "text-green-600" : "text-gray-500"}>
-              • Password must be at least 8 characters long
-            </p>
-
-            <p className={hasUpperLower ? "text-green-600" : "text-gray-500"}>
-              • Include uppercase and lowercase letters
-            </p>
-
-            <p className={hasNumberSpecial ? "text-green-600" : "text-gray-500"}>
-              • Include at least one number and special character
-            </p>
           </div>
 
           {error && <p className="text-sm text-red-500">{error}</p>}
