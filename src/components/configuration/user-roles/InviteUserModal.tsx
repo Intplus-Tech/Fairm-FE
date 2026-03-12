@@ -17,6 +17,8 @@ export default function InviteUserModal({
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [role, setRole] = useState("");
+
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>(""); 
 
  async function handleSubmit(e: React.FormEvent) {
@@ -98,7 +100,7 @@ export default function InviteUserModal({
                 onChange={(e) => setLastName(e.target.value)}
                 required
                 className="w-full rounded-md border px-3 py-2 text-sm"
-                placeholder="Jane Stone"
+                placeholder="Full Name"
               />
             </div>
 
@@ -171,9 +173,10 @@ export default function InviteUserModal({
 
             <button
               type="submit"
-              className="rounded-md bg-[#4A3AFF] px-4 py-2 text-sm text-white hover:bg-blue-700"
+              disabled={loading}
+              className="rounded-md bg-[#4A3AFF] px-4 py-2 text-sm text-white hover:bg-blue-700 disabled:opacity-50"
             >
-              Send Invitation
+              {loading ? "Sending..." : "Send Invitation"}
             </button>
           </div>
         </form>
