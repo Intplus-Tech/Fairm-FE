@@ -1,5 +1,8 @@
 "use client";
 
+
+
+import ActionButtons from "@/components/farm-gate-sales/ActionButtons";
 import EggSalesTable from "@/components/farm-gate-sales/EggSalesTable";
 import PackagingDetails from "@/components/farm-gate-sales/PackagingDetails";
 import PaymentStatus from "@/components/farm-gate-sales/PaymentStatus";
@@ -7,12 +10,6 @@ import SaleDetails from "@/components/farm-gate-sales/SaleDetails";
 import SaleHeader from "@/components/farm-gate-sales/SaleHeader";
 import { useState } from "react";
 
-// import SaleHeader from "@/components/farm-gate-sales/SaleHeader";
-// import SaleDetails from "@/components/farm-gate-sales/SaleDetails";
-// import EggSalesTable from "@/components/farm-gate-sales/EggSalesTable";
-// import PackagingDetails from "@/components/farm-gate-sales/PackagingDetails";
-// import PaymentStatus from "@/components/farm-gate-sales/PaymentStatus";
-// import ActionButtons from "@/components/farm-gate-sales/ActionButtons";
 
 export default function FarmGateSalesPage() {
 
@@ -46,7 +43,7 @@ export default function FarmGateSalesPage() {
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-6xl mx-auto space-y-6">
 
-        <SaleHeader/>
+       <SaleHeader/>
 
 
          <SaleDetails saleData={saleData}

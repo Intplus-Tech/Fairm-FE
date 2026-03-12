@@ -39,35 +39,47 @@ export default function LoginPage() {
   const isFormValid = isEmailValid && isPasswordValid && !isLoading;
 
   const handleLogin = async () => {
-    setErrorMessage(null);
+  setErrorMessage(null);
 
-    if (!email.trim()) return setErrorMessage("Email is required.");
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return setErrorMessage("Please enter a valid email.");
-    if (!password.trim()) return setErrorMessage("Password is required.");
-    if (password.length < 6) return setErrorMessage("Password must be at least 6 characters.");
+  if (!email.trim()) return setErrorMessage("Email is required.");
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return setErrorMessage("Please enter a valid email.");
+  if (!password.trim()) return setErrorMessage("Password is required.");
+  if (password.length < 6) return setErrorMessage("Password must be at least 6 characters.");
 
-    setIsLoading(true);
+  setIsLoading(true);
 
-    try {
-      const response = await authService.login({ email, password });
+  try {
+    const response = await authService.login({ email, password });
 
-      // Store tokens
-      tokenStorage.set(response.data.token);
-      tokenStorage.setRefresh(response.data.refreshToken);
+    // store tokens
+    tokenStorage.set(response.data.token);
+    tokenStorage.setRefresh(response.data.refreshToken);
 
+    // get logged in user
+    const user = response.data.user;
+
+    // role based redirect
+    if (user?.role === "entry_officer") {
+      router.push("/entry-officer/dashboard");
+    } else {
       router.push("/dashboard");
-    } catch (err) {
-      const error = err as AxiosError<ApiErrorResponse>;
-      const message = error.response?.data?.message;
-
-      if (error.response?.status === 400) setErrorMessage(message || "Invalid login details.");
-      else if (error.response?.status === 401) setErrorMessage("Invalid email or password.");
-      else setErrorMessage("Something went wrong. Please try again.");
-    } finally {
-      setIsLoading(false);
     }
-  };
 
+  } catch (err) {
+    const error = err as AxiosError<ApiErrorResponse>;
+    const message = error.response?.data?.message;
+
+    if (error.response?.status === 400)
+      setErrorMessage(message || "Invalid login details.");
+    else if (error.response?.status === 401)
+      setErrorMessage("Invalid email or password.");
+    else
+      setErrorMessage("Something went wrong. Please try again.");
+  } finally {
+    setIsLoading(false);
+  }
+};
+  
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-transparent px-4">
       {/* Brand */}
@@ -124,7 +136,7 @@ export default function LoginPage() {
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
-            </div>
+          </div>
 
             {/* Remember + Forgot password */}
             <div className="flex items-center justify-between">
@@ -167,3 +179,6 @@ export default function LoginPage() {
     </main>
   );
 }
+
+
+

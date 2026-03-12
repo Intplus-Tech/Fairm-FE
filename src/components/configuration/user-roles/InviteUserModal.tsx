@@ -21,17 +21,31 @@ export default function InviteUserModal({
 
   const res = await fetch("/api/demo/invite", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ fullName, email, phone, role }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      fullName,
+      email,
+      phone,
+      role,
+    }),
   });
 
   const data = await res.json();
 
+  if (!res.ok) {
+    console.error(data);
+    return;
+  }
+
   console.log("Invite link (demo):", data.inviteLink);
+
+  // For testing you can open automatically
+  // window.open(data.inviteLink, "_blank");
 
   onSuccess();
 }
-
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
@@ -102,6 +116,8 @@ export default function InviteUserModal({
                 placeholder="+234 9078789999"
               />
             </div>
+            
+           
           </div>
 
           {/* Role */}
@@ -109,23 +125,18 @@ export default function InviteUserModal({
             <label className="mb-1 block text-sm font-medium">
               User Role <span className="text-red-500">*</span>
             </label>
-            <select
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              required
-              className="w-full rounded-md border px-3 py-2 text-sm"
-            >
-              <option value="">Select</option>
-              <option value="Owner">
-                Owner – Full Visibility & System Configuration
-              </option>
-              <option value="Admin">
-                Admin – Operations, Stock & Staff Oversight
-              </option>
-              <option value="Farm Manager">
-                Farm Manager – Data Entry & Local Inventory
-              </option>
-            </select>
+           <select
+  value={role}
+  onChange={(e) => setRole(e.target.value)}
+  required
+  className="w-full rounded-md border px-3 py-2 text-sm"
+>
+  <option value="">Select</option>
+  <option value="owner">Owner</option>
+  <option value="admin">Admin</option>
+  <option value="manager">Manager</option>
+  <option value="entry_officer">Entry Officer</option>
+</select>
           </div>
 
           {/* Actions */}

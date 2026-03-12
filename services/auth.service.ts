@@ -21,3 +21,4 @@ export const authService = {
     return api.post<VerifyOtpResponse>("/auth/verify-otp", payload).then(res => res.data);
   },
 };
+

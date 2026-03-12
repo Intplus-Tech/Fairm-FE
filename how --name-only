@@ -1,0 +1,123 @@
+[33mcommit db0fc1df0b4f958ea42629c07b26717242dc669b[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfeat/dev-olayemi[m[33m, [m[1;31morigin/feat/dev-olayemi[m[33m)[m
+Author: cyberrspace <xhamooel95@gmail.com>
+Date:   Wed Mar 11 08:40:45 2026 -0700
+
+    fairm ai activated
+
+[33mcommit e960807729cb3f7d2f677b48bc287e49a9f0c0ab[m
+Author: sbendavid <samuelbendavid01@gmail.com>
+Date:   Wed Mar 11 15:34:57 2026 +0100
+
+    feat: added the services and types
+
+[33mcommit 0032038a233fd87085d1f850d3ebe58a1d74aca7[m
+Author: cyberrspace <xhamooel95@gmail.com>
+Date:   Tue Mar 10 01:46:52 2026 -0700
+
+    implemented entry officer modules
+
+[33mcommit 6dfec6879b65cd5ae9f6fd584b0dff93b99808c6[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m
+Author: cyberrspace <xhamooel95@gmail.com>
+Date:   Fri Feb 20 23:07:52 2026 +0100
+
+    base url added to env
+
+[33mcommit 0eba696a566c80af57812aa12719fd4d75a093e5[m
+Author: cyberrspace <xhamooel95@gmail.com>
+Date:   Fri Feb 20 19:16:08 2026 +0100
+
+    configuration page updated and param error resolved
+
+[33mcommit 1319b89efb0672b95dc6ef60d80dc3ab33088f46[m
+Author: cyberrspace <xhamooel95@gmail.com>
+Date:   Tue Feb 17 11:58:08 2026 +0100
+
+    credential changed to true
+
+[33mcommit ff4e90d1846d474adcbeacb1841f868c680ed3ab[m
+Author: cyberrspace <xhamooel95@gmail.com>
+Date:   Tue Feb 17 10:45:32 2026 +0100
+
+    temp: disable credentials to test CORS
+
+[33mcommit 408106683691065bd0d79c28524ee7d77d25164f[m
+Author: cyberrspace <xhamooel95@gmail.com>
+Date:   Mon Feb 16 22:33:16 2026 +0100
+
+    category folder updated
+
+[33mcommit bf51dfdeb53220e634f4c898bbe500f26f96166d[m
+Author: cyberrspace <xhamooel95@gmail.com>
+Date:   Mon Feb 16 14:32:07 2026 +0100
+
+    frontend cors errors fixing
+
+[33mcommit 2795c7b902bfa3b0003cd7511a22514def91fe0a[m
+Author: cyberrspace <xhamooel95@gmail.com>
+Date:   Sun Feb 15 21:26:55 2026 +0100
+
+    Fix login service and axios for backend connectivity
+
+[33mcommit 455d451dc6dd6c29175163a2649c959d46ec7225[m
+Author: cyberrspace <xhamooel95@gmail.com>
+Date:   Sun Feb 15 20:06:25 2026 +0100
+
+    feat: add typed user service and update users hook
+
+[33mcommit d04b65a77887f356e4fcb8a2d9dddc10c2431908[m
+Author: cyberrspace <xhamooel95@gmail.com>
+Date:   Sat Feb 14 12:35:22 2026 +0100
+
+    Fix password-reset dynamic rendering for useSearchParams
+
+[33mcommit 468e5f78b27dc3bf7f795facedd134ab6dcdc93b[m
+Author: cyberrspace <xhamooel95@gmail.com>
+Date:   Sat Feb 14 09:32:24 2026 +0100
+
+    feat: add threshold settings and user roles components
+
+[33mcommit 9c86e7c8cdbd4a797ae55afa99bdbf012e2d5e25[m
+Author: cyberrspace <xhamooel95@gmail.com>
+Date:   Mon Feb 9 14:20:42 2026 +0100
+
+    feat: enhance bird management dashboard with new components and tables for broilers and pullets
+
+[33mcommit 7202a0260d777132ed518f59dfecb5b97bcc4f9f[m
+Author: cyberrspace <xhamooel95@gmail.com>
+Date:   Sat Feb 7 16:48:35 2026 +0100
+
+    fix: resolve build issues and stabilize charts
+
+[33mcommit c1b2e4a3061052f6a00a5c7b02a885a566c3f997[m
+Merge: 44bd35d 6a7b1a1
+Author: cyberrspace <xhamooel95@gmail.com>
+Date:   Fri Feb 6 23:35:23 2026 +0100
+
+    Merge branch 'feat/dev-olayemi'
+
+[33mcommit 6a7b1a110347d05f07de7648479bf7cbaee04cdd[m
+Author: cyberrspace <xhamooel95@gmail.com>
+Date:   Fri Feb 6 22:56:42 2026 +0100
+
+    feat(auth, broiler): fix password flows, typing, and table alignment
+
+[33mcommit 44bd35d1426bc456ed6c09b6c6c2a949c05962eb[m
+Merge: 44ff3c2 5b1f625
+Author: Adewale Olayemi <xhamooel95@gmail.com>
+Date:   Fri Feb 6 16:34:02 2026 +0100
+
+    Merge pull request #1 from Intplus-Tech/feat/dev-olayemi
+    
+    setting up the first commit
+
+[33mcommit 5b1f6252224ea862c9a8f8dcf5c79ff8bcd113d1[m
+Author: cyberrspace <xhamooel95@gmail.com>
+Date:   Fri Feb 6 16:13:28 2026 +0100
+
+    setting up the first commit
+
+[33mcommit 44ff3c202764807fe60604a81908f1bffcabc588[m
+Author: cyberrspace <xhamooel95@gmail.com>
+Date:   Tue Feb 3 06:49:29 2026 +0100
+
+    chore: initialize FAIRM admin frontend
