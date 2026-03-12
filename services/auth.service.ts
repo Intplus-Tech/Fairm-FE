@@ -9,7 +9,7 @@ import type {
 } from "@/types/auth";
 
 export const authService = {
-  login(payload: LoginRequest): Promise<LoginResponse> {
+  login: (payload: LoginRequest): Promise<LoginResponse> => {
     return api.post<LoginResponse>("/auth/login", payload).then(res => res.data);
   },
 

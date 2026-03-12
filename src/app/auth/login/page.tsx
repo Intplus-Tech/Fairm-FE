@@ -20,8 +20,10 @@ import Word from "@/components/brand/word";
 
 import type { ApiErrorResponse } from "@/types/auth";
 import { AxiosError } from "axios";
+
 import { authService } from "../../../../services/auth.service";
 import { tokenStorage } from "@/lib/api/token";
+import { storeUser } from "@/lib/auth/getUser";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -32,63 +34,85 @@ export default function LoginPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  // validation rules
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const isPasswordValid = password.trim().length >= 6;
 
   const isFormValid = isEmailValid && isPasswordValid && !isLoading;
 
   const handleLogin = async () => {
-  setErrorMessage(null);
+    setErrorMessage(null);
 
-  if (!email.trim()) return setErrorMessage("Email is required.");
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return setErrorMessage("Please enter a valid email.");
-  if (!password.trim()) return setErrorMessage("Password is required.");
-  if (password.length < 6) return setErrorMessage("Password must be at least 6 characters.");
-
-  setIsLoading(true);
-
-  try {
-    const response = await authService.login({ email, password });
-
-    // store tokens
-    tokenStorage.set(response.data.token);
-    tokenStorage.setRefresh(response.data.refreshToken);
-
-    // get logged in user
-    const user = response.data.user;
-
-    // role based redirect
-    if (user?.role === "entry_officer") {
-      router.push("/entry-officer/dashboard");
-    } else {
-      router.push("/dashboard");
+    if (!email.trim()) {
+      setErrorMessage("Email is required.");
+      return;
     }
 
-  } catch (err) {
-    const error = err as AxiosError<ApiErrorResponse>;
-    const message = error.response?.data?.message;
+    if (!password.trim()) {
+      setErrorMessage("Password is required.");
+      return;
+    }
 
-    if (error.response?.status === 400)
-      setErrorMessage(message || "Invalid login details.");
-    else if (error.response?.status === 401)
-      setErrorMessage("Invalid email or password.");
-    else
-      setErrorMessage("Something went wrong. Please try again.");
-  } finally {
-    setIsLoading(false);
-  }
-};
-  
+    setIsLoading(true);
+
+    try {
+      const response = await authService.login({ email, password });
+
+      const token = response?.data?.token;
+      const refreshToken = response?.data?.refreshToken;
+      const apiUser = response?.data?.user;
+
+      if (!token || !apiUser) {
+        throw new Error("Invalid login response from server");
+      }
+
+      // store tokens
+      tokenStorage.set(token);
+      tokenStorage.setRefresh(refreshToken);
+
+      // transform API user to app user
+      const user = {
+        id: apiUser._id,
+        email: apiUser.email,
+        role: apiUser.role,
+        fullName: `${apiUser.firstName} ${apiUser.lastName}`,
+      };
+
+      // store user
+      storeUser(user);
+
+      const role = apiUser.role?.toLowerCase();
+
+      // role-based redirect
+      if (role === "entry_officer") {
+        router.replace("/entry-officer");
+        return;
+      }
+
+      if (role === "admin" || role === "owner" || role === "manager") {
+        router.replace("/dashboard");
+        return;
+      }
+
+      router.replace("/dashboard");
+
+    } catch (err) {
+      const error = err as AxiosError<ApiErrorResponse>;
+
+      setErrorMessage(
+        error.response?.data?.message || "Login failed"
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-transparent px-4">
-      {/* Brand */}
       <div className="flex items-center gap-2 mb-6">
         <Logo className="h-[23px] w-[23px]" />
         <Word className="h-[34px] w-[80px]" />
       </div>
 
-      {/* Card */}
       <Card className="w-full max-w-lg md:max-w-xl bg-transparent backdrop-blur-lg">
         <CardHeader className="space-y-2 pb-4">
           <CardTitle className="text-2xl text-start font-semibold">
@@ -98,7 +122,7 @@ export default function LoginPage() {
 
         <CardContent className="px-6 md:px-8 pb-8 space-y-4">
           <div className="space-y-6">
-            {/* Email */}
+
             <div className="space-y-1">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -112,7 +136,6 @@ export default function LoginPage() {
               />
             </div>
 
-            {/* Password */}
             <div className="space-y-1">
               <Label htmlFor="password">Password</Label>
 
@@ -136,9 +159,8 @@ export default function LoginPage() {
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
-          </div>
+            </div>
 
-            {/* Remember + Forgot password */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <input
@@ -160,12 +182,10 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* Error message (UI only, no popup, no overlay) */}
           {errorMessage && (
             <p className="text-sm text-red-600 mt-2">{errorMessage}</p>
           )}
 
-          {/* Login button */}
           <Button
             onClick={handleLogin}
             disabled={!isFormValid}
@@ -179,6 +199,3 @@ export default function LoginPage() {
     </main>
   );
 }
-
-
-
