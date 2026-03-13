@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { authService } from "../../../../services/auth.service";
 
 interface InviteUserModalProps {
   onClose: () => void;
@@ -11,59 +12,44 @@ export default function InviteUserModal({
   onClose,
   onSuccess,
 }: InviteUserModalProps) {
-  const [fullName, setFullName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [role, setRole] = useState("");
+
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string>(""); 
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+ async function handleSubmit(e: React.FormEvent) {
+  e.preventDefault();
 
-    try {
-      setLoading(true);
+  // Combine firstName and lastName
+  const fullName = `${firstName} ${lastName}`.trim();
 
-      const res = await fetch("/api/demo/invite", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          fullName,
-          email,
-          phone,
-          role,
-        }),
-      });
+  try {
+    const res = await fetch("/api/demo/invite", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ fullName, email, phone, role }),
+    });
 
-      let data: any = null;
+    const data = await res.json();
 
-      // Safely parse response
-      try {
-        data = await res.json();
-      } catch {
-        data = null;
-      }
-
-      if (!res.ok) {
-        console.error("Invite request failed:", res.status, data);
-        alert(data?.message || "Failed to send invite");
-        return;
-      }
-
-      console.log("Invite link (demo):", data?.inviteLink);
-
-      // Optional: open invite link automatically for testing
-      // window.open(data.inviteLink, "_blank");
-
-      onSuccess();
-    } catch (error) {
-      console.error("Network error:", error);
-      alert("Something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
+    if (!res.ok) {
+      // Set error message
+      setError(data.message || "Failed to send invite.");
+      return;
     }
+
+    console.log("Invite link (demo):", data.inviteLink);
+    setError(""); // Clear any previous error
+    onSuccess();
+  } catch (err) {
+    setError("Something went wrong. Please try again.");
+    console.error(err);
   }
+}
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
@@ -97,8 +83,21 @@ export default function InviteUserModal({
                 Full Name <span className="text-red-500">*</span>
               </label>
               <input
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                required
+                className="w-full rounded-md border px-3 py-2 text-sm"
+                placeholder="Jane"
+              />
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-medium">
+                Last Name <span className="text-red-500">*</span>
+              </label>
+              <input
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
                 required
                 className="w-full rounded-md border px-3 py-2 text-sm"
                 placeholder="Full Name"
@@ -155,6 +154,12 @@ export default function InviteUserModal({
               <option value="entry_officer">Entry Officer</option>
             </select>
           </div>
+
+          {error && (
+            <p className="text-red-500 text-sm mb-2">
+              {error}
+            </p>
+          )}
 
           {/* Actions */}
           <div className="flex justify-end gap-3 pt-4">
