@@ -39,7 +39,10 @@ export default function LoginPage() {
 
   const isFormValid = isEmailValid && isPasswordValid && !isLoading;
 
-  const handleLogin = async () => {
+  const handleLogin = async (e?: React.MouseEvent<HTMLButtonElement>) => {
+    // prevent page refresh
+    e?.preventDefault();
+
     setErrorMessage(null);
 
     if (!email.trim()) {
@@ -55,6 +58,8 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
+      console.log("Login payload:", { email, password });
+
       const response = await authService.login({ email, password });
 
       const token = response?.data?.token;
@@ -83,7 +88,7 @@ export default function LoginPage() {
       const role = apiUser.role?.toLowerCase();
 
       // role-based redirect
-      if (role === "entry_officer") {
+      if (role === "entry-officer") {
         router.replace("/entry-officer");
         return;
       }
@@ -97,6 +102,8 @@ export default function LoginPage() {
 
     } catch (err) {
       const error = err as AxiosError<ApiErrorResponse>;
+
+      console.error("Login error:", error);
 
       setErrorMessage(
         error.response?.data?.message || "Login failed"
