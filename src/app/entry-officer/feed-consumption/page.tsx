@@ -1,5 +1,8 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+// import { useEntryFlow } from "@/context/entry-flow-context";
+
 import AbnormalFeeding from "@/components/feed-consumption/AbnormalFeeding";
 import DailyFeedHeader from "@/components/feed-consumption/DailyFeedHeader";
 import FeedActions from "@/components/feed-consumption/FeedActions";
@@ -9,13 +12,8 @@ import WaterConsumption from "@/components/feed-consumption/WaterConsumption";
 import { feedConsumptionService } from "../../../../services/feed-consumption.service";
 import { AbnormalFeedingType, AppearanceType, FeedConsumptionRequest, InsectPestType, SmellType } from "@/types/feed-consumption";
 import { useMemo, useState } from "react";
+import { useEntryFlow } from "../../../../context/entry-flow-context";
 
-// import DailyFeedHeader from "@/components/feed/DailyFeedHeader";
-// import FeedConsumptionTable from "@/components/feed/FeedConsumptionTable";
-// import FeedQualityCheck from "@/components/feed/FeedQualityCheck";
-// import WaterConsumption from "@/components/feed/WaterConsumption";
-// import AbnormalFeeding from "@/components/feed/AbnormalFeeding";
-// import FeedActions from "@/components/feed/FeedActions";
 
 type FeedRow = {
   pen: string;
@@ -26,7 +24,11 @@ type FeedRow = {
 };
 
 export default function Page() {
-    const [time, setTime] = useState("08:00");
+  const { setFlow } = useEntryFlow();
+  const router = useRouter();
+
+
+  const [time, setTime] = useState("08:00");
   const [checker, setChecker] = useState("Ajewole Iyanuloluwa");
 
   const [rows, setRows] = useState<FeedRow[]>([
@@ -115,6 +117,15 @@ export default function Page() {
       setLoading(false);
     }
   };
+
+    const handleNext = () => {
+    setFlow((prev: any) => ({
+      ...prev,
+      feed: true,
+    }));
+
+    router.push("/entry-officer/egg-production");
+  };
   
   return (
     <div className="min-h-screen bg-gray-50 p-6 space-y-6">
@@ -145,7 +156,7 @@ export default function Page() {
         setAdditionalNotes={setAdditionalNotes}
       />
 
-      <FeedActions onSave={handleSubmit} loading={loading} />
+      <FeedActions onSave={handleSubmit} loading={loading} handleNext={handleNext} />
      </div>
   );
 }

@@ -1,5 +1,8 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+// import { useEntryFlow } from "@/context/entry-flow-context";
+
 import ActionButtons from "@/components/farm-gate-sales/ActionButtons";
 import EggSalesTable from "@/components/farm-gate-sales/EggSalesTable";
 import PackagingDetails from "@/components/farm-gate-sales/PackagingDetails";
@@ -10,9 +13,12 @@ import { FarmGateSaleRequest } from "@/types/farm-gate-sales";
 import { useState } from "react";
 import { farmGateSaleService } from "../../../../services/farm-gate-sales.service";
 
+import { useEntryFlow } from "../../../../context/entry-flow-context";
 
 export default function FarmGateSalesPage() {
   const [loading, setLoading] = useState(false);
+  const { setFlow } =useEntryFlow();
+  const router = useRouter();
 
   const [saleData, setSaleData] = useState<FarmGateSaleRequest>({
     customerType: "manager",
@@ -78,6 +84,7 @@ export default function FarmGateSalesPage() {
 
       console.log("Farm Sale Saved:", createdSale);
       alert("Farm gate sale created successfully");
+      router.push("/entry-officer/lagos-transfer");
     } catch (error) {
       console.error("Failed to save farm gate sale:", error);
       alert("Failed to save farm gate sale");
@@ -86,11 +93,20 @@ export default function FarmGateSalesPage() {
     }
   };
 
+  function handleNext() {
+    setFlow((prev: any) => ({
+      ...prev,
+      farm: true,
+    }));
+
+    router.push("/entry-officer/lagos-transfer");
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-6xl mx-auto space-y-6">
 
-       <SaleHeader/>
+        <SaleHeader />
 
       <SaleDetails saleData={saleData} updateField={updateField} />
 
@@ -101,6 +117,15 @@ export default function FarmGateSalesPage() {
       <PaymentStatus saleData={saleData} updateField={updateField} />
 
       <ActionButtons onSave={handleSave} loading={loading} />
+
+        <div className="flex justify-end">
+          <button
+            onClick={handleNext}
+            className="bg-indigo-600 text-white px-6 py-2 rounded-lg"
+          >
+            Next: Bulk Transfer →
+          </button>
+        </div>
 
       </div>
     </div>

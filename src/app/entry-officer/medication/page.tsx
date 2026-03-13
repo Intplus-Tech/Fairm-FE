@@ -1,4 +1,7 @@
+"use client";
 
+import { useRouter } from "next/navigation";
+// import { useEntryFlow } from "@/context/entry-flow-context";
 
 import HealthObservation from "@/components/medication/HealthObservation";
 import MedicationActions from "@/components/medication/MedicationActions";
@@ -17,6 +20,7 @@ import type {
 } from "@/types/medication";
 import { useMemo, useState } from "react";
 import { medicationService } from "../../../../services/medication.service";
+import { useEntryFlow } from "../../../../context/entry-flow-context";
 
 type TreatmentRow = {
   pen: string;
@@ -79,6 +83,8 @@ export default function MedicationPage() {
   const [applied, setApplied] = useState<AppliedType>("no");
 
   const [loading, setLoading] = useState(false);
+  const { setFlow } = useEntryFlow();
+  const router = useRouter();
 
   const firstValidRow = useMemo(() => {
     return rows.find(
@@ -142,6 +148,15 @@ export default function MedicationPage() {
     }
   };
 
+    const handleNext = () => {
+    setFlow((prev: any) => ({
+      ...prev,
+      medication: true,
+    }));
+
+    router.push("/entry-officer/duty-roaster");
+  };
+
   
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -185,8 +200,17 @@ export default function MedicationPage() {
 
         <MedicationActions onSave={handleSave} loading={loading} />
 
+        <div className="flex justify-end">
+          <button
+            onClick={handleNext}
+            className="bg-indigo-600 text-white px-6 py-2 rounded-lg"
+          >
+            Next: Duty Roaster →
+          </button>
+        </div>
+
       </div>
 
     </div>
-  )
+  );
 }

@@ -1,94 +1,54 @@
 "use client";
 
-import DutyRosterFooter from "@/components/duty-roster/DutyRosterFooter";
-import DutyRosterHeader from "@/components/duty-roster/DutyRosterHeader";
-import DutyRosterSection from "@/components/duty-roster/DutyRosterSection";
-// import DutyRosterSection from "@/components/duty-roster/DutyRosterSection";
-// import DutyRosterFooter from "@/components/duty-roster/DutyRosterFooter";
+import { useRouter } from "next/navigation";
+// import { useEntryFlow } from "@/context/entry-flow-context";
+
+import MortalityHeader from "@/components/mortality/mortality-header";
+import PenDataTable from "@/components/mortality/pen-data-table";
+import SickBirdObservation from "@/components/mortality/sick-bird-observation";
+import PhotoEvidence from "@/components/mortality/photo-evidence";
+import { useEntryFlow } from "../../../../context/entry-flow-context";
 
 export default function MortalityPage() {
-  const managementTeam = [
-    {
-      name: "Mr. David",
-      position: "Manager",
-      dutyStatus: "Off",
-      location: "--",
-      task: "Day off",
-    },
-    {
-      name: "Mr. Azeez",
-      position: "Supervisor",
-      dutyStatus: "On",
-      location: "Office",
-      task: "Supervision, Feed Ordering",
-    },
-    {
-      name: "Mr. Iyanu",
-      position: "Supervisor",
-      dutyStatus: "On",
-      location: "Pen 2",
-      task: "Egg Collection & Quality Checks",
-    },
-    {
-      name: "Mr. Adebare",
-      position: "Supervisor",
-      dutyStatus: "On",
-      location: "Storage",
-      task: "Medication & Equipment Checks",
-    },
-  ];
+  const { setFlow } = useEntryFlow();
+  const router = useRouter();
 
-  const attendants = [
-    {
-      name: "Nickola Samuel Ayomide",
-      position: "",
-      dutyStatus: "Select",
-      location: "Pen 2",
-      task: "Feed distribution, Water checks",
-    },
-    {
-      name: "Ajibade Omolola",
-      position: "",
-      dutyStatus: "Select",
-      location: "Pen 2",
-      task: "Pen Cleaning, feed assist",
-    },
-    {
-      name: "Joshua Adebola",
-      position: "",
-      dutyStatus: "Select",
-      location: "Pen 3",
-      task: "Eggs Collection and counting",
-    },
-    {
-      name: "Uzoma junior",
-      position: "",
-      dutyStatus: "Select",
-      location: "All Pens",
-      task: "General Cleaning and waste disposal",
-    },
-  ];
+  const handleNext = () => {
+    setFlow((prev: any) => ({
+      ...prev,
+      mortality: true,
+    }));
+
+    router.push("/entry-officer/feed-consumption");
+  };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+    <div className="min-h-screen bg-gray-100 p-6 space-y-6">
+      <MortalityHeader />
 
-        <DutyRosterHeader />
+      <div className="bg-white rounded-xl shadow p-6">
+        <PenDataTable />
+      </div>
 
-        <div className="p-6 space-y-8">
-       <DutyRosterSection
-            title="MANAGEMENT TEAM"
-            employees={managementTeam}
-          />
+      <div className="bg-white rounded-xl shadow p-6">
+        <SickBirdObservation />
+      </div>
 
-          <DutyRosterSection
-            title="ATTENDANTS"
-            employees={attendants}
-          />
-        </div>
+      <div className="bg-white rounded-xl shadow p-6">
+        <PhotoEvidence />
+      </div>
 
-        <DutyRosterFooter/>
+      <div className="flex justify-end gap-4">
+        <button className="border border-indigo-500 text-indigo-600 px-6 py-2 rounded-lg">
+          Save Flock Health Data
+        </button>
 
+        <button
+          onClick={handleNext}
+          className="bg-indigo-600 text-white px-6 py-2 rounded-lg"
+        >
+          Next: Feed Consumption →
+        </button>
       </div>
     </div>
   );

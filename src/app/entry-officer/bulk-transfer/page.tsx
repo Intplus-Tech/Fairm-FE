@@ -1,3 +1,6 @@
+"use client";
+
+import { useRouter } from "next/navigation";
 
 
 import DestinationSection from "@/components/bulk-transfer/DestinationSection";
@@ -11,11 +14,14 @@ import TransferDetails from "@/components/bulk-transfer/TransferDetails";
 import TransferHeader from "@/components/bulk-transfer/TransferHeader";
 import { bulkTransferService } from "../../../../services/bulk-transfer.service";
 import { BulkTransferRequest } from "@/types/bulk-transfer";
-// import { useState } from "react";
+import { useEntryFlow } from "../../../../context/entry-flow-context";
+import { useState } from "react";
 
 export default function BulkTransferPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+    const { setFlow } = useEntryFlow();
+  const router = useRouter();
 
   const [form, setForm] = useState<BulkTransferRequest>({
     destination: "",
@@ -62,6 +68,7 @@ export default function BulkTransferPage() {
       await bulkTransferService.create(form);
 
       alert("Bulk transfer saved successfully!");
+      router.push("/entry-officer/medication");
     } catch (err: unknown) {
       const message =
           err instanceof Error ? err.message : "An unexpected error occurred";
@@ -71,9 +78,18 @@ export default function BulkTransferPage() {
     }
   };
 
+    const handleNext = () => {
+    setFlow((prev: any) => ({
+      ...prev,
+      lagos: true,
+    }));
+
+    router.push("/entry-officer/medication");
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
+
       <div className="max-w-6xl mx-auto space-y-6">
 
       {error && (
@@ -148,7 +164,17 @@ export default function BulkTransferPage() {
 
         <TransferActions onSave={handleSubmit} loading={loading} />
 
+        <div className="flex justify-end">
+          <button
+            onClick={handleNext}
+            className="bg-indigo-600 text-white px-6 py-2 rounded-lg"
+          >
+            Next: Medication →
+          </button>
+        </div>
+
       </div>
+
     </div>
-  )
+  );
 }

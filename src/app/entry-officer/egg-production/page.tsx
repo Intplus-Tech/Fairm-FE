@@ -1,14 +1,13 @@
-// app/egg-production/page.tsx
-// import EggCollectionTable from "@/components/EggCollectionTable";
-// import CollectionIssues from "@/components/CollectionIssues";
-// import PhotosEvidence from "@/components/PhotosEvidence";
-// import PageNavigation from "@/components/PageNavigation";
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useEntryFlow } from "../../../../context/entry-flow-context";
 
 import CollectionIssues from "@/components/egg-production/CollectionIssues";
 import EggCollectionTable from "@/components/egg-production/EggCollectionTable";
 import PageNavigation from "@/components/egg-production/PageNavigation";
 import PhotosEvidence from "@/components/egg-production/PhotosEvidence";
-// import { useState } from "react";
+import { useState } from "react";
 import { uploadFileService } from "../../../../services/uploadFile.service";
 import { CollectionIssuesType, EggProductionRequest } from "@/types/egg-production";
 import { eggProductionService } from "../../../../services/egg-production.service";
@@ -45,6 +44,8 @@ export default function EggProductionPage() {
   const [collectionIssues, setCollectionIssues] = useState<CollectionIssuesType[]>([]);
   const [photosEvidences, setPhotosEvidences] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
+    const { setFlow } = useEntryFlow();
+  const router = useRouter();
 
   const handlePhotoUpload = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
@@ -86,6 +87,7 @@ export default function EggProductionPage() {
       await Promise.all(payloads.map((payload) => eggProductionService.create(payload)));
 
       alert("Egg production data saved successfully!");
+      router.push("/entry-officer/farm-gate-sales");
     } catch (error) {
       console.error("Failed to save egg production data:", error);
       alert("Failed to save egg production data");
@@ -93,9 +95,19 @@ export default function EggProductionPage() {
       setSaving(false);
     }
   };
+
+    const handleNext = () => {
+    setFlow((prev: any) => ({
+      ...prev,
+      egg: true,
+    }));
+
+    router.push("/entry-officer/farm-gate-sales");
+  };
   
   return (
     <div className="max-w-6xl mx-auto p-6">
+
       <header className="mb-6 bg-purple-600 text-white p-4 rounded-md">
         <h1 className="text-xl font-bold">Daily Egg Production</h1>
         <p className="text-sm">Sunday, February 1, 2026</p>
@@ -115,6 +127,16 @@ export default function EggProductionPage() {
          />
         <PageNavigation onSave={handleSave} loading={saving} />
       </section>
+
+      <div className="flex justify-end mt-6">
+        <button
+          onClick={handleNext}
+          className="bg-indigo-600 text-white px-6 py-2 rounded-lg"
+        >
+          Next: Farm Gate Sales →
+        </button>
+      </div>
+
     </div>
   );
 }
