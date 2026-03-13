@@ -1,9 +1,28 @@
+import { FarmGateSaleRequest } from "@/types/farm-gate-sales";
+
 interface Props {
-  saleData: any;
-  updateField: (field: string, value: any) => void;
+  saleData: FarmGateSaleRequest;
+  updateField: <K extends keyof FarmGateSaleRequest>(
+    field: K,
+    value: FarmGateSaleRequest[K]
+  ) => void;
 }
 
 export default function PackagingDetails({ saleData, updateField }: Props) {
+  const handlePackingChange = (
+    field: keyof FarmGateSaleRequest["packingDetails"],
+    value: string
+  ) => {
+    updateField("packingDetails", {
+      ...saleData.packingDetails,
+      [field]:
+        field === "cratesUsed" || field === "sacksUsed"
+          ? Number(value) || 0
+          : field === "loadedAt"
+          ? new Date(`1970-01-01T${value}:00`)
+          : value,
+    });
+  };
   return (
     <div className="bg-white p-6 rounded-xl shadow-sm border space-y-4">
 
@@ -16,8 +35,9 @@ export default function PackagingDetails({ saleData, updateField }: Props) {
         <div>
           <label className="text-sm">Crates Used</label>
           <input
-            value={saleData.cratesUsed}
-            onChange={(e)=>updateField("cratesUsed", e.target.value)}
+          type="number"
+            value={saleData.packingDetails.cratesUsed}
+            onChange={(e) => handlePackingChange("cratesUsed", e.target.value)}
             className="border rounded-lg p-2 w-full mt-1"
           />
         </div>
@@ -25,8 +45,9 @@ export default function PackagingDetails({ saleData, updateField }: Props) {
         <div>
           <label className="text-sm">Sacks Used</label>
           <input
-            value={saleData.sacksUsed}
-            onChange={(e)=>updateField("sacksUsed", e.target.value)}
+            type="number"
+            value={saleData.packingDetails.sacksUsed}
+            onChange={(e) => handlePackingChange("sacksUsed", e.target.value)}
             className="border rounded-lg p-2 w-full mt-1"
           />
         </div>
@@ -34,8 +55,8 @@ export default function PackagingDetails({ saleData, updateField }: Props) {
         <div>
           <label className="text-sm">Vehicle</label>
           <input
-            value={saleData.vehicle}
-            onChange={(e)=>updateField("vehicle", e.target.value)}
+            value={saleData.packingDetails.vehicle}
+            onChange={(e) => handlePackingChange("vehicle", e.target.value)}
             className="border rounded-lg p-2 w-full mt-1"
           />
         </div>
@@ -44,8 +65,8 @@ export default function PackagingDetails({ saleData, updateField }: Props) {
           <label className="text-sm">Loading Time</label>
           <input
             type="time"
-            value={saleData.loadingTime}
-            onChange={(e)=>updateField("loadingTime", e.target.value)}
+            value={saleData.packingDetails.loadedAt.toTimeString().slice(0, 5)}
+            onChange={(e) => handlePackingChange("loadedAt", e.target.value)}
             className="border rounded-lg p-2 w-full mt-1"
           />
         </div>
@@ -53,8 +74,8 @@ export default function PackagingDetails({ saleData, updateField }: Props) {
         <div>
           <label className="text-sm">Loaded By</label>
           <input
-            value={saleData.loadedBy}
-            onChange={(e)=>updateField("loadedBy", e.target.value)}
+            value={saleData.packingDetails.loadedBy}
+            onChange={(e) => handlePackingChange("loadedBy", e.target.value)}
             className="border rounded-lg p-2 w-full mt-1"
           />
         </div>
@@ -62,8 +83,8 @@ export default function PackagingDetails({ saleData, updateField }: Props) {
         <div>
           <label className="text-sm">Verified By</label>
           <input
-            value={saleData.verifiedBy}
-            onChange={(e)=>updateField("verifiedBy", e.target.value)}
+            value={saleData.packingDetails.verifiedBy}
+            onChange={(e) => handlePackingChange("verifiedBy", e.target.value)}
             className="border rounded-lg p-2 w-full mt-1"
           />
         </div>

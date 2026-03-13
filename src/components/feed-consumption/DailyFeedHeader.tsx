@@ -1,17 +1,29 @@
 "use client";
 
-import { useState } from "react";
+type Props = {
+  time: string;
+  setTime: (value: string) => void;
+  checker: string;
+  setChecker: (value: string) => void;
+};
 
-export default function DailyFeedHeader() {
-  const [time, setTime] = useState("8:00");
-  const [checker, setChecker] = useState("Ajewole Iyanuloluwa");
-
+export default function DailyFeedHeader({
+  time,
+  setTime,
+  checker,
+  setChecker,
+}: Props) {
   return (
     <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-6 rounded-xl">
       <h1 className="text-xl font-semibold mb-4">Daily Feed Consumption</h1>
 
       <div className="flex gap-6 items-center text-sm">
-        <div>Saturday, January 31, 2026</div>
+        <div>{new Date().toLocaleDateString("en-US", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })}</div>
 
         <div className="flex items-center gap-2">
           <span>Time</span>

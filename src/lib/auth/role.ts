@@ -1,11 +1,11 @@
 import { User } from "./getUser";
 
 export function isAdmin(role: string | undefined) {
-  return role === "admin";
+  return role === "super_admin";
 }
 
 export function isEntryOfficer(role: string | undefined) {
-  return role === "entry_officer";
+  return role === "staff";
 }
 
 export function isManager(role: string | undefined) {

@@ -36,11 +36,11 @@ export interface FarmGateSaleResponse {
   };
   packingDetails: {
     cratesUsed: number;
-    sacksUsed: 5;
+    sacksUsed: number;
     vehicle: string;
     loadedAt: Date;
     loadedBy: string;
-    VerifiedBy: string;
+    verifiedBy: string;
   };
   paymentStatus: {
     amountReceived: string;
@@ -88,7 +88,7 @@ export interface FarmGateSaleRequest {
     vehicle: string;
     loadedAt: Date;
     loadedBy: string;
-    VerifiedBy: string;
+    verifiedBy: string;
   };
   paymentStatus: {
     amountReceived: string;

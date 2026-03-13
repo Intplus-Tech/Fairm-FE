@@ -1,6 +1,39 @@
-export default function TreatmentsTable() {
+import type { MedicationTreatmentStatus } from "@/types/medication";
 
-  const pens = ["2", "3", "2B", "4"]
+type TreatmentRow = {
+  pen: string;
+  medication: string;
+  purpose: string;
+  dosage: number | "";
+  method: string;
+  status: MedicationTreatmentStatus;
+};
+
+type Props = {
+  rows: TreatmentRow[];
+  setRows: React.Dispatch<React.SetStateAction<TreatmentRow[]>>;
+};
+
+export default function TreatmentsTable({ rows, setRows }: Props) {
+    const handleChange = (
+    index: number,
+    key: keyof TreatmentRow,
+    value: string
+  ) => {
+    const updated = [...rows];
+
+    updated[index] = {
+      ...updated[index],
+      [key]:
+        key === "dosage"
+          ? value === ""
+            ? ""
+            : Number(value)
+          : value,
+    } as TreatmentRow;
+
+    setRows(updated);
+  };
 
   return (
     <div className="bg-white p-6 rounded-xl border shadow-sm">
@@ -23,66 +56,84 @@ export default function TreatmentsTable() {
         </thead>
 
         <tbody className="divide-y">
-
-          {pens.map((pen) => (
-
-            <tr key={pen} className="h-14">
-
-              <td>{pen}</td>
+          {rows.map((row, index) => (
+            <tr key={row.pen} className="h-14">
+              <td>{row.pen}</td>
 
               <td>
-                <select className="border rounded p-1">
-                  <option>Select</option>
-                </select>
+                <input
+                  className="border rounded p-1 w-full"
+                  placeholder="Medication"
+                  value={row.medication}
+                  onChange={(e) =>
+                    handleChange(index, "medication", e.target.value)
+                  }
+                />
               </td>
 
               <td>
-                <select className="border rounded p-1">
-                  <option>Select</option>
-                </select>
+                <input
+                  className="border rounded p-1 w-full"
+                  placeholder="Purpose"
+                  value={row.purpose}
+                  onChange={(e) =>
+                    handleChange(index, "purpose", e.target.value)
+                  }
+                />
               </td>
 
               <td className="flex items-center gap-2">
-
                 <input
-                  defaultValue="6"
+                  value={row.dosage}
+                  onChange={(e) => handleChange(index, "dosage", e.target.value)}
                   className="border rounded p-1 w-14"
+                  type="number"
                 />
 
                 <span className="text-xs text-gray-500">
                   bag in 2000L
                 </span>
-
               </td>
 
               <td>
-                <select className="border rounded p-1">
-                  <option>Select</option>
+                <select
+                  className="border rounded p-1"
+                  value={row.method}
+                  onChange={(e) => handleChange(index, "method", e.target.value)}
+                >
+                  <option value="">Select</option>
+                  <option value="water">Water</option>
+                  <option value="spray">Spray</option>
+                  <option value="injection">Injection</option>
+                  <option value="oral">Oral</option>
                 </select>
               </td>
 
               <td>
-
                 <div className="flex gap-3">
-
                   <label className="flex items-center gap-1">
-                    <input type="radio" name={`status-${pen}`} />
+                    <input
+                      type="radio"
+                      name={`status-${row.pen}`}
+                      checked={row.status === "pending"}
+                      onChange={() => handleChange(index, "status", "pending")}
+                    />
                     Pending
                   </label>
 
                   <label className="flex items-center gap-1">
-                    <input type="radio" name={`status-${pen}`} />
+                    <input
+                      type="radio"
+                      name={`status-${row.pen}`}
+                      checked={row.status === "done"}
+                      onChange={() => handleChange(index, "status", "done")}
+                    />
                     Done
                   </label>
-
                 </div>
-
               </td>
-
             </tr>
-
           ))}
-
         </tbody>
 
       </table>
