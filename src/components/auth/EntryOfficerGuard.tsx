@@ -1,6 +1,7 @@
 "use client";
 
-import { getUser } from "@/lib/auth/getUser";
+
+import { getStoredUser } from "@/lib/auth/getUser";
 import { redirect } from "next/navigation";
 
 export default function EntryOfficerGuard({
@@ -8,7 +9,7 @@ export default function EntryOfficerGuard({
 }: {
   children: React.ReactNode;
 }) {
-  const user = getUser();
+  const user = getStoredUser();
 
   if (!user) {
     redirect("/auth/login");
