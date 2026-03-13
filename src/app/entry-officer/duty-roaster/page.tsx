@@ -7,11 +7,24 @@ import DutyRosterFooter from "@/components/duty-roster/DutyRosterFooter";
 import DutyRosterHeader from "@/components/duty-roster/DutyRosterHeader";
 import DutyRosterSection from "@/components/duty-roster/DutyRosterSection";
 import { useEntryFlow } from "../../../../context/entry-flow-context";
+import { DutyRoasterRequest, DutyStatus } from "@/types/duty-roaster";
+import { dutyRoasterService } from "../../../../services/duty-roaster.service";
+
+type EmployeeRow = {
+  id: string;
+  name: string;
+  position: string;
+  dutyStatus: DutyStatus;
+  location: string;
+  taskAssigned: string;
+};
 
 export default function DutyRoasterPage() {
 
   const router = useRouter();
   const { setFlow } = useEntryFlow();
+
+    const [loading, setLoading] = useState(false);
 
   const handleFinish = () => {
 
@@ -41,6 +54,40 @@ export default function DutyRoasterPage() {
     { name:"Uzoma junior", position:"", dutyStatus:"Select", location:"All Pens", task:"General Cleaning and waste disposal" },
   ];
 
+  const updateAttendant = (
+    id: string,
+    field: keyof Employee,
+    value: string
+  ) => {
+    setAttendants((prev) =>
+      prev.map((employee) =>
+        employee.id === id ? { ...employee, [field]: value } : employee
+      )
+    );
+  };
+
+    const handleSaveAttendance = async () => {
+    try {
+      setLoading(true);
+
+      const payloads: DutyRoasterRequest[] = attendants.map((employee) => ({
+        attendantId: employee._id, // replace with real employee DB _id
+        dutyStatus: employee.dutyStatus,
+        location: employee.location,
+        taskAssigned: employee.taskAssigned,
+      }));
+
+      await Promise.all(payloads.map((payload) => dutyRoasterService.create(payload)));
+
+      alert("Duty roster saved successfully");
+    } catch (error) {
+      console.error("Failed to save duty roster:", error);
+      alert("Failed to save duty roster");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 p-6">
 
@@ -53,25 +100,22 @@ export default function DutyRoasterPage() {
           <DutyRosterSection
             title="MANAGEMENT TEAM"
             employees={managementTeam}
+            editable={false}
           />
 
           <DutyRosterSection
             title="ATTENDANTS"
             employees={attendants}
+            editable
+            onUpdate={updateAttendant}
           />
 
         </div>
 
-        <DutyRosterFooter />
-
-        <div className="flex justify-end p-6">
-          <button
-            onClick={handleFinish}
-            className="bg-indigo-600 text-white px-6 py-2 rounded-lg"
-          >
-            Finish Entry
-          </button>
-        </div>
+        <DutyRosterFooter 
+          loading={loading}
+          onSave={handleSaveAttendance}
+         handleFinish={handleFinish}/>
 
       </div>
 

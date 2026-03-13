@@ -1,21 +1,32 @@
-// import DutyRosterRow from "./DutyRosterRow";
+"use client";
 
+import { DutyStatus } from "@/types/duty-roaster";
 import DutyRosterRow from "./DutyRoasterRow";
 
-interface Employee {
+type EmployeeRow = {
+  id: string;
   name: string;
   position: string;
-  dutyStatus: string;
+  dutyStatus: DutyStatus;
   location: string;
-  task: string;
-}
+  taskAssigned: string;
+};
 
 interface Props {
   title: string;
-  employees: Employee[];
+  employees: EmployeeRow[];
+  editable?: boolean;
+  onUpdate?: (
+    id: string,
+    field: keyof EmployeeRow,
+    value: string
+  ) => void;
 }
 
-export default function DutyRosterSection({ title, employees }: Props) {
+export default function DutyRosterSection({
+  title,
+  employees,
+}: Props) {
   return (
     <div className="border rounded-lg overflow-hidden">
       <div className="bg-gray-50 px-4 py-3 font-semibold text-gray-700">
