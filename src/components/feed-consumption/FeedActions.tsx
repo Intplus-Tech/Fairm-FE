@@ -3,9 +3,10 @@
 type Props = {
   onSave: () => void;
   loading?: boolean;
+  handleNext: () => void;
 };
 
-export default function FeedActions({ onSave, loading }: Props) {
+export default function FeedActions({ onSave, loading, handleNext }: Props) {
   return (
     <div className="flex justify-between">
       <button className="px-4 py-2 border rounded-lg">
@@ -20,7 +21,9 @@ export default function FeedActions({ onSave, loading }: Props) {
           {loading ? "Saving..." : "Save Feed Data"}
         </button>
 
-        <button className="px-4 py-2 bg-indigo-600 text-white rounded-lg">
+        <button 
+        onClick={handleNext}
+        className="px-4 py-2 bg-indigo-600 text-white rounded-lg">
           Next: Feed Consumption →
         </button>
       </div>
