@@ -1,11 +1,11 @@
-export type medicationTreatmentStatus = "pending" | "done";
+export type MedicationTreatmentStatus = "pending" | "done";
 
 export type SicknessObserved =
   | "mites_observed"
   | "lice_observed"
   | "worms_observed";
 
-export type appliedType = "yes" | "no" | "schedule";
+export type AppliedType = "yes" | "no" | "schedule";
 
 export type VaccinationType =
   | "nd_vaccine"
@@ -25,7 +25,7 @@ export interface MedicationResponse {
   purpose: string;
   dosage: number;
   method: string;
-  status: medicationTreatmentStatus;
+  status: MedicationTreatmentStatus;
   medicationDetails: {
     name: string;
     expiryAt: Date;
@@ -38,7 +38,7 @@ export interface MedicationResponse {
   treatment: {
     sicknessObserved: SicknessObserved[];
     treatment: string;
-    applied: appliedType;
+    applied: AppliedType;
   };
   createdAt: string;
   updatedAt: string;
@@ -50,10 +50,10 @@ export interface MedicationRequest {
   purpose: string;
   dosage: number;
   method: string;
-  status: medicationTreatmentStatus;
+  status: MedicationTreatmentStatus;
   medicationDetails: {
     name: string;
-    expiryAt: Date;
+    expiryAt: string;
   };
   vaccinationSchedule: {
     vaccineType: VaccinationType[];
@@ -63,6 +63,6 @@ export interface MedicationRequest {
   treatment: {
     sicknessObserved: SicknessObserved[];
     treatment: string;
-    applied: appliedType;
+    applied: AppliedType;
   };
 }

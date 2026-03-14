@@ -15,7 +15,7 @@ export default function EntryOfficerGuard({
     redirect("/auth/login");
   }
 
-  if (user.role !== "entry-officer") {
+  if (user.role !== "staff" && user.role !== "super_admin") {
     redirect("/dashboard");
   }
 

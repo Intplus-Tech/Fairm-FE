@@ -1,9 +1,12 @@
 import { api } from "@/lib/api/axios";
-import { PenRequest } from "@/types/pen";
+import { PenRequest, PenResponse } from "@/types/pen";
+import { PaginatedResponse } from ".";
 
 export const pensService = {
   list() {
-    return api.get<{ data: PenRequest[] }>("/pens");
+    return api
+      .get<{ data: PaginatedResponse<PenResponse> }>("/pens")
+      .then((res) => res.data.data.data);
   },
 
   create(payload: PenRequest) {

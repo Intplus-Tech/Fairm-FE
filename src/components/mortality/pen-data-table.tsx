@@ -1,13 +1,48 @@
 "use client";
 
-const pens = [
-  { pen: "2", opening: 4356 },
-  { pen: "3", opening: 3234 },
-  { pen: "2B", opening: "" },
-  { pen: "4", opening: "" },
-];
+import type { Dispatch, SetStateAction } from "react";
+import type { CulledReason } from "@/types/mortality";
 
-export default function PenDataTable() {
+interface PenMortalityFormRow {
+  penId: string;
+  penLabel: string;
+  openingStock: number;
+  weight: number;
+  mortality: number;
+  sickWeakCount: number;
+  treat: boolean;
+  culledCount: number;
+  culledReason: CulledReason;
+  closingStock: number;
+  temperatureMin: number;
+  temperatureMax: number;
+}
+
+interface PenDataTableProps {
+  rows: PenMortalityFormRow[];
+  setRows: Dispatch<SetStateAction<PenMortalityFormRow[]>>;
+}
+
+export default function PenDataTable({ rows, setRows }: PenDataTableProps) {
+  const updateRow = (
+    index: number,
+    field: keyof PenMortalityFormRow,
+    value: string | number | boolean
+  ) => {
+    setRows((prev) =>
+      prev.map((row, i) => {
+        if (i !== index) return row;
+
+        const updatedRow = {
+          ...row,
+          [field]: value,
+        } as PenMortalityFormRow;
+
+        return updatedRow;
+      })
+    );
+  };
+  
   return (
     <div>
       <h2 className="font-semibold mb-4 text-lg">Pen Specific Data</h2>
@@ -27,48 +62,89 @@ export default function PenDataTable() {
           </thead>
 
           <tbody>
-            {pens.map((row, i) => (
+            {rows.map((row, i) => (
               <tr key={i} className="border-t">
-                <td className="p-2">{row.pen}</td>
+                <td className="p-2">{row.penLabel}</td>
 
                 <td className="p-2">
                   <input
-                    defaultValue={row.opening}
+                    type="number"
+                    value={row.openingStock}
+                    onChange={(e) =>
+                      updateRow(i, "openingStock", Number(e.target.value))
+                    }
                     className="border rounded px-2 py-1 w-24 bg-gray-100"
                   />
                 </td>
 
                 <td className="p-2">
-                  <input className="border border-red-400 rounded px-2 py-1 w-20" />
+                  <input
+                    type="number"
+                    value={row.weight}
+                    onChange={(e) =>
+                      updateRow(i, "weight", Number(e.target.value))
+                    }
+                    className="border rounded px-2 py-1 w-20"
+                  />
                 </td>
 
                 <td className="p-2">
-                  <input className="border border-red-400 rounded px-2 py-1 w-20" />
+                  <input
+                    type="number"
+                    value={row.mortality}
+                    onChange={(e) =>
+                      updateRow(i, "mortality", Number(e.target.value))
+                    }
+                    className="border rounded px-2 py-1 w-20"
+                  />
                 </td>
 
                 <td className="p-2">
                   <input className="border border-yellow-400 rounded px-2 py-1 w-20 mb-1" />
 
                   <div className="flex items-center gap-2 text-xs">
-                    <input type="checkbox" />
+                    <input
+                    type="checkbox"
+                    checked={row.treat}
+                    onChange={(e) => updateRow(i, "treat", e.target.checked)}
+                  />
                     Treat
                   </div>
                 </td>
 
                 <td className="p-2">
-                  <select className="border rounded px-2 py-1 text-sm">
-                    <option>Reason</option>
-                    <option>Injured</option>
-                    <option>Non-Productive</option>
-                    <option>Aggressive</option>
-                    <option>Other</option>
-                    <option>Deformed</option>
+                  <input
+                    type="number"
+                    value={row.culledCount}
+                    onChange={(e) =>
+                      updateRow(i, "culledCount", Number(e.target.value))
+                    }
+                    className="border rounded px-2 py-1 w-20"
+                  />
+                  <div className="flex items-center gap-2 text-xs">
+                  <select
+                    value={row.culledReason}
+                    onChange={(e) =>
+                      updateRow(i, "culledReason", e.target.value as CulledReason)
+                    }
+                    className="border rounded px-2 py-1 text-sm"
+                  >
+                    <option value="injured">Injured</option>
+                    <option value="non_productive">Non-Productive</option>
+                    <option value="aggressive">Aggressive</option>
+                    <option value="other">Other</option>
+                    <option value="deformed">Deformed</option>
                   </select>
+                </div>
                 </td>
 
                 <td className="p-2">
                   <input
-                    defaultValue={4356}
+                    type="number"
+                    value={row.closingStock}
+                    onChange={(e) =>
+                      updateRow(i, "closingStock", Number(e.target.value))
+                    }
                     className="border rounded px-2 py-1 w-24 bg-gray-100"
                   />
                 </td>

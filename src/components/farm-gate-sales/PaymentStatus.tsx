@@ -1,9 +1,26 @@
+import { FarmGateSaleRequest } from "@/types/farm-gate-sales";
+
 interface Props {
-  saleData: any;
-  updateField: (field: string, value: any) => void;
+  saleData: FarmGateSaleRequest;
+  updateField: <K extends keyof FarmGateSaleRequest>(
+    field: K,
+    value: FarmGateSaleRequest[K]
+  ) => void;
 }
 
+
 export default function PaymentStatus({ saleData, updateField }: Props) {
+  const handlePaymentChange = (
+    field: keyof FarmGateSaleRequest["paymentStatus"],
+    value: string | boolean
+  ) => {
+    updateField("paymentStatus", {
+      ...saleData.paymentStatus,
+      [field]: value,
+    });
+  };
+
+
   return (
     <div className="bg-white p-6 rounded-xl shadow-sm border space-y-4">
 
@@ -16,8 +33,10 @@ export default function PaymentStatus({ saleData, updateField }: Props) {
         <div>
           <label className="text-sm">Amount Received</label>
           <input
-            value={saleData.amountReceived}
-            onChange={(e)=>updateField("amountReceived", e.target.value)}
+            value={saleData.paymentStatus.amountReceived}
+            onChange={(e) =>
+              handlePaymentChange("amountReceived", e.target.value)
+            }
             className="border rounded-lg p-2 w-full mt-1"
           />
         </div>
@@ -25,8 +44,8 @@ export default function PaymentStatus({ saleData, updateField }: Props) {
         <div>
           <label className="text-sm">Balance Due</label>
           <input
-            value={saleData.balanceDue}
-            onChange={(e)=>updateField("balanceDue", e.target.value)}
+            value={saleData.paymentStatus.balanceDue}
+            onChange={(e)=>handlePaymentChange("balanceDue", e.target.value)}
             className="border rounded-lg p-2 w-full mt-1"
           />
         </div>
@@ -43,7 +62,8 @@ export default function PaymentStatus({ saleData, updateField }: Props) {
               <input
                 type="radio"
                 name="receipt"
-                onChange={()=>updateField("receiptIssued","yes")}
+                checked={saleData.paymentStatus.receipt === true}
+                onChange={() => handlePaymentChange("receipt", true)}
               />
               Yes
             </label>
@@ -52,7 +72,8 @@ export default function PaymentStatus({ saleData, updateField }: Props) {
               <input
                 type="radio"
                 name="receipt"
-                onChange={()=>updateField("receiptIssued","no")}
+                checked={saleData.paymentStatus.receipt === false}
+                onChange={() => handlePaymentChange("receipt", false)}
               />
               No
             </label>

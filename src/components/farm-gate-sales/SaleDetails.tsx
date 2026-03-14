@@ -1,6 +1,11 @@
+import { FarmGateSaleRequest } from "@/types/farm-gate-sales";
+
 interface Props {
-  saleData: any;
-  updateField: (field: string, value: any) => void;
+  saleData: FarmGateSaleRequest;
+  updateField: <K extends keyof FarmGateSaleRequest>(
+    field: K,
+    value: FarmGateSaleRequest[K]
+  ) => void;
 }
 
 export default function SaleDetails({ saleData, updateField }: Props) {
@@ -56,8 +61,8 @@ export default function SaleDetails({ saleData, updateField }: Props) {
             <input
               type="radio"
               name="payment"
-              checked={saleData.paymentMethod === "bank"}
-              onChange={() => updateField("paymentMethod", "bank")}
+              checked={saleData.paymentMethod === "bank_transfer"}
+              onChange={() => updateField("paymentMethod", "bank_transfer")}
             />
             Bank Transfer
           </label>

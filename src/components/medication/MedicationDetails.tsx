@@ -1,4 +1,18 @@
-export default function MedicationDetails() {
+"use client";
+
+type Props = {
+  medicationName: string;
+  setMedicationName: (value: string) => void;
+  expiryAt: string;
+  setExpiryAt: (value: string) => void;
+};
+
+export default function MedicationDetails({
+  medicationName,
+  setMedicationName,
+  expiryAt,
+  setExpiryAt,
+}: Props) {
   return (
     <div className="bg-white p-6 rounded-xl border shadow-sm">
 
@@ -16,6 +30,8 @@ export default function MedicationDetails() {
           <input
             placeholder="Enter Medication Name"
             className="w-full border rounded-lg p-2 mt-1"
+            value={medicationName}
+            onChange={(e) => setMedicationName(e.target.value)}
           />
         </div>
 
@@ -27,6 +43,8 @@ export default function MedicationDetails() {
           <input
             type="date"
             className="w-full border rounded-lg p-2 mt-1"
+            value={expiryAt}
+            onChange={(e) => setExpiryAt(e.target.value)}
           />
         </div>
 

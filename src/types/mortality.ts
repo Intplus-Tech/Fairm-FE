@@ -55,7 +55,7 @@ export interface MortalityRequest {
   };
   sickWeak: {
     noOfSickWeak: number;
-    treat: true;
+    treat: boolean;
   };
   culled: {
     noOfCulled: number;

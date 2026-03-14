@@ -2,7 +2,13 @@
 
 import { useRouter } from "next/navigation";
 
-export default function DutyRosterFooter() {
+interface Props {
+  onSave: () => void;
+  loading?: boolean;
+  handleFinish: () => void;
+}
+
+export default function DutyRosterFooter({ onSave, loading, handleFinish }: Props) {
   const router = useRouter();
 
   return (
@@ -16,12 +22,18 @@ export default function DutyRosterFooter() {
       </button>
 
       <div className="flex gap-4">
-        <button className="border border-indigo-500 text-indigo-500 px-6 py-2 rounded-lg">
-          Save Employee Attendance
+        <button 
+          onClick={onSave}
+          disabled={loading}
+        className="border border-indigo-500 text-indigo-500 px-6 py-2 rounded-lg">
+          {loading ? "Saving..." : "Save Employee Attendance"}
         </button>
 
-        <button className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-2 rounded-lg">
-          Save Report
+        <button 
+          onClick={handleFinish}
+          disabled={loading}
+        className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-2 rounded-lg">
+          {loading ? "Saving..." : "Save Report"}
         </button>
       </div>
     </div>

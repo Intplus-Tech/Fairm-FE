@@ -1,4 +1,33 @@
-export default function LoadingDetails() {
+interface LoadingDetailsValue {
+  loadingStart: Date;
+  loadingEnd: Date;
+  loadingTeam: string;
+  supervisor: string;
+}
+
+interface LoadingDetailsProps {
+  value: LoadingDetailsValue;
+  onChange: (value: LoadingDetailsValue) => void;
+}
+
+const toTimeInputValue = (date: Date | string) => {
+  const d = new Date(date);
+  const hours = String(d.getHours()).padStart(2, "0");
+  const minutes = String(d.getMinutes()).padStart(2, "0");
+  return `${hours}:${minutes}`;
+};
+
+const updateTime = (baseDate: Date | string, time: string) => {
+  const d = new Date(baseDate);
+  const [hours, minutes] = time.split(":").map(Number);
+  d.setHours(hours || 0, minutes || 0, 0, 0);
+  return d;
+};
+
+export default function LoadingDetails({
+  value,
+  onChange,
+}: LoadingDetailsProps) {
   return (
     <div className="bg-white p-6 rounded-xl border shadow-sm space-y-4">
 
@@ -8,26 +37,48 @@ export default function LoadingDetails() {
 
         <div>
           <label className="text-sm">Loading Starts</label>
-          <input type="time" className="w-full border rounded-lg p-2 mt-1"/>
+          <input type="time"
+            value={toTimeInputValue(value.loadingStart)}
+            onChange={(e) =>
+              onChange({
+                ...value,
+                loadingStart: updateTime(value.loadingStart, e.target.value),
+              })
+            } 
+            className="w-full border rounded-lg p-2 mt-1"/>
         </div>
 
         <div>
           <label className="text-sm">Loading End</label>
-          <input type="time" className="w-full border rounded-lg p-2 mt-1"/>
+          <input type="time"
+            value={toTimeInputValue(value.loadingEnd)}
+            onChange={(e) =>
+              onChange({
+                ...value,
+                loadingEnd: updateTime(value.loadingEnd, e.target.value),
+              })
+            } 
+            className="w-full border rounded-lg p-2 mt-1"/>
         </div>
 
         <div>
           <label className="text-sm">Loading Team</label>
-          <select className="w-full border rounded-lg p-2 mt-1">
-            <option>Joshua Adebola</option>
-          </select>
+          <input
+            value={value.loadingTeam}
+            onChange={(e) => onChange({ ...value, loadingTeam: e.target.value })}
+            className="w-full border rounded-lg p-2 mt-1"
+            placeholder="Enter loading team"
+          />
         </div>
 
         <div>
           <label className="text-sm">Supervisor</label>
-          <select className="w-full border rounded-lg p-2 mt-1">
-            <option>Mr Azzez</option>
-          </select>
+          <input
+            value={value.supervisor}
+            onChange={(e) => onChange({ ...value, supervisor: e.target.value })}
+            className="w-full border rounded-lg p-2 mt-1"
+            placeholder="Enter supervisor"
+          />
         </div>
 
       </div>

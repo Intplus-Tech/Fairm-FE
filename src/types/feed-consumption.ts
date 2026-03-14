@@ -16,12 +16,12 @@ export interface FeedConsumptionResponse {
   _id: string;
   penId: string;
   openingBags: number;
-  closingBags: 50;
+  closingBags: number;
   fedTodayBagsTime: {
-    noOfBags: 10;
+    noOfBags: number;
     time: Date;
   };
-  consumedBags: 40;
+  consumedBags: number;
   feedQualityCheck: {
     appearance: AppearanceType;
     smell: SmellType;
@@ -29,9 +29,9 @@ export interface FeedConsumptionResponse {
   };
   waterConsumption: {
     penId: string;
-    opening: 100;
-    closing: 50;
-    consumptionPerLiter: 5;
+    opening: number;
+    closing: number;
+    consumptionPerLiter: number;
     notes: string;
   };
   abnormalFeedingBehavior: {
@@ -45,12 +45,12 @@ export interface FeedConsumptionResponse {
 export interface FeedConsumptionRequest {
   penId: string;
   openingBags: number;
-  closingBags: 50;
+  closingBags: number;
   fedTodayBagsTime: {
-    noOfBags: 10;
-    time: Date;
+    noOfBags: number;
+    time: string;
   };
-  consumedBags: 40;
+  consumedBags: number;
   feedQualityCheck: {
     appearance: string;
     smell: string;
@@ -58,9 +58,9 @@ export interface FeedConsumptionRequest {
   };
   waterConsumption: {
     penId: string;
-    opening: 100;
-    closing: 50;
-    consumptionPerLiter: 5;
+    opening: number;
+    closing: number;
+    consumptionPerLiter: number;
     notes: string;
   };
   abnormalFeedingBehavior: {

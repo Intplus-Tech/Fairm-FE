@@ -1,34 +1,58 @@
 // components/EggCollectionTable.tsx
 "use client";
 
-import { useState } from "react";
-
-interface EggData {
-  pen: string;
-  times: {
-    time: string;
-    good: number | "";
-    defects: number | "";
-  }[];
+export interface EggCollectionRow {
+  penId: string;
+  penLabel: string;
+  sixAm: {
+    goodEggs: number;
+    defectEggs: number;
+  };
+  nineAm: {
+    goodEggs: number;
+    defectEggs: number;
+  };
+  twoPm: {
+    goodEggs: number;
+    defectEggs: number;
+  };
 }
 
 interface EggCollectionTableProps {
-  initialData?: EggData[];
+  data: EggCollectionRow[];
+  onChange: (rows: EggCollectionRow[]) => void;
 }
 
-export default function EggCollectionTable({ initialData }: EggCollectionTableProps) {
-  const [data, setData] = useState<EggData[]>(initialData || [
-    { pen: "2", times: [{time: "06:00 AM", good: 1000, defects: 80},{time:"09:00 AM", good:800, defects:80},{time:"02:00 PM", good:900, defects:20}]},
-    { pen: "3", times: [{time: "06:00 AM", good:"", defects:""},{time:"09:00 AM", good:"", defects:""},{time:"02:00 PM", good:"", defects:""}]},
-    { pen: "2B", times: [{time: "06:00 AM", good:"", defects:""},{time:"09:00 AM", good:"", defects:""},{time:"02:00 PM", good:"", defects:""}]},
-    { pen: "4", times: [{time: "06:00 AM", good:"", defects:""},{time:"09:00 AM", good:"", defects:""},{time:"02:00 PM", good:"", defects:""}]},
-  ]);
+type TimeKey = "sixAm" | "nineAm" | "twoPm";
+type FieldKey = "goodEggs" | "defectEggs";
 
-  const handleChange = (penIndex: number, timeIndex: number, field: "good" | "defects", value: string) => {
+export default function EggCollectionTable({
+  data,
+  onChange,
+}: EggCollectionTableProps) {
+  const handleChange = (
+    rowIndex: number,
+    timeKey: TimeKey,
+    field: FieldKey,
+    value: string
+  ) => {
     const updated = [...data];
-    updated[penIndex].times[timeIndex][field] = value === "" ? "" : Number(value);
-    setData(updated);
+    updated[rowIndex] = {
+      ...updated[rowIndex],
+      [timeKey]: {
+        ...updated[rowIndex][timeKey],
+        [field]: value === "" ? 0 : Number(value),
+      },
+    };
+
+    onChange(updated);
   };
+
+  const timeColumns: { label: string; key: TimeKey }[] = [
+    { label: "06:00 AM", key: "sixAm" },
+    { label: "09:00 AM", key: "nineAm" },
+    { label: "02:00 PM", key: "twoPm" },
+  ];
 
   return (
     <div className="overflow-x-auto border rounded-md p-4">
@@ -36,34 +60,41 @@ export default function EggCollectionTable({ initialData }: EggCollectionTablePr
         <thead>
           <tr>
             <th className="border-b p-2">Pen</th>
-            {data[0].times.map((t, i) => (
-              <th key={i} className="border-b p-2 text-center">
-                {t.time} <br />
+            {timeColumns.map((col) => (
+              <th key={col.key} className="border-b p-2 text-center">
+                {col.label} <br />
                 <span className="text-xs font-normal">(Good / Defects)</span>
               </th>
             ))}
           </tr>
         </thead>
         <tbody>
-          {data.map((penData, penIdx) => (
-            <tr key={penData.pen}>
-              <td className="border-b p-2">{penData.pen}</td>
-              {penData.times.map((time, timeIdx) => (
-                <td key={time.time} className="border-b p-2 text-center">
+          {data.map((row, rowIdx) => (
+            <tr key={row.penId}>
+              <td className="border-b p-2">{row.penLabel}</td>
+
+              {timeColumns.map((col) => (
+                <td key={col.key} className="border-b p-2 text-center">
                   <input
                     type="number"
+                    min={0}
                     placeholder="0"
                     className="border rounded px-2 py-1 w-16 mr-1"
-                    value={time.good}
-                    onChange={(e) => handleChange(penIdx, timeIdx, "good", e.target.value)}
+                    value={row[col.key].goodEggs}
+                    onChange={(e) =>
+                      handleChange(rowIdx, col.key, "goodEggs", e.target.value)
+                    }
                   />
                   /
                   <input
                     type="number"
+                    min={0}
                     placeholder="0"
                     className="border rounded px-2 py-1 w-16 ml-1"
-                    value={time.defects}
-                    onChange={(e) => handleChange(penIdx, timeIdx, "defects", e.target.value)}
+                    value={row[col.key].defectEggs}
+                    onChange={(e) =>
+                      handleChange(rowIdx, col.key, "defectEggs", e.target.value)
+                    }
                   />
                 </td>
               ))}
