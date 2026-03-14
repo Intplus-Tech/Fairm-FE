@@ -25,7 +25,7 @@ export default function PackagingTransport({
 
         <div>
           <label className="text-sm">Crates Used</label>
-          <input defaultValue="0"
+          <input
             type="number"
             value={value.cratesUsed}
             onChange={(e) =>
@@ -37,7 +37,7 @@ export default function PackagingTransport({
 
         <div>
           <label className="text-sm">Sacks Used</label>
-          <input defaultValue="0"
+          <input
             type="number"
             value={value.sacksUsed}
             onChange={(e) =>

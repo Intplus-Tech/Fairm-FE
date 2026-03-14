@@ -7,45 +7,53 @@ import CollectionIssues from "@/components/egg-production/CollectionIssues";
 import EggCollectionTable from "@/components/egg-production/EggCollectionTable";
 import PageNavigation from "@/components/egg-production/PageNavigation";
 import PhotosEvidence from "@/components/egg-production/PhotosEvidence";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { uploadFileService } from "../../../../services/uploadFile.service";
 import { CollectionIssuesType, EggProductionRequest } from "@/types/egg-production";
 import { eggProductionService } from "../../../../services/egg-production.service";
+import { pensService } from "../../../../services/pen.service";
+import { PenResponse } from "@/types/pen";
 
-const initialRows: EggCollectionRow[] = [
-  {
-    penId: "2",
-    sixAm: { goodEggs: 1000, defectEggs: 80 },
-    nineAm: { goodEggs: 800, defectEggs: 80 },
-    twoPm: { goodEggs: 900, defectEggs: 20 },
-  },
-  {
-    penId: "3",
-    sixAm: { goodEggs: 0, defectEggs: 0 },
-    nineAm: { goodEggs: 0, defectEggs: 0 },
-    twoPm: { goodEggs: 0, defectEggs: 0 },
-  },
-  {
-    penId: "2B",
-    sixAm: { goodEggs: 0, defectEggs: 0 },
-    nineAm: { goodEggs: 0, defectEggs: 0 },
-    twoPm: { goodEggs: 0, defectEggs: 0 },
-  },
-  {
-    penId: "4",
-    sixAm: { goodEggs: 0, defectEggs: 0 },
-    nineAm: { goodEggs: 0, defectEggs: 0 },
-    twoPm: { goodEggs: 0, defectEggs: 0 },
-  },
-];
+type EggSlot = { goodEggs: number; defectEggs: number };
+type EggCollectionRow = {
+  penId: string;
+  penLabel: string;
+  sixAm: EggSlot;
+  nineAm: EggSlot;
+  twoPm: EggSlot;
+}
+
+const emptySlot = (): EggSlot => ({ goodEggs: 0, defectEggs: 0 });
 
 export default function EggProductionPage() {
-  const [rows, setRows] = useState<EggCollectionRow[]>(initialRows);
+  const [rows, setRows] = useState<EggCollectionRow[]>([]);
   const [collectionIssues, setCollectionIssues] = useState<CollectionIssuesType[]>([]);
   const [photosEvidences, setPhotosEvidences] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
-    const { setFlow } = useEntryFlow();
+  const { setFlow } = useEntryFlow();
   const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+    const fetchPens = async () => {
+      try {
+        const penRes = await pensService.list();
+        setRows(
+          penRes.map((pen: PenResponse) => ({
+            penId: pen._id,
+            penLabel: pen.name,
+            sixAm: emptySlot(),
+            nineAm: emptySlot(),
+            twoPm: emptySlot(),
+          }))
+        );
+      } catch (err) {
+        console.error("Failed to fetch pens:", err);
+        setError("Failed to load pens");
+      }
+    };
+    fetchPens();
+  }, []);
 
   const handlePhotoUpload = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
@@ -97,7 +105,7 @@ export default function EggProductionPage() {
   };
 
     const handleNext = () => {
-    setFlow((prev: any) => ({
+    setFlow((prev: {egg: boolean}) => ({
       ...prev,
       egg: true,
     }));
@@ -108,9 +116,20 @@ export default function EggProductionPage() {
   return (
     <div className="max-w-6xl mx-auto p-6">
 
+      {error && (
+        <p className="text-red-500 text-sm mb-2">
+          {error}
+        </p>
+      )}
+
       <header className="mb-6 bg-purple-600 text-white p-4 rounded-md">
         <h1 className="text-xl font-bold">Daily Egg Production</h1>
-        <p className="text-sm">Sunday, February 1, 2026</p>
+        <p className="text-sm">{new Date().toLocaleDateString("en-US", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })}</p>
       </header>
 
       <section className="mb-6">

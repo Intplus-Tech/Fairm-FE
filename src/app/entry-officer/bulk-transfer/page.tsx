@@ -20,7 +20,7 @@ import { useState } from "react";
 export default function BulkTransferPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-    const { setFlow } = useEntryFlow();
+  const { setFlow } = useEntryFlow();
   const router = useRouter();
 
   const [form, setForm] = useState<BulkTransferRequest>({
@@ -79,7 +79,7 @@ export default function BulkTransferPage() {
   };
 
     const handleNext = () => {
-    setFlow((prev: any) => ({
+    setFlow((prev: {lagos: boolean}) => ({
       ...prev,
       lagos: true,
     }));

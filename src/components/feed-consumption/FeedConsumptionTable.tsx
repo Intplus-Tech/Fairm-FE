@@ -94,7 +94,7 @@ export default function FeedConsumptionTable({ rows, setRows }: Props) {
               </td>
 
               <td>
-                (Number(row.opening || 0) + Number(row.fed || 0) - Number(row.closing || 0))
+                {(Number(row.opening || 0) + Number(row.fed || 0) - Number(row.closing || 0))}
               </td>
             </tr>
           ))}

@@ -25,7 +25,7 @@ export default function EggSalesTable({ saleData, updateField }: Props) {
       ...saleData.eggSalesGrade,
       [gradeKey]: {
         ...saleData.eggSalesGrade[gradeKey],
-        [field]: field === "quantity" ? Number(value) || 0 : value,
+         [field]: field === "notes" ? value : Number(value) || 0,
       },
     });
   };

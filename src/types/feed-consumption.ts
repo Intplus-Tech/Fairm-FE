@@ -48,7 +48,7 @@ export interface FeedConsumptionRequest {
   closingBags: number;
   fedTodayBagsTime: {
     noOfBags: number;
-    time: Date;
+    time: string;
   };
   consumedBags: number;
   feedQualityCheck: {

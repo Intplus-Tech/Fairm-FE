@@ -11,9 +11,10 @@ import FeedQualityCheck from "@/components/feed-consumption/FeedQualityCheck";
 import WaterConsumption from "@/components/feed-consumption/WaterConsumption";
 import { feedConsumptionService } from "../../../../services/feed-consumption.service";
 import { AbnormalFeedingType, AppearanceType, FeedConsumptionRequest, InsectPestType, SmellType } from "@/types/feed-consumption";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useEntryFlow } from "../../../../context/entry-flow-context";
-
+import { pensService } from "../../../../services/pen.service";
+import { PenResponse } from "@/types/pen";
 
 type FeedRow = {
   pen: string;
@@ -27,39 +28,58 @@ export default function Page() {
   const { setFlow } = useEntryFlow();
   const router = useRouter();
 
-
   const [time, setTime] = useState("08:00");
-  const [checker, setChecker] = useState("Ajewole Iyanuloluwa");
-
-  const [rows, setRows] = useState<FeedRow[]>([
-    { pen: "2", feed: "LM", opening: 45, fed: 6, closing: 24 },
-    { pen: "3", feed: "LM", opening: 32.5, fed: 13, closing: 19.5 },
-    { pen: "2B", feed: "", opening: "", fed: "", closing: "" },
-    { pen: "4", feed: "", opening: "", fed: "", closing: "" },
-  ]);
-
+  const [checker, setChecker] = useState("");
+  const [rows, setRows] = useState<FeedRow[]>([]);
   const [appearance, setAppearance] = useState<AppearanceType>("good");
   const [smell, setSmell] = useState<SmellType>("normal");
   const [insectPests, setInsectPests] = useState<InsectPestType>("none");
-
   const [water, setWater] = useState({
-    penId: "2",
-    opening: 12450,
-    closing: 13700,
-    notes: "Normal Flow",
+    penId: "",
+    opening: 0,
+    closing: 0,
+    notes: "",
   });
-
   const [symptoms, setSymptoms] = useState<AbnormalFeedingType[]>([]);
-  const [additionalNotes, setAdditionalNotes] = useState(
-    "Water leak in Pen 3 needs repair. Birds eating normally."
-  );
-
+  const [additionalNotes, setAdditionalNotes] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const firstValidRow = useMemo(() => {
-    return rows.find(
+  const getPenLabel = (pen: PenResponse) => {
+    if (pen.name && pen.name.trim()) return pen.name;
+    return `Pen ${pen._id.slice(-4).toUpperCase()}`;
+  };
+
+  useEffect(() => {
+    const fetchPens = async () => {
+      try {
+        const penRes = await pensService.list();
+        setRows(
+          penRes.map((pen: PenResponse) => ({
+            pen: pen._id,
+            feed: "",
+            opening: "",
+            fed: "",
+            closing: "",
+            penLabel: getPenLabel(pen),
+          }))
+        );
+        if (penRes.length > 0) {
+          setWater((prev) => ({ ...prev, penId: penRes[0]._id }));
+        }
+      } catch (err) {
+        console.error("Failed to fetch pens:", err);
+        setError("Failed to load pens");
+      }
+    };
+    fetchPens();
+  }, []);
+
+  const validRows = useMemo(() => {
+    return rows.filter(
       (row) =>
         row.pen &&
+        row.feed &&
         row.opening !== "" &&
         row.fed !== "" &&
         row.closing !== ""
@@ -67,48 +87,47 @@ export default function Page() {
   }, [rows]);
 
   const handleSubmit = async () => {
-    if (!firstValidRow) {
+    if (validRows.length === 0) {
       alert("Please complete at least one feed consumption row.");
       return;
     }
 
-    const opening = Number(firstValidRow.opening);
-    const fed = Number(firstValidRow.fed);
-    const closing = Number(firstValidRow.closing);
-    const consumed = opening + fed - closing;
-
-    const waterConsumptionPerLiter = water.closing - water.opening;
-
-    const payload: FeedConsumptionRequest = {
-      penId: firstValidRow.pen,
-      openingBags: opening,
-      closingBags: closing,
-      fedTodayBagsTime: {
-        noOfBags: fed,
-        time: new Date().toISOString().split("T")[0] + `T${time}:00.000Z`,
-      },
-      consumedBags: consumed,
-      feedQualityCheck: {
-        appearance,
-        smell,
-        insectPests,
-      },
-      waterConsumption: {
-        penId: water.penId,
-        opening: Number(water.opening),
-        closing: Number(water.closing),
-        consumptionPerLiter: Number(waterConsumptionPerLiter),
-        notes: water.notes,
-      },
-      abnormalFeedingBehavior: {
-        symptoms,
-        additionalNotes,
-      },
-    };
-
     try {
       setLoading(true);
-      await feedConsumptionService.create(payload);
+
+      await Promise.all(
+        validRows.map((row) => {
+          const opening = Number(row.opening);
+          const fed = Number(row.fed);
+          const closing = Number(row.closing);
+          const consumed = opening + fed - closing;
+
+          const payload: FeedConsumptionRequest = {
+            penId: row.pen,
+            openingBags: opening,
+            closingBags: closing,
+            fedTodayBagsTime: {
+              noOfBags: fed,
+              time:
+                new Date().toISOString().split("T")[0] +
+                `T${time}:00.000Z`,
+            },
+            consumedBags: consumed,
+            feedQualityCheck: { appearance, smell, insectPests },
+            waterConsumption: {
+              penId: water.penId,
+              opening: Number(water.opening),
+              closing: Number(water.closing),
+              consumptionPerLiter: water.closing - water.opening,
+              notes: water.notes,
+            },
+            abnormalFeedingBehavior: { symptoms, additionalNotes },
+          };
+
+          return feedConsumptionService.create(payload);
+        })
+      );
+
       alert("Feed consumption saved successfully!");
     } catch (error) {
       console.error("Failed to save feed consumption:", error);
@@ -118,17 +137,20 @@ export default function Page() {
     }
   };
 
-    const handleNext = () => {
-    setFlow((prev: any) => ({
-      ...prev,
-      feed: true,
-    }));
-
+  const handleNext = () => {
+    setFlow((prev: { feed: boolean}) => ({ ...prev, feed: true }));
     router.push("/entry-officer/egg-production");
   };
   
   return (
     <div className="min-h-screen bg-gray-50 p-6 space-y-6">
+      {error && (
+        <p className="text-red-500 text-sm mb-2">
+          {error}
+        </p>
+      )}
+      
+      
       <DailyFeedHeader
         time={time}
         setTime={setTime}

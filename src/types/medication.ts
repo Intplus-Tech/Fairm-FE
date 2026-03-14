@@ -53,7 +53,7 @@ export interface MedicationRequest {
   status: MedicationTreatmentStatus;
   medicationDetails: {
     name: string;
-    expiryAt: Date;
+    expiryAt: string;
   };
   vaccinationSchedule: {
     vaccineType: VaccinationType[];

@@ -10,15 +10,19 @@ import PaymentStatus from "@/components/farm-gate-sales/PaymentStatus";
 import SaleDetails from "@/components/farm-gate-sales/SaleDetails";
 import SaleHeader from "@/components/farm-gate-sales/SaleHeader";
 import { FarmGateSaleRequest } from "@/types/farm-gate-sales";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { farmGateSaleService } from "../../../../services/farm-gate-sales.service";
 
 import { useEntryFlow } from "../../../../context/entry-flow-context";
+import { usersService } from "../../../../services/user.service";
+import { User } from "@/types/user";
 
 export default function FarmGateSalesPage() {
   const [loading, setLoading] = useState(false);
   const { setFlow } =useEntryFlow();
   const router = useRouter();
+  const [users, setEmployees] = useState<User[]>([])
+    const [error, setError] = useState<string | null>(null);
 
   const [saleData, setSaleData] = useState<FarmGateSaleRequest>({
     customerType: "manager",
@@ -27,33 +31,33 @@ export default function FarmGateSalesPage() {
     paymentMethod: "cash",
     eggSalesGrade: {
       pulletGradeA: {
-        quantity: 0,
-        price: "",
-        total: "",
+        quantity: Number(0),
+        price: Number(0),
+        total: Number(0),
         notes: "",
       },
       mediumGradeB: {
-        quantity: 0,
-        price: "",
-        total: "",
+        quantity: Number(0),
+        price: Number(0),
+        total: Number(0),
         notes: "",
       },
       smallGradeC: {
-        quantity: 0,
-        price: "",
-        total: "",
+        quantity: Number(0),
+        price: Number(0),
+        total: Number(0),
         notes: "",
       },
       crackedDiscount: {
-        quantity: 0,
-        price: "",
-        total: "",
+        quantity: Number(0),
+        price: Number(0),
+        total: Number(0),
         notes: "",
       },
     },
     packingDetails: {
-      cratesUsed: 0,
-      sacksUsed: 0,
+      cratesUsed: Number(0),
+      sacksUsed: Number(0),
       vehicle: "",
       loadedAt: new Date(),
       loadedBy: "",
@@ -65,6 +69,19 @@ export default function FarmGateSalesPage() {
       receipt: false,
     },
   });
+  
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const res = await usersService.list();
+        setEmployees(res);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+  
+    fetchUsers();
+  }, []);
 
   const updateField = <K extends keyof FarmGateSaleRequest>(
     field: K,
@@ -80,6 +97,8 @@ export default function FarmGateSalesPage() {
     try {
       setLoading(true);
 
+      console.log(saleData)
+
       const createdSale = await farmGateSaleService.create(saleData);
 
       console.log("Farm Sale Saved:", createdSale);
@@ -88,23 +107,30 @@ export default function FarmGateSalesPage() {
     } catch (error) {
       console.error("Failed to save farm gate sale:", error);
       alert("Failed to save farm gate sale");
+      setError("Failed to load pens");
     } finally {
       setLoading(false);
     }
   };
 
   function handleNext() {
-    setFlow((prev: any) => ({
+    setFlow((prev: {farm: boolean}) => ({
       ...prev,
       farm: true,
     }));
 
-    router.push("/entry-officer/lagos-transfer");
+    router.push("/entry-officer/bulk-transfer");
   }
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-6xl mx-auto space-y-6">
+
+      {error && (
+        <p className="text-red-500 text-sm mb-2">
+          {error}
+        </p>
+      )}
 
         <SaleHeader />
 
@@ -112,7 +138,7 @@ export default function FarmGateSalesPage() {
 
       <EggSalesTable saleData={saleData} updateField={updateField} />
 
-      <PackagingDetails saleData={saleData} updateField={updateField} />
+      <PackagingDetails saleData={saleData} updateField={updateField} users={users} />
 
       <PaymentStatus saleData={saleData} updateField={updateField} />
 

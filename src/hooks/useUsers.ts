@@ -13,20 +13,22 @@ export function useUsers() {
     setLoading(true);
     try {
       const res = await usersService.list();
-      setUsers(res.data.data);
+      setUsers(res);
     } finally {
       setLoading(false);
     }
   }
 
-  async function inviteUser(payload: Parameters<typeof usersService.invite>[0]) {
+  async function inviteUser(
+    payload: Parameters<typeof usersService.invite>[0],
+  ) {
     await usersService.invite(payload);
     await fetchUsers();
   }
 
   async function deleteUser(id: string) {
     await usersService.remove(id);
-    setUsers(prev => prev.filter(u => u._id !== id));
+    setUsers((prev) => prev.filter((u) => u._id !== id));
   }
 
   useEffect(() => {

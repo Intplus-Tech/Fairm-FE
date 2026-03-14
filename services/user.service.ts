@@ -1,10 +1,5 @@
-
 import { api } from "@/lib/api/axios";
-import {
-  InviteUserPayload,
-  SetupAccountPayload,
-  User,
-} from "@/types/user";
+import { InviteUserPayload, SetupAccountPayload, User } from "@/types/user";
 
 export const usersService = {
   invite(payload: InviteUserPayload) {
@@ -16,7 +11,7 @@ export const usersService = {
   },
 
   list() {
-    return api.get<{ data: User[] }>("/users");
+    return api.get<{ data: User[] }>("/users").then((res) => res.data.data);
   },
 
   getById(id: string) {

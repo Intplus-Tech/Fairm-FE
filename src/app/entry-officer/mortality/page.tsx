@@ -1,16 +1,17 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-// import { useEntryFlow } from "@/context/entry-flow-context";
-
 import MortalityHeader from "@/components/mortality/mortality-header";
 import PenDataTable from "@/components/mortality/pen-data-table";
 import SickBirdObservation from "@/components/mortality/sick-bird-observation";
 import PhotoEvidence from "@/components/mortality/photo-evidence";
 import { useEntryFlow } from "../../../../context/entry-flow-context";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CulledReason, SicknessType } from "@/types/mortality";
 import { mortalityService } from "../../../../services/mortality.service";
+import { pensService } from "../../../../services/pen.service";
+import { PenResponse } from "@/types/pen";
+import { uploadFileService } from "../../../../services/uploadFile.service";
 
 interface PenMortalityFormRow {
   penId: string;
@@ -31,82 +32,67 @@ export default function MortalityPage() {
   const { setFlow } = useEntryFlow();
   const router = useRouter();
 
-    const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-    const [rows, setRows] = useState<PenMortalityFormRow[]>([
-    {
-      penId: "pen_2_id", // replace with real pen IDs from backend later
-      penLabel: "2",
-      openingStock: 4356,
-      weight: 0,
-      mortality: 0,
-      sickWeakCount: 0,
-      treat: false,
-      culledCount: 0,
-      culledReason: "other",
-      closingStock: 4356,
-      temperatureMin: 0,
-      temperatureMax: 0,
-    },
-    {
-      penId: "pen_3_id",
-      penLabel: "3",
-      openingStock: 3234,
-      weight: 0,
-      mortality: 0,
-      sickWeakCount: 0,
-      treat: false,
-      culledCount: 0,
-      culledReason: "other",
-      closingStock: 3234,
-      temperatureMin: 0,
-      temperatureMax: 0,
-    },
-    {
-      penId: "pen_2b_id",
-      penLabel: "2B",
-      openingStock: 0,
-      weight: 0,
-      mortality: 0,
-      sickWeakCount: 0,
-      treat: false,
-      culledCount: 0,
-      culledReason: "other",
-      closingStock: 0,
-      temperatureMin: 0,
-      temperatureMax: 0,
-    },
-    {
-      penId: "pen_4_id",
-      penLabel: "4",
-      openingStock: 0,
-      weight: 0,
-      mortality: 0,
-      sickWeakCount: 0,
-      treat: false,
-      culledCount: 0,
-      culledReason: "other",
-      closingStock: 0,
-      temperatureMin: 0,
-      temperatureMax: 0,
-    },
-  ]);
+  const [pens, setPens] = useState<PenResponse[]>([]);
+  const [rows, setRows] = useState<PenMortalityFormRow[]>([]);
 
-    const [symptoms, setSymptoms] = useState<SicknessType[]>([]);
-  const [additionalNotes, setAdditionalNotes] = useState(
-    "Only Birds in Pen 2 have these symptoms"
-  );
+  const [symptoms, setSymptoms] = useState<SicknessType[]>([]);
+  const [additionalNotes, setAdditionalNotes] = useState("");
   const [photosEvidences, setPhotosEvidences] = useState<string[]>([]);
   const [checkedBy, setCheckedBy] = useState("Ajewole Iyanoluwa");
   const [checkedTime, setCheckedTime] = useState("08:00");
 
-    const handleSave = async () => {
+  // Helper to shorten MongoDB ID if no pen name exists
+  const getPenLabel = (pen: PenResponse) => {
+    if (pen.name && pen.name.trim()) return pen.name;
+    return `Pen ${pen._id.slice(-4).toUpperCase()}`;
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setError(null);
+
+        const penRes = await pensService.list();
+        setPens(penRes);
+
+        // Build rows from real pen data
+        const mappedRows: PenMortalityFormRow[] = penRes.map((pen: PenResponse) => ({
+          penId: pen._id, // real DB ID used for API save
+          penLabel: getPenLabel(pen), // readable label for UI
+          openingStock: Number(0), // if your pen model has this field
+          weight: 0,
+          mortality: 0,
+          sickWeakCount: 0,
+          treat: false,
+          culledCount: 0,
+          culledReason: "other",
+          closingStock: Number(0), // starts same as opening
+          temperatureMin: 0,
+          temperatureMax: 0,
+        }));
+
+        setRows(mappedRows);
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : "Failed to load pens";
+        setError(message);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleSave = async () => {
     try {
       setLoading(true);
+      setError(null);
 
       await Promise.all(
-        rows.map((row) =>
-          mortalityService.create({
+        rows.map((row) => {
+          return mortalityService.create({
             penId: row.penId,
             openingStock: Number(row.openingStock),
             closingStock: Number(row.closingStock),
@@ -118,7 +104,7 @@ export default function MortalityPage() {
             },
             sickWeak: {
               noOfSickWeak: Number(row.sickWeakCount),
-              treat: row.treat as true, // see note below
+              treat: row.treat,
             },
             culled: {
               noOfCulled: Number(row.culledCount),
@@ -129,8 +115,8 @@ export default function MortalityPage() {
               additionalNotes,
             },
             photosEvidences,
-          })
-        )
+          });
+        })
       );
 
       alert("Mortality data saved successfully!");
@@ -142,8 +128,31 @@ export default function MortalityPage() {
     }
   };
 
+  const handlePhotoUpload = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+
+    try {
+      const uploadedUrls: string[] = [];
+
+      for (const file of Array.from(files)) {
+        const base64 = await fileToBase64(file);
+
+        const uploaded = await uploadFileService.create({
+          file: base64,
+        });
+
+        uploadedUrls.push(uploaded.url);
+      }
+
+      setPhotosEvidences((prev) => [...prev, ...uploadedUrls]);
+    } catch (error) {
+      console.error("Photo upload failed:", error);
+      alert("Failed to upload photo(s)");
+    }
+  };
+
   const handleNext = () => {
-    setFlow((prev: any) => ({
+    setFlow((prev: { mortality: boolean }) => ({
       ...prev,
       mortality: true,
     }));
@@ -153,6 +162,14 @@ export default function MortalityPage() {
 
   return (
     <div className="min-h-screen bg-gray-100 p-6 space-y-6">
+
+      
+      {error && (
+        <p className="text-red-500 text-sm mb-2">
+          {error}
+        </p>
+      )}
+      
       <MortalityHeader
         checkedBy={checkedBy}
         checkedTime={checkedTime}
@@ -176,7 +193,7 @@ export default function MortalityPage() {
       <div className="bg-white rounded-xl shadow p-6">
         <PhotoEvidence
           photosEvidences={photosEvidences}
-          setPhotosEvidences={setPhotosEvidences}
+          onUpload={handlePhotoUpload}
         />
       </div>
 
@@ -198,4 +215,17 @@ export default function MortalityPage() {
       </div>
     </div>
   );
+}
+
+function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      resolve(reader.result as string);
+    };
+
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
 }

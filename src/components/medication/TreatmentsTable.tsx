@@ -1,7 +1,8 @@
 import type { MedicationTreatmentStatus } from "@/types/medication";
 
-type TreatmentRow = {
-  pen: string;
+export type TreatmentRow = {
+  penId: string;
+  penLabel: string;
   medication: string;
   purpose: string;
   dosage: number | "";
@@ -57,8 +58,8 @@ export default function TreatmentsTable({ rows, setRows }: Props) {
 
         <tbody className="divide-y">
           {rows.map((row, index) => (
-            <tr key={row.pen} className="h-14">
-              <td>{row.pen}</td>
+            <tr key={row.penId} className="h-14">
+              <td>{row.penLabel}</td>
 
               <td>
                 <input
@@ -114,7 +115,7 @@ export default function TreatmentsTable({ rows, setRows }: Props) {
                   <label className="flex items-center gap-1">
                     <input
                       type="radio"
-                      name={`status-${row.pen}`}
+                      name={`status-${row.penId}`}
                       checked={row.status === "pending"}
                       onChange={() => handleChange(index, "status", "pending")}
                     />
@@ -124,7 +125,7 @@ export default function TreatmentsTable({ rows, setRows }: Props) {
                   <label className="flex items-center gap-1">
                     <input
                       type="radio"
-                      name={`status-${row.pen}`}
+                      name={`status-${row.penId}`}
                       checked={row.status === "done"}
                       onChange={() => handleChange(index, "status", "done")}
                     />

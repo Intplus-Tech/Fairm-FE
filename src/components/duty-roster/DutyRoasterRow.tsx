@@ -41,19 +41,19 @@ export default function DutyRosterRow({
       <div>
         {editable ? (
       <select
-        defaultValue={employee.dutyStatus}
+        value={employee.dutyStatus}
         onChange={(e) =>
           onUpdate?.(employee.id, "dutyStatus", e.target.value)
         }
         className="border rounded px-2 py-1 w-[120px]"
       >
-        <option>On</option>
-        <option>Off</option>
-        <option>Select</option>
+        <option value="select">Select</option>
+        <option value="on_duty">On</option>
+        <option value="off_duty">Off</option>
       </select>
       ) : (
           <span className="capitalize">
-            {employee.dutyStatus.replace("_", " ")}
+            {employee.dutyStatus === "on_duty" ? "On" : "Off"}
           </span>
         )}
       </div>
@@ -61,7 +61,7 @@ export default function DutyRosterRow({
       <div>
         {editable ? (
       <select
-        defaultValue={employee.location}
+        value={employee.location}
         onChange={(e) =>
           onUpdate?.(employee.id, "location", e.target.value)
         }

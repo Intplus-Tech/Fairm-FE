@@ -11,26 +11,26 @@ export interface FarmGateSaleResponse {
   eggSalesGrade: {
     pulletGradeA: {
       quantity: number;
-      price: string;
-      total: string;
+      price: number;
+      total: number;
       notes: string;
     };
     mediumGradeB: {
       quantity: number;
-      price: string;
-      total: string;
+      price: number;
+      total: number;
       notes: string;
     };
     smallGradeC: {
       quantity: number;
-      price: string;
-      total: string;
+      price: number;
+      total: number;
       notes: string;
     };
     crackedDiscount: {
       quantity: number;
-      price: string;
-      total: string;
+      price: number;
+      total: number;
       notes: string;
     };
   };
@@ -59,26 +59,26 @@ export interface FarmGateSaleRequest {
   eggSalesGrade: {
     pulletGradeA: {
       quantity: number;
-      price: string;
-      total: string;
+      price: number;
+      total: number;
       notes: string;
     };
     mediumGradeB: {
       quantity: number;
-      price: string;
-      total: string;
+      price: number;
+      total: number;
       notes: string;
     };
     smallGradeC: {
       quantity: number;
-      price: string;
-      total: string;
+      price: number;
+      total: number;
       notes: string;
     };
     crackedDiscount: {
       quantity: number;
-      price: string;
-      total: string;
+      price: number;
+      total: number;
       notes: string;
     };
   };

@@ -38,12 +38,6 @@ export default function PenDataTable({ rows, setRows }: PenDataTableProps) {
           [field]: value,
         } as PenMortalityFormRow;
 
-        // auto-calculate closing stock
-        updatedRow.closingStock =
-          Number(updatedRow.openingStock) -
-          Number(updatedRow.mortality) -
-          Number(updatedRow.culledCount);
-
         return updatedRow;
       })
     );
@@ -84,7 +78,7 @@ export default function PenDataTable({ rows, setRows }: PenDataTableProps) {
                 </td>
 
                 <td className="p-2">
-                                    <input
+                  <input
                     type="number"
                     value={row.weight}
                     onChange={(e) =>
@@ -119,19 +113,38 @@ export default function PenDataTable({ rows, setRows }: PenDataTableProps) {
                 </td>
 
                 <td className="p-2">
-                  <select className="border rounded px-2 py-1 text-sm">
-                    <option>Reason</option>
-                    <option>Injured</option>
-                    <option>Non-Productive</option>
-                    <option>Aggressive</option>
-                    <option>Other</option>
-                    <option>Deformed</option>
+                  <input
+                    type="number"
+                    value={row.culledCount}
+                    onChange={(e) =>
+                      updateRow(i, "culledCount", Number(e.target.value))
+                    }
+                    className="border rounded px-2 py-1 w-20"
+                  />
+                  <div className="flex items-center gap-2 text-xs">
+                  <select
+                    value={row.culledReason}
+                    onChange={(e) =>
+                      updateRow(i, "culledReason", e.target.value as CulledReason)
+                    }
+                    className="border rounded px-2 py-1 text-sm"
+                  >
+                    <option value="injured">Injured</option>
+                    <option value="non_productive">Non-Productive</option>
+                    <option value="aggressive">Aggressive</option>
+                    <option value="other">Other</option>
+                    <option value="deformed">Deformed</option>
                   </select>
+                </div>
                 </td>
 
                 <td className="p-2">
                   <input
-                    defaultValue={4356}
+                    type="number"
+                    value={row.closingStock}
+                    onChange={(e) =>
+                      updateRow(i, "closingStock", Number(e.target.value))
+                    }
                     className="border rounded px-2 py-1 w-24 bg-gray-100"
                   />
                 </td>

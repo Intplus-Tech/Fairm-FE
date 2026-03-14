@@ -63,9 +63,6 @@ export default function LoadingDetails({
 
         <div>
           <label className="text-sm">Loading Team</label>
-          <select className="w-full border rounded-lg p-2 mt-1">
-            <option>Joshua Adebola</option>
-          </select>
           <input
             value={value.loadingTeam}
             onChange={(e) => onChange({ ...value, loadingTeam: e.target.value })}
@@ -76,9 +73,6 @@ export default function LoadingDetails({
 
         <div>
           <label className="text-sm">Supervisor</label>
-          <select className="w-full border rounded-lg p-2 mt-1">
-            <option>Mr Azzez</option>
-          </select>
           <input
             value={value.supervisor}
             onChange={(e) => onChange({ ...value, supervisor: e.target.value })}

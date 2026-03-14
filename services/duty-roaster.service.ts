@@ -5,25 +5,25 @@ import { DutyRoasterRequest, DutyRoasterResponse } from "@/types/duty-roaster";
 export const dutyRoasterService = {
   list() {
     return api
-      .get<{ data: DutyRoasterResponse }>("/roasters")
+      .get<{ data: DutyRoasterResponse }>("/rosters")
       .then((res) => res.data.data);
   },
 
   create(payload: DutyRoasterRequest) {
-    return api.post("/roasters", payload).then((res) => res.data.data);
+    return api.post("/rosters", payload).then((res) => res.data.data);
   },
 
   getById(id: string) {
     return api
-      .get<{ data: DutyRoasterResponse }>(`/roasters/${id}`)
+      .get<{ data: DutyRoasterResponse }>(`/rosters/${id}`)
       .then((res) => res.data.data);
   },
 
   update(id: string, payload: Partial<DutyRoasterRequest>) {
-    return api.put(`/roasters/${id}`, payload);
+    return api.put(`/rosters/${id}`, payload);
   },
 
   remove(id: string) {
-    return api.delete(`/roasters/${id}`);
+    return api.delete(`/rosters/${id}`);
   },
 };

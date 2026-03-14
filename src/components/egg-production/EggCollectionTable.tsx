@@ -3,6 +3,7 @@
 
 export interface EggCollectionRow {
   penId: string;
+  penLabel: string;
   sixAm: {
     goodEggs: number;
     defectEggs: number;
@@ -70,7 +71,7 @@ export default function EggCollectionTable({
         <tbody>
           {data.map((row, rowIdx) => (
             <tr key={row.penId}>
-              <td className="border-b p-2">{row.penId}</td>
+              <td className="border-b p-2">{row.penLabel}</td>
 
               {timeColumns.map((col) => (
                 <td key={col.key} className="border-b p-2 text-center">

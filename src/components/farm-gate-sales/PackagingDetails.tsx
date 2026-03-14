@@ -1,4 +1,5 @@
 import { FarmGateSaleRequest } from "@/types/farm-gate-sales";
+import { User } from "@/types/user";
 
 interface Props {
   saleData: FarmGateSaleRequest;
@@ -6,9 +7,10 @@ interface Props {
     field: K,
     value: FarmGateSaleRequest[K]
   ) => void;
+  users: User[];
 }
 
-export default function PackagingDetails({ saleData, updateField }: Props) {
+export default function PackagingDetails({ saleData, updateField, users  }: Props) {
   const handlePackingChange = (
     field: keyof FarmGateSaleRequest["packingDetails"],
     value: string
@@ -73,20 +75,34 @@ export default function PackagingDetails({ saleData, updateField }: Props) {
 
         <div>
           <label className="text-sm">Loaded By</label>
-          <input
+          <select
             value={saleData.packingDetails.loadedBy}
             onChange={(e) => handlePackingChange("loadedBy", e.target.value)}
             className="border rounded-lg p-2 w-full mt-1"
-          />
+          >
+            <option value="">Select staff</option>
+            {users.map((user) => (
+              <option key={user._id} value={user._id}>
+                {user.firstName ?? user.email}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div>
           <label className="text-sm">Verified By</label>
-          <input
+          <select
             value={saleData.packingDetails.verifiedBy}
             onChange={(e) => handlePackingChange("verifiedBy", e.target.value)}
             className="border rounded-lg p-2 w-full mt-1"
-          />
+          >
+            <option value="">Select staff</option>
+            {users.map((user) => (
+              <option key={user._id} value={user._id}>
+                {user.firstName ?? user.email}
+              </option>
+            ))}
+          </select>
         </div>
 
       </div>

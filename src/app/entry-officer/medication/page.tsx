@@ -12,18 +12,20 @@ import VaccinationSchedule from "@/components/medication/VaccinationSchedule";
 import type {
   AppliedType,
   MedicationRequest,
-  MedicationResponse,
   MedicationTreatmentStatus,
   SicknessObserved,
   VaccinationMethod,
   VaccinationType,
 } from "@/types/medication";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { medicationService } from "../../../../services/medication.service";
 import { useEntryFlow } from "../../../../context/entry-flow-context";
+import { pensService } from "../../../../services/pen.service";
+import { PenResponse } from "@/types/pen";
 
 type TreatmentRow = {
-  pen: string;
+  penId: string;
+  penLabel: string;
   medication: string;
   purpose: string;
   dosage: number | "";
@@ -32,64 +34,51 @@ type TreatmentRow = {
 };
 
 export default function MedicationPage() {
-    const [administeredBy, setAdministeredBy] = useState("Ajewole Iyanuloluwa");
+  const [administeredBy, setAdministeredBy] = useState("");
   const [time, setTime] = useState("08:00");
-
-  const [rows, setRows] = useState<TreatmentRow[]>([
-    {
-      pen: "2",
-      medication: "",
-      purpose: "",
-      dosage: 6,
-      method: "",
-      status: "pending",
-    },
-    {
-      pen: "3",
-      medication: "",
-      purpose: "",
-      dosage: 6,
-      method: "",
-      status: "pending",
-    },
-    {
-      pen: "2B",
-      medication: "",
-      purpose: "",
-      dosage: 6,
-      method: "",
-      status: "pending",
-    },
-    {
-      pen: "4",
-      medication: "",
-      purpose: "",
-      dosage: 6,
-      method: "",
-      status: "pending",
-    },
-  ]);
-
+  const [rows, setRows] = useState<TreatmentRow[]>([]);
   const [medicationName, setMedicationName] = useState("");
   const [expiryAt, setExpiryAt] = useState("");
-
   const [vaccineTypes, setVaccineTypes] = useState<VaccinationType[]>([]);
   const [otherVaccine, setOtherVaccine] = useState("");
   const [vaccineDosage, setVaccineDosage] = useState<number | "">(0);
   const [vaccineMethod, setVaccineMethod] = useState<VaccinationMethod>("water");
-
   const [sicknessObserved, setSicknessObserved] = useState<SicknessObserved[]>([]);
   const [treatmentName, setTreatmentName] = useState("");
   const [applied, setApplied] = useState<AppliedType>("no");
-
   const [loading, setLoading] = useState(false);
-  const { setFlow } = useEntryFlow();
+  const [error, setError] = useState<string | null>(null);
+
+    const { setFlow } = useEntryFlow();
   const router = useRouter();
 
-  const firstValidRow = useMemo(() => {
-    return rows.find(
+  useEffect(() => {
+    const fetchPens = async () => {
+      try {
+        const penRes = await pensService.list();
+        setRows(
+          penRes.map((pen: PenResponse) => ({
+            penId: pen._id,
+            penLabel: pen.name ?? pen._id,
+            medication: "",
+            purpose: "",
+            dosage: 0,
+            method: "",
+            status: "pending" as MedicationTreatmentStatus,
+          }))
+        );
+      } catch (err) {
+        console.error("Failed to fetch pens:", err);
+        setError("Failed to load pens");
+      }
+    };
+    fetchPens();
+  }, []);
+
+  const validRows = useMemo(() => {
+    return rows.filter(
       (row) =>
-        row.pen &&
+        row.penId &&
         row.medication.trim() &&
         row.purpose.trim() &&
         row.dosage !== "" &&
@@ -98,7 +87,7 @@ export default function MedicationPage() {
   }, [rows]);
 
   const handleSave = async () => {
-    if (!firstValidRow) {
+    if (validRows.length === 0) {
       alert("Please complete at least one treatment row.");
       return;
     }
@@ -113,32 +102,38 @@ export default function MedicationPage() {
       return;
     }
 
-    const payload: MedicationRequest = {
-      penId: firstValidRow.pen,
-      medication: firstValidRow.medication,
-      purpose: firstValidRow.purpose,
-      dosage: Number(firstValidRow.dosage),
-      method: firstValidRow.method,
-      status: firstValidRow.status,
-      medicationDetails: {
-        name: medicationName,
-        expiryAt: new Date(expiryAt).toISOString(),
-      },
-      vaccinationSchedule: {
-        vaccineType: vaccineTypes,
-        dosage: Number(vaccineDosage || 0),
-        method: vaccineMethod,
-      },
-      treatment: {
-        sicknessObserved,
-        treatment: treatmentName,
-        applied,
-      },
-    };
-
     try {
       setLoading(true);
-      await medicationService.create(payload);
+
+      await Promise.all(
+        validRows.map((row) => {
+          const payload: MedicationRequest = {
+            penId: row.penId,
+            medication: row.medication,
+            purpose: row.purpose,
+            dosage: Number(row.dosage),
+            method: row.method,
+            status: row.status,
+            medicationDetails: {
+              name: medicationName,
+              expiryAt: new Date(expiryAt).toISOString(),
+            },
+            vaccinationSchedule: {
+              vaccineType: vaccineTypes,
+              dosage: Number(vaccineDosage || 0),
+              method: vaccineMethod,
+            },
+            treatment: {
+              sicknessObserved,
+              treatment: treatmentName,
+              applied,
+            },
+          };
+
+          return medicationService.create(payload);
+        })
+      );
+
       alert("Medication treatment saved successfully!");
     } catch (error) {
       console.error("Failed to save medication treatment:", error);
@@ -149,7 +144,7 @@ export default function MedicationPage() {
   };
 
     const handleNext = () => {
-    setFlow((prev: any) => ({
+    setFlow((prev: {medication: boolean}) => ({
       ...prev,
       medication: true,
     }));
@@ -160,6 +155,13 @@ export default function MedicationPage() {
   
   return (
     <div className="min-h-screen bg-gray-50 p-6">
+
+       {error && (
+        <p className="text-red-500 text-sm mb-2">
+          {error}
+        </p>
+      )}
+
 
       <div className="max-w-6xl mx-auto space-y-6">
         <MedicationHeader

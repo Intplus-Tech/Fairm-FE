@@ -26,6 +26,8 @@ interface Props {
 export default function DutyRosterSection({
   title,
   employees,
+    editable,
+  onUpdate,
 }: Props) {
   return (
     <div className="border rounded-lg overflow-hidden">
@@ -40,8 +42,13 @@ export default function DutyRosterSection({
         <div>Task Assigned</div>
       </div>
 
-      {employees.map((employee, index) => (
-        <DutyRosterRow key={index} employee={employee} />
+      {employees.map((employee) => (
+        <DutyRosterRow 
+          key={employee.id}
+          employee={employee}
+          editable={editable}
+          onUpdate={onUpdate} 
+           />
       ))}
     </div>
   );
