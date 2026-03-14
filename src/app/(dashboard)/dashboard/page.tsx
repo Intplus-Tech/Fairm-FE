@@ -3,7 +3,7 @@ import EggProductionChart from "@/components/dashboard/EggProductionChart";
 import MortalityChart from "@/components/dashboard/MortalityChart";
 import EggHealthChart from "@/components/dashboard/EggHealth";
 import AlertsTable from "@/components/dashboard/AlertsTable";
-import FloatingAskAI from "@/components/dashboard/FloatingAskAI";
+// import FloatingAskAI from "@/components/dashboard/FloatingAskAI";
 
 export default function Dashboard() {
   return (
@@ -20,7 +20,7 @@ export default function Dashboard() {
 
       <AlertsTable />
 
-      <FloatingAskAI />
+      {/* <FloatingAskAI /> */}
 
     </div>
   );

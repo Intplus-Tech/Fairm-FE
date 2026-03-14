@@ -14,7 +14,18 @@ export function getStoredUser(): User | null {
   if (!raw) return null;
 
   try {
-    return JSON.parse(raw) as User;
+    const parsed = JSON.parse(raw);
+
+    // Validate structure
+    if (
+      typeof parsed.id === "string" &&
+      typeof parsed.email === "string" &&
+      typeof parsed.role === "string"
+    ) {
+      return parsed as User;
+    }
+
+    return null;
   } catch {
     return null;
   }

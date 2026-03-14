@@ -1,14 +1,27 @@
-import { AlertTriangle, Bird, Info, UserPlus, } from "lucide-react";
+"use client";
+
+import { AlertTriangle, Bird, Info } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { useEffect, useState } from "react";
 
 export default function TopPullet() {
+  const [name, setName] = useState("User");
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+
+    if (storedUser) {
+      const parsed = JSON.parse(storedUser);
+      setName(parsed?.name || "User");
+    }
+  }, []);
+
   return (
     <div className="w-full">
       <div className="pb-5">
-        <p className="font-semibold p-1">Good Morning, John.</p>
+        <p className="font-semibold p-1">Good Morning, {name}.</p>
       </div>
 
-      {/* Cards container */}
       <div
         className="
           flex gap-2
@@ -21,7 +34,7 @@ export default function TopPullet() {
         <Card className="w-[218px] h-[114px] p-2 shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1">
-              <Bird className="text-[#4A3AFF]  h-[18px] w-[18px] border border-[#4A3AFF1A] rounded-full bg-[#4A3AFF1A]" />
+              <Bird className="text-[#4A3AFF] h-[18px] w-[18px] border border-[#4A3AFF1A] rounded-full bg-[#4A3AFF1A]" />
               <p className="text-[12px] font-semibold">Total Birds</p>
             </div>
             <Info className="h-[14px] w-[14px] text-[#141B34]" />
@@ -38,7 +51,7 @@ export default function TopPullet() {
         <Card className="w-[218px] h-[114px] p-2 shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1">
-              <Bird className="text-[#4A3AFF]  h-[18px] w-[18px] border border-[#4A3AFF1A] rounded-full bg-[#4A3AFF1A]" />
+              <Bird className="text-[#4A3AFF] h-[18px] w-[18px] border border-[#4A3AFF1A] rounded-full bg-[#4A3AFF1A]" />
               <p className="text-[12px] font-semibold">Total Mortality</p>
             </div>
             <Info className="h-[14px] w-[14px] text-[#141B34]" />
@@ -55,7 +68,7 @@ export default function TopPullet() {
         <Card className="w-[218px] h-[114px] p-2 shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1">
-              <Bird className="text-[#4A3AFF]  h-[18px] w-[18px] border border-[#4A3AFF1A] rounded-full bg-[#4A3AFF1A]" />
+              <Bird className="text-[#4A3AFF] h-[18px] w-[18px] border border-[#4A3AFF1A] rounded-full bg-[#4A3AFF1A]" />
               <p className="text-[12px] font-semibold">Total Alive Bird</p>
             </div>
             <Info className="h-[14px] w-[14px] text-[#141B34]" />
@@ -72,7 +85,10 @@ export default function TopPullet() {
         <Card className="w-[218px] h-[114px] p-2 shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1">
-              <AlertTriangle size={18} className="text-[#FF0004] border border-[#FF00041A] rounded-full bg-[#FF00041A]" />
+              <AlertTriangle
+                size={18}
+                className="text-[#FF0004] border border-[#FF00041A] rounded-full bg-[#FF00041A]"
+              />
               <p className="text-[12px] font-semibold">Active Breaches</p>
             </div>
             <Info className="h-[14px] w-[14px] text-[#141B34]" />

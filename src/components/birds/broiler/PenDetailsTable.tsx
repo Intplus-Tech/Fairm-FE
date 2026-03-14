@@ -42,11 +42,13 @@ export default function PenDetailsTable() {
                 <td className="px-4 py-4">230</td>
                 <td className="px-4 py-4">0</td>
                 <td className="px-4 py-4">3.45</td>
+
                 <td className="px-4 py-4">
                   <span className="flex items-center gap-2">
                     <span
-                      className={`w-3 h-3 rounded-full ${i % 2 === 0 ? "bg-red-500" : "bg-yellow-400"
-                        }`}
+                      className={`w-3 h-3 rounded-full ${
+                        i % 2 === 0 ? "bg-red-500" : "bg-yellow-400"
+                      }`}
                     />
                     {i % 2 === 0 ? "Critical" : "Warning"}
                   </span>

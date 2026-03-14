@@ -81,7 +81,9 @@ export default function LoginPage() {
 
       storeUser(user);
 
-      toast.success("Login successful!"); // ✅ show success toast
+     toast.success("Login successful!", {
+  duration: 10000, // stays for 10 seconds
+});
 
       const role = apiUser.role?.toLowerCase();
 
@@ -196,6 +198,7 @@ export default function LoginPage() {
             >
               {isLoading ? "Logging in..." : "Login"}
             </Button>
+            
           </CardContent>
         </Card>
       </main>

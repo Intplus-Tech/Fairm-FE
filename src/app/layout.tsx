@@ -29,7 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           position="top-right"      
           reverseOrder={false}      
           toastOptions={{
-            duration: 4000,        
+            duration: 1000,        
             style: {
               fontFamily: "var(--font-sans)", 
             },

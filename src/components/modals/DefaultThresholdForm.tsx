@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { thresholdsService } from "@/../services/threshold.service";
+import toast from "react-hot-toast";
 
 const ageRanges = [
   "0-20 weeks",
@@ -15,11 +16,11 @@ export default function DefaultThresholdForm({
   onBack,
   onComplete,
 }: {
-  farmId: string; 
+  farmId: string;
   onBack: () => void;
   onComplete: () => void;
 }) {
-    const [form, setForm] = useState({
+  const [form, setForm] = useState({
     useIndustryBenchmarks: true,
     useSystemThreshold: false,
     mortalityRate: { warning: 0, critical: 0 },
@@ -32,7 +33,7 @@ export default function DefaultThresholdForm({
       ageRange: age,
       eggsPerWeek: 0,
     })),
-    farmId
+    farmId,
   });
 
   const [loading, setLoading] = useState(false);
@@ -41,12 +42,24 @@ export default function DefaultThresholdForm({
   const handleSubmit = async () => {
     try {
       setLoading(true);
+      setError(null);
+
       await thresholdsService.create(form);
-      onComplete();
+
+      toast.success("Alert thresholds saved and activated successfully.", {
+        duration: 4000,
+      });
+
+      // slight delay so toast is visible
+      setTimeout(() => {
+        onComplete();
+      }, 800);
     } catch (err) {
       const message =
-          err instanceof Error ? err.message : "An unexpected error occurred";
+        err instanceof Error ? err.message : "An unexpected error occurred";
+
       setError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -64,27 +77,30 @@ export default function DefaultThresholdForm({
         {/* Toggles */}
         <div className="space-y-2 text-sm">
           <label className="flex items-center gap-2">
-            <input type="checkbox"
-            checked={form.useIndustryBenchmarks}
+            <input
+              type="checkbox"
+              checked={form.useIndustryBenchmarks}
               onChange={(e) =>
                 setForm((prev) => ({
                   ...prev,
                   useIndustryBenchmarks: e.target.checked,
                 }))
-              } />
+              }
+            />
             Use Industry benchmarks
           </label>
 
           <label className="flex items-center gap-2">
-            <input type="checkbox" 
-            checked={form.useSystemThreshold}
+            <input
+              type="checkbox"
+              checked={form.useSystemThreshold}
               onChange={(e) =>
                 setForm((prev) => ({
                   ...prev,
                   useSystemThreshold: e.target.checked,
                 }))
               }
-               />
+            />
             Use System Threshold
           </label>
         </div>
@@ -116,9 +132,7 @@ export default function DefaultThresholdForm({
 
         {/* Temperature */}
         <div>
-          <h3 className="font-medium mb-2">
-            Temperature Range (°C) *
-          </h3>
+          <h3 className="font-medium mb-2">Temperature Range (°C) *</h3>
           <div className="grid grid-cols-2 gap-4">
             {(["min", "max"] as const).map((key) => (
               <input
@@ -143,9 +157,7 @@ export default function DefaultThresholdForm({
 
         {/* Feed Consumption */}
         <div>
-          <h3 className="font-medium mb-2">
-            Feed Consumption Deviation *
-          </h3>
+          <h3 className="font-medium mb-2">Feed Consumption Deviation *</h3>
           {(["lowerLimit", "upperLimit"] as const).map((limitType) => (
             <div key={limitType} className="space-y-2">
               <p className="text-sm font-medium capitalize">{limitType}</p>
@@ -178,9 +190,7 @@ export default function DefaultThresholdForm({
 
         {/* Egg Production */}
         <div>
-          <h3 className="font-medium mb-2">
-            Egg Production (Birds) *
-          </h3>
+          <h3 className="font-medium mb-2">Egg Production (Birds) *</h3>
 
           <div className="space-y-2 text-sm">
             {form.eggProductionPerBird.map((item, index) => (
@@ -208,18 +218,11 @@ export default function DefaultThresholdForm({
         </div>
       </div>
 
-      {error && (
-        <p className="text-red-500 text-sm mb-2">
-          {error}
-        </p>
-      )}
+      {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
 
       {/* FOOTER */}
       <div className="flex justify-end gap-3 border-t pt-4">
-        <button
-          onClick={onBack}
-          className="border px-4 py-2 rounded-lg"
-        >
+        <button onClick={onBack} className="border px-4 py-2 rounded-lg">
           Cancel
         </button>
 

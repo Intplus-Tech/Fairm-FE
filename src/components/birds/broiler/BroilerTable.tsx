@@ -1,19 +1,41 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import BroilerRow from "./BroilerRow";
 import Pagination from "./Pagination";
 import { broilerData } from "../data/mockData";
 
-export default function BroilerTable() {
+interface Props {
+  search: string;
+}
+
+export default function BroilerTable({ search }: Props) {
   const [page, setPage] = useState(1);
+
+  const rowsPerPage = 5;
+
+  /* 🔎 FILTER DATA */
+  const filteredData = useMemo(() => {
+    return broilerData.filter((row) =>
+      `${row.date} ${row.pens} ${row.stock} ${row.mortality} ${row.culls} ${row.feed} ${row.water} ${row.weight} ${row.alert}`
+        .toLowerCase()
+        .includes(search.toLowerCase())
+    );
+  }, [search]);
+
+  /* 📄 PAGINATION */
+  const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+
+  const paginatedData = filteredData.slice(
+    (page - 1) * rowsPerPage,
+    page * rowsPerPage
+  );
 
   return (
     <div className="space-y-4">
-      {/* horizontal scroll without visible scrollbar */}
+      {/* TABLE */}
       <div className="overflow-x-auto scrollbar-hide">
         <table className="min-w-[1100px] w-full text-sm table-fixed">
-          {/* COLUMN ALIGNMENT */}
           <colgroup>
             <col className="w-10" />
             <col />
@@ -43,14 +65,30 @@ export default function BroilerTable() {
           </thead>
 
           <tbody>
-            {broilerData.map((row) => (
-              <BroilerRow key={row.id} row={row} />
-            ))}
+            {paginatedData.length > 0 ? (
+              paginatedData.map((row) => (
+                <BroilerRow key={row.id} row={row} />
+              ))
+            ) : (
+              <tr>
+                <td
+                  colSpan={10}
+                  className="text-center py-10 text-gray-400"
+                >
+                  No results found
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
 
-      <Pagination page={page} totalPages={5} onChange={setPage} />
+      {/* PAGINATION */}
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        onChange={setPage}
+      />
     </div>
   );
 }
