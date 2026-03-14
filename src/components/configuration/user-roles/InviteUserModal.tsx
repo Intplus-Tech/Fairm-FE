@@ -24,25 +24,53 @@ export default function InviteUserModal({
   const [error, setError] = useState<string>(""); 
 
   async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  e.preventDefault();
+  setLoading(true);
+  setError("");
 
-    try {
-      await authService.inviteUser({
-        firstName,
-        lastName,
-        email,
-        role: "staff",
-      })
+  try {
+    await authService.inviteUser({
+      firstName,
+      lastName,
+      email,
+      role: "staff", // or use role variable if dynamic
+    });
 
-      onSuccess();
-    } catch (err: unknown) {
+    // ✅ Call onSuccess
+    onSuccess();
+
+    // ✅ Show success toast with CheckCircle
+    toast.custom(
+      (t) => (
+        <div
+          className={`
+            ${t.visible ? "animate-enter" : "animate-leave"}
+            flex gap-3 rounded-xl bg-white p-4 shadow-lg border border-green-500
+          `}
+        >
+          <CheckCircle className="h-6 w-6 text-green-600" />
+          <div className="flex flex-col text-sm text-gray-900">
+            <div>Invitation Sent</div>
+            <div>User has been successfully invited!</div>
+          </div>
+        </div>
+      ),
+      {
+        duration: 4000,
+        position: "top-right",
+      }
+    );
+
+    onClose();
+  } catch (err: unknown) {
     const message =
-        err instanceof Error ? err.message : "An unexpected error occurred";
+      err instanceof Error ? err.message : "An unexpected error occurred";
     setError(message);
   } finally {
     setLoading(false);
   }
-  }
+}
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
       <div className="w-full max-w-lg rounded-lg bg-white p-6">
