@@ -12,21 +12,9 @@ import { mortalityService } from "../../../../services/mortality.service";
 import { pensService } from "../../../../services/pen.service";
 import { PenResponse } from "@/types/pen";
 import { uploadFileService } from "../../../../services/uploadFile.service";
-
-interface PenMortalityFormRow {
-  penId: string;
-  penLabel: string;
-  openingStock: number;
-  weight: number;
-  mortality: number;
-  sickWeakCount: number;
-  treat: boolean;
-  culledCount: number;
-  culledReason: CulledReason;
-  closingStock: number;
-  temperatureMin: number;
-  temperatureMax: number;
-}
+import { getStoredUser } from "@/lib/auth/getUser";
+import { PenMortalityFormRow } from "@/types/mortality-form";
+import toast from "react-hot-toast"; // ✅ toast import
 
 export default function MortalityPage() {
   const { setFlow } = useEntryFlow();
@@ -41,10 +29,10 @@ export default function MortalityPage() {
   const [symptoms, setSymptoms] = useState<SicknessType[]>([]);
   const [additionalNotes, setAdditionalNotes] = useState("");
   const [photosEvidences, setPhotosEvidences] = useState<string[]>([]);
-  const [checkedBy, setCheckedBy] = useState("Ajewole Iyanoluwa");
-  const [checkedTime, setCheckedTime] = useState("08:00");
 
-  // Helper to shorten MongoDB ID if no pen name exists
+  const [checkedBy, setCheckedBy] = useState("");
+  const [checkedTime, setCheckedTime] = useState("");
+
   const getPenLabel = (pen: PenResponse) => {
     if (pen.name && pen.name.trim()) return pen.name;
     return `Pen ${pen._id.slice(-4).toUpperCase()}`;
@@ -54,35 +42,39 @@ export default function MortalityPage() {
     const fetchData = async () => {
       try {
         setError(null);
-
         const penRes = await pensService.list();
         setPens(penRes);
 
-        // Build rows from real pen data
         const mappedRows: PenMortalityFormRow[] = penRes.map((pen: PenResponse) => ({
-          penId: pen._id, // real DB ID used for API save
-          penLabel: getPenLabel(pen), // readable label for UI
-          openingStock: Number(0), // if your pen model has this field
+          penId: pen._id,
+          penLabel: getPenLabel(pen),
+          openingStock: 0,
           weight: 0,
           mortality: 0,
           sickWeakCount: 0,
           treat: false,
           culledCount: 0,
           culledReason: "other",
-          closingStock: Number(0), // starts same as opening
+          closingStock: 0,
           temperatureMin: 0,
           temperatureMax: 0,
         }));
 
         setRows(mappedRows);
       } catch (err) {
-        const message =
-          err instanceof Error ? err.message : "Failed to load pens";
-        setError(message);
+        setError(err instanceof Error ? err.message : "Failed to load pens");
       }
     };
 
     fetchData();
+
+    const user = getStoredUser();
+    if (user?.fullName) setCheckedBy(user.fullName);
+
+    const now = new Date();
+    const hh = now.getHours().toString().padStart(2, "0");
+    const mm = now.getMinutes().toString().padStart(2, "0");
+    setCheckedTime(`${hh}:${mm}`);
   }, []);
 
   const handleSave = async () => {
@@ -92,37 +84,56 @@ export default function MortalityPage() {
 
       await Promise.all(
         rows.map((row) => {
-          return mortalityService.create({
+          const payload = {
             penId: row.penId,
-            openingStock: Number(row.openingStock),
-            closingStock: Number(row.closingStock),
-            mortality: Number(row.mortality),
-            weight: Number(row.weight),
+            openingStock: Number(row.openingStock) || 0,
+            closingStock: Number(row.closingStock) || 0,
+            mortality: Number(row.mortality) || 0,
+            weight: Number(row.weight) || 0,
             temperatureRange: {
-              min: Number(row.temperatureMin),
-              max: Number(row.temperatureMax),
+              min: Number(row.temperatureMin) || 0,
+              max: Number(row.temperatureMax) || 0,
             },
             sickWeak: {
-              noOfSickWeak: Number(row.sickWeakCount),
+              noOfSickWeak: Number(row.sickWeakCount) || 0,
               treat: row.treat,
             },
             culled: {
-              noOfCulled: Number(row.culledCount),
-              reason: row.culledReason,
+              noOfCulled: Number(row.culledCount) || 0,
+              reason: row.culledReason as CulledReason,
             },
             sickBirdObservations: {
               symptoms,
               additionalNotes,
             },
             photosEvidences,
-          });
+          };
+
+          return mortalityService.create(payload);
         })
       );
 
-      alert("Mortality data saved successfully!");
-    } catch (error) {
-      console.error("Failed to save mortality data:", error);
-      alert("Failed to save mortality data");
+      // ✅ Success toast
+      toast.success(
+        <div>
+          <p>Mortality data saved successfully!</p>
+          <p>Checked By: {checkedBy}</p>
+          <p>Time: {checkedTime}</p>
+        </div>,
+        { duration: 4000 } // auto-dismiss
+      );
+    } catch (err: any) {
+      console.error("Failed to save mortality data:", err);
+      const message = err?.response?.data?.message || "Failed to save mortality data";
+      setError(message);
+
+      // ✅ Error toast
+      toast.error(
+        <div>
+          <p>{message}</p>
+        </div>,
+        { duration: 4000 }
+      );
     } finally {
       setLoading(false);
     }
@@ -132,44 +143,33 @@ export default function MortalityPage() {
     if (!files || files.length === 0) return;
 
     try {
-      const uploadedUrls: string[] = [];
+      const uploadedFiles = await uploadFileService.create(files);
+      const uploadedIds = Array.isArray(uploadedFiles)
+        ? uploadedFiles.map((f) => f._id)
+        : [uploadedFiles._id];
+      setPhotosEvidences((prev) => [...prev, ...uploadedIds]);
+    } catch (err) {
+      console.error("Photo upload failed:", err);
 
-      for (const file of Array.from(files)) {
-        const base64 = await fileToBase64(file);
-
-        const uploaded = await uploadFileService.create({
-          file: base64,
-        });
-
-        uploadedUrls.push(uploaded.url);
-      }
-
-      setPhotosEvidences((prev) => [...prev, ...uploadedUrls]);
-    } catch (error) {
-      console.error("Photo upload failed:", error);
-      alert("Failed to upload photo(s)");
+      // ✅ Photo upload error toast
+      toast.error(
+        <div>
+          <p>Failed to upload photo(s)</p>
+        </div>,
+        { duration: 4000 }
+      );
     }
   };
 
   const handleNext = () => {
-    setFlow((prev: { mortality: boolean }) => ({
-      ...prev,
-      mortality: true,
-    }));
-
+    setFlow((prev: { mortality: boolean }) => ({ ...prev, mortality: true }));
     router.push("/entry-officer/feed-consumption");
   };
 
   return (
     <div className="min-h-screen bg-gray-100 p-6 space-y-6">
+      {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
 
-      
-      {error && (
-        <p className="text-red-500 text-sm mb-2">
-          {error}
-        </p>
-      )}
-      
       <MortalityHeader
         checkedBy={checkedBy}
         checkedTime={checkedTime}
@@ -191,10 +191,7 @@ export default function MortalityPage() {
       </div>
 
       <div className="bg-white rounded-xl shadow p-6">
-        <PhotoEvidence
-          photosEvidences={photosEvidences}
-          onUpload={handlePhotoUpload}
-        />
+        <PhotoEvidence onUpload={handlePhotoUpload} />
       </div>
 
       <div className="flex justify-end gap-4">
@@ -215,17 +212,4 @@ export default function MortalityPage() {
       </div>
     </div>
   );
-}
-
-function fileToBase64(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-
-    reader.onload = () => {
-      resolve(reader.result as string);
-    };
-
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
 }
