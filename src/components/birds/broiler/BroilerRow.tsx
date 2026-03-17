@@ -27,7 +27,7 @@ export default function BroilerRow({ row }: BroilerRowProps) {
   return (
     <>
       <tr className={`${open ? "bg-gray-50" : ""}`}>
-        <td className="w-10 px-2 py-2 text-center">
+        <td className="w-10 px-4 py-3 text-center align-middle">
           <button
             onClick={() => setOpen(!open)}
             className={`p-1 rounded ${
@@ -38,16 +38,16 @@ export default function BroilerRow({ row }: BroilerRowProps) {
           </button>
         </td>
 
-        <td className="px-2 py-2">{row.date}</td>
-        <td className="px-2 py-2">{row.pens}</td>
-        <td className="px-2 py-2">{row.stock}</td>
-        <td className="px-2 py-2">{row.mortality}</td>
-        <td className="px-2 py-2">{row.culls}</td>
-        <td className="px-2 py-2">{row.feed}</td>
-        <td className="px-2 py-2">{row.water}</td>
-        <td className="px-2 py-2">{row.weight}</td>
+        <td className="px-10 py-6 align-middle">{row.date}</td>
+        <td className="px-10 py-6 align-middle">{row.pens}</td>
+        <td className="px-10 py-6 align-middle">{row.stock}</td>
+        <td className="px-10 py-6 align-middle">{row.mortality}</td>
+        <td className="px-10 py-6 align-middle">{row.culls}</td>
+        <td className="px-10 py-6 align-middle">{row.feed}</td>
+        <td className="px-10 py-6 align-middle">{row.water}</td>
+        <td className="px-10 py-6 align-middle">{row.weight}</td>
 
-        <td className="px-2 py-2">
+        <td className="px-4 py-3 align-middle">
           <span className="flex items-center gap-2">
             <span
               className={`w-3 h-3 rounded-full ${
@@ -61,7 +61,7 @@ export default function BroilerRow({ row }: BroilerRowProps) {
 
       {open && (
         <tr>
-          <td colSpan={10} className="p-4">
+          <td colSpan={10} className="px-4 py-4">
             <PenDetailsTable />
           </td>
         </tr>

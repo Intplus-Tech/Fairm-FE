@@ -9,16 +9,17 @@ interface Props {
 }
 
 export default function EmployeeTable({ employees }: Props) {
+
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   return (
-    <div className="rounded-xl border overflow-hidden">
-      <table className="w-full border-collapse">
-        <thead className="bg-muted text-sm">
-          <tr>
-            {/* ID header aligned with ID text (not chevron) */}
-            <th className="p-4 pl-[56px] text-left">ID</th>
+    <div className="rounded-xl border overflow-hidden bg-white">
 
+      <table className="w-full text-sm">
+
+        <thead className="bg-muted">
+          <tr>
+            <th className="p-4 text-left w-[200px]">ID</th>
             <th className="p-4 text-left">Name & ID</th>
             <th className="p-4 text-left">Position</th>
             <th className="p-4 text-left">Department</th>
@@ -27,18 +28,26 @@ export default function EmployeeTable({ employees }: Props) {
         </thead>
 
         <tbody>
-          {employees.map(emp => (
+
+          {employees.map((emp) => (
+
             <EmployeeRow
               key={emp._id}
               employee={emp}
               expanded={expandedId === emp._id}
               onToggle={() =>
-                setExpandedId(expandedId === emp._id ? null : emp._id)
+                setExpandedId(
+                  expandedId === emp._id ? null : emp._id
+                )
               }
             />
+
           ))}
+
         </tbody>
+
       </table>
+
     </div>
   );
 }

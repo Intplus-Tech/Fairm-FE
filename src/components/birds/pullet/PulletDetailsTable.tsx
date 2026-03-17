@@ -23,14 +23,14 @@ export default function PulletDetailsTable() {
           <tbody>
             {[1, 2, 3, 4].map((i) => (
               <tr key={i} className="border-t">
-                <td className="px-6 py-4">Pen {i}</td>
-                <td className="px-6 py-4">3</td>
-                <td className="px-6 py-4">12,981</td>
-                <td className="px-6 py-4">81</td>
-                <td className="px-6 py-4">Grower</td>
-                <td className="px-6 py-4">3.45</td>
-                <td className="px-6 py-4">94%</td>
-                <td className="px-6 py-4">
+                <td className="px-10 py-6">Pen {i}</td>
+                <td className="px-10 py-6">3</td>
+                <td className="px-10 py-6">12,981</td>
+                <td className="px-10 py-6">81</td>
+                <td className="px-10 py-6">Grower</td>
+                <td className="px-10 py-6">3.45</td>
+                <td className="px-10 py-6">94%</td>
+                <td className="px-10 py-6">
                   <span
                     className={`inline-block px-2 py-1 rounded text-xs ${i === 4
                         ? "bg-yellow-100 text-yellow-700"

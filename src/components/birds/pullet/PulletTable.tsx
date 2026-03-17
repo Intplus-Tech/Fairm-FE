@@ -60,10 +60,10 @@ export default function PulletTable() {
       />
 
       <div className="overflow-x-auto scrollbar-hide">
-        <table className="min-w-[1100px] w-full text-sm table-fixed">
-          <thead className="bg-gray-50 px-2">
-            <tr>
-              <th></th>
+        <table className="min-w-[1100px] w-full text-sm table-fixed ">
+          <thead className="bg-gray-50 px-2 py-6">
+            <tr className="p-6">
+              <th className="py-6"></th>
               <th>Date</th>
               <th>No of Pens</th>
               <th>Opening Stock</th>

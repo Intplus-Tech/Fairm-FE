@@ -14,7 +14,6 @@ export default function BroilerTable({ search }: Props) {
 
   const rowsPerPage = 5;
 
-  /* 🔎 FILTER DATA */
   const filteredData = useMemo(() => {
     return broilerData.filter((row) =>
       `${row.date} ${row.pens} ${row.stock} ${row.mortality} ${row.culls} ${row.feed} ${row.water} ${row.weight} ${row.alert}`
@@ -23,7 +22,6 @@ export default function BroilerTable({ search }: Props) {
     );
   }, [search]);
 
-  /* 📄 PAGINATION */
   const totalPages = Math.ceil(filteredData.length / rowsPerPage);
 
   const paginatedData = filteredData.slice(
@@ -33,9 +31,8 @@ export default function BroilerTable({ search }: Props) {
 
   return (
     <div className="space-y-4">
-      {/* TABLE */}
       <div className="overflow-x-auto scrollbar-hide">
-        <table className="min-w-[1100px] w-full text-sm table-fixed">
+        <table className="min-w-[1100px] w-full text-sm table-fixed border-collapse">
           <colgroup>
             <col className="w-10" />
             <col />
@@ -51,16 +48,16 @@ export default function BroilerTable({ search }: Props) {
 
           <thead className="bg-gray-50 text-[#1C155F]">
             <tr>
-              <th></th>
-              <th>Date</th>
-              <th>No of Pens</th>
-              <th>Opening Stock</th>
-              <th>Mortality</th>
-              <th>Culls / Sales</th>
-              <th>Feed Consumed(kg)</th>
-              <th>Water Consumed(L)</th>
-              <th>Average Weight(Kg)</th>
-              <th>Alerts</th>
+              <th className="px-4 py-3"></th>
+              <th className="px-6 py-3 text-left">Date</th>
+              <th className="px-6 py-3 text-left">No of Pens</th>
+              <th className="px-6 py-3 text-left">Opening Stock</th>
+              <th className="px-6 py-3 text-left">Mortality</th>
+              <th className="px-6 py-3 text-left">Culls / Sales</th>
+              <th className="px-6 py-3 text-left">Feed Consumed (kg)</th>
+              <th className="px-6 py-3 text-left">Water Consumed (L)</th>
+              <th className="px-6 py-3 text-left">Average Weight (Kg)</th>
+              <th className="px-6 py-3 text-left">Alerts</th>
             </tr>
           </thead>
 
@@ -71,10 +68,7 @@ export default function BroilerTable({ search }: Props) {
               ))
             ) : (
               <tr>
-                <td
-                  colSpan={10}
-                  className="text-center py-10 text-gray-400"
-                >
+                <td colSpan={10} className="text-center py-10 text-gray-400">
                   No results found
                 </td>
               </tr>
@@ -83,12 +77,7 @@ export default function BroilerTable({ search }: Props) {
         </table>
       </div>
 
-      {/* PAGINATION */}
-      <Pagination
-        page={page}
-        totalPages={totalPages}
-        onChange={setPage}
-      />
+      <Pagination page={page} totalPages={totalPages} onChange={setPage} />
     </div>
   );
 }
