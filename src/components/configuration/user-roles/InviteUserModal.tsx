@@ -24,30 +24,21 @@ export default function InviteUserModal({
  async function handleSubmit(e: React.FormEvent) {
   e.preventDefault();
 
-  // Combine firstName and lastName
-  const fullName = `${firstName} ${lastName}`.trim();
+    try {
+      await authService.inviteUser({
+        firstName,
+        lastName,
+        email,
+        role: "staff",
+      })
 
-  try {
-    const res = await fetch("/api/demo/invite", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ fullName, email, phone, role }),
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      // Set error message
-      setError(data.message || "Failed to send invite.");
-      return;
-    }
-
-    console.log("Invite link (demo):", data.inviteLink);
-    setError(""); // Clear any previous error
-    onSuccess();
-  } catch (err) {
-    setError("Something went wrong. Please try again.");
-    console.error(err);
+      onSuccess();
+    } catch (err: unknown) {
+    const message =
+        err instanceof Error ? err.message : "An unexpected error occurred";
+    setError(message);
+  } finally {
+    setLoading(false);
   }
 }
 
@@ -80,7 +71,7 @@ export default function InviteUserModal({
           <div className="space-y-4">
             <div>
               <label className="mb-1 block text-sm font-medium">
-                Full Name <span className="text-red-500">*</span>
+                First Name <span className="text-red-500">*</span>
               </label>
               <input
                 value={firstName}

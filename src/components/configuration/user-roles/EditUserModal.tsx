@@ -1,17 +1,14 @@
 "use client";
 
+import { UserRole } from "@/types/auth";
+import { User } from "@/types/user";
 import { useState } from "react";
+import { usersService } from "../../../../services/user.service";
 
 interface EditUserModalProps {
   onClose: () => void;
   onSuccess: () => void;
-  user?: {
-    fullName: string;
-    email: string;
-    phone: string;
-    role: string;
-    status: "Active" | "Inactive";
-  };
+  user: User;
 }
 
 export default function EditUserModal({
@@ -19,17 +16,40 @@ export default function EditUserModal({
   onSuccess,
   user,
 }: EditUserModalProps) {
-  const [fullName, setFullName] = useState(user?.fullName ?? "");
-  const [email, setEmail] = useState(user?.email ?? "");
-  const [phone, setPhone] = useState(user?.phone ?? "");
-  const [role, setRole] = useState(user?.role ?? "");
-  const [status, setStatus] = useState(user?.status ?? "Active");
+  const [firstName, setFirstName] = useState(user.firstName);
+  const [lastName, setLastName] = useState(user.lastName);
+  const [email, setEmail] = useState(user.email);
+  const [role, setRole] = useState<UserRole>(user.role);
+  const [status, setStatus] = useState<User["status"]>(user.status);
 
-  function handleSubmit(e: React.FormEvent) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    // Later: call backend update user endpoint here
-    onSuccess();
+    try {
+      setLoading(true);
+      setError(null);
+
+      const payload: Partial<User> = {
+        firstName,
+        lastName,
+        email,
+        role,
+        status,
+      };
+
+      await usersService.update(user._id, payload);
+
+      onSuccess();
+      onClose();
+    } catch (err) {
+      console.error("Failed to update user:", err);
+      setError("Failed to update user. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -46,16 +66,33 @@ export default function EditUserModal({
           </button>
         </div>
 
+        {error && (
+          <div className="mb-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-600">
+            {error}
+          </div>
+        )}
+
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Full Name */}
+          {/* First Name */}
+          <div>
+            <label className="mb-1 block text-sm font-medium">First Name</label>
+            <input
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              required
+              className="w-full rounded-md border px-3 py-2 text-sm"
+            />
+          </div>
+
+          {/* Last Name */}
           <div>
             <label className="mb-1 block text-sm font-medium">
-              Full Name
+              Last Name
             </label>
             <input
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
               required
               className="w-full rounded-md border px-3 py-2 text-sm"
             />
@@ -75,18 +112,6 @@ export default function EditUserModal({
             />
           </div>
 
-          {/* Phone */}
-          <div>
-            <label className="mb-1 block text-sm font-medium">
-              Phone Number
-            </label>
-            <input
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className="w-full rounded-md border px-3 py-2 text-sm"
-            />
-          </div>
-
           {/* Role */}
           <div>
             <label className="mb-1 block text-sm font-medium">
@@ -94,15 +119,13 @@ export default function EditUserModal({
             </label>
             <select
               value={role}
-              onChange={(e) => setRole(e.target.value)}
+              onChange={(e) => setRole(e.target.value as UserRole)}
               required
               className="w-full rounded-md border px-3 py-2 text-sm"
             >
               <option value="">Select role</option>
-              <option value="Owner">Owner</option>
-              <option value="Admin">Admin</option>
-              <option value="Farm Manager">Farm Manager</option>
-              <option value="Entry Officer">Entry Officer</option>
+              <option value="super_admin">Super Admin</option>
+              <option value="staff">Staff</option>
             </select>
           </div>
 
@@ -114,12 +137,12 @@ export default function EditUserModal({
             <select
               value={status}
               onChange={(e) =>
-                setStatus(e.target.value as "Active" | "Inactive")
+                setStatus(e.target.value as User["status"])
               }
               className="w-full rounded-md border px-3 py-2 text-sm"
             >
-              <option value="Active">Active</option>
-              <option value="Inactive">Inactive</option>
+              <option value="active">Active</option>
+              <option value="pending_setup">Pending Setup</option>
             </select>
           </div>
 
@@ -128,15 +151,17 @@ export default function EditUserModal({
             <button
               type="button"
               onClick={onClose}
+              disabled={loading}
               className="rounded-md border px-4 py-2 text-sm"
             >
               Cancel
             </button>
             <button
               type="submit"
+              disabled={loading}
               className="rounded-md bg-primary px-4 py-2 text-sm text-white hover:bg-primary/90"
             >
-              Save Changes
+              {loading ? "Saving..." : "Save Changes"}
             </button>
           </div>
         </form>
