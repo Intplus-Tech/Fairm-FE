@@ -13,7 +13,7 @@ import ChartCard from "./ChartCard";
 import { eggHealthData } from "./data/mockDashboardData";
 
 
-export default function EggHealthChart() {
+export default function EggHealthChart({ data }: { data: any[] }) {
   return (
     <ChartCard
       title="Egg Health"

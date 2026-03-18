@@ -38,16 +38,16 @@ export default function BroilerRow({ row }: BroilerRowProps) {
           </button>
         </td>
 
-        <td className="px-10 py-6 align-middle">{row.date}</td>
-        <td className="px-10 py-6 align-middle">{row.pens}</td>
-        <td className="px-10 py-6 align-middle">{row.stock}</td>
-        <td className="px-10 py-6 align-middle">{row.mortality}</td>
-        <td className="px-10 py-6 align-middle">{row.culls}</td>
-        <td className="px-10 py-6 align-middle">{row.feed}</td>
-        <td className="px-10 py-6 align-middle">{row.water}</td>
-        <td className="px-10 py-6 align-middle">{row.weight}</td>
+        <td className="px-10 py-6">{row.date}</td>
+        <td className="px-10 py-6">{row.pens}</td>
+        <td className="px-10 py-6">{row.stock}</td>
+        <td className="px-10 py-6">{row.mortality}</td>
+        <td className="px-10 py-6">{row.culls}</td>
+        <td className="px-10 py-6">{row.feed}</td>
+        <td className="px-10 py-6">{row.water}</td>
+        <td className="px-10 py-6">{row.weight}</td>
 
-        <td className="px-4 py-3 align-middle">
+        <td className="px-4 py-3">
           <span className="flex items-center gap-2">
             <span
               className={`w-3 h-3 rounded-full ${

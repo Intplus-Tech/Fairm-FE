@@ -1,18 +1,37 @@
+"use client";
+
 import { AlertTriangle, Bird, Info, UserPlus } from "lucide-react";
 import { Card } from "../ui/card";
+import { DashboardResponse } from "../../../services/dashboard.service";
+// import { DashboardResponse } from "@/services/dashboard.service";
 
-export default function TopInfo() {
+interface TopInfoProps {
+  data: DashboardResponse | null;
+  userName: string;
+}
+
+export default function TopInfo({ data, userName }: TopInfoProps) {
+  const greeting = () => {
+    const hour = new Date().getHours();
+
+    if (hour < 12) return "Good Morning";
+    if (hour < 18) return "Good Afternoon";
+    return "Good Evening";
+  };
+
   return (
     <div className="w-full">
+      {/* Greeting */}
       <div className="pb-5">
         <p className="text-2xl font-semibold p-1 text-[#170F49]">
-          Good Morning, John.
+          {greeting()}, {userName || "User"}.
         </p>
       </div>
 
-      {/* Cards container */}
+      {/* Cards */}
       <div className="flex gap-2 overflow-x-auto whitespace-nowrap scrollbar-hide md:overflow-visible">
-        {/* Card 1 */}
+        
+        {/* Total Live Birds */}
         <Card className="w-[70vw] sm:w-[300px] md:w-[320px] lg:w-[290px] h-[170px] p-5 shrink-0">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-4">
@@ -25,14 +44,16 @@ export default function TopInfo() {
           </div>
 
           <div>
-            <p className="text-[22px] font-bold">0</p>
+            <p className="text-[22px] font-bold">
+              {data?.totalLiveBirds ?? 0}
+            </p>
             <p className="text-xs font-semibold text-muted-foreground">
               Current bird count
             </p>
           </div>
         </Card>
 
-        {/* Card 2 */}
+        {/* Total Mortality */}
         <Card className="w-[70vw] sm:w-[300px] md:w-[320px] lg:w-[290px] h-[170px] p-5 shrink-0">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-4">
@@ -45,14 +66,16 @@ export default function TopInfo() {
           </div>
 
           <div>
-            <p className="text-[22px] font-bold">0</p>
+            <p className="text-[22px] font-bold">
+              {data?.totalMortality ?? 0}
+            </p>
             <p className="text-xs font-semibold text-muted-foreground">
-              Current bird count
+              Current mortality count
             </p>
           </div>
         </Card>
 
-        {/* Card 3 */}
+        {/* Farm Staff */}
         <Card className="w-[80vw] sm:w-[300px] md:w-[320px] lg:w-[280px] h-[170px] p-5 shrink-0">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-4">
@@ -65,14 +88,16 @@ export default function TopInfo() {
           </div>
 
           <div>
-            <p className="text-[22px] font-bold">0</p>
+            <p className="text-[22px] font-bold">
+              {data?.farmStaff ?? 0}
+            </p>
             <p className="text-xs font-semibold text-muted-foreground">
-              Current bird count
+              Total staff count
             </p>
           </div>
         </Card>
 
-        {/* Card 4 */}
+        {/* Active Breaches */}
         <Card className="w-[80vw] sm:w-[300px] md:w-[320px] lg:w-[280px] h-[170px] p-5 shrink-0">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-4">
@@ -86,15 +111,20 @@ export default function TopInfo() {
 
           <div>
             <div className="flex items-center gap-2">
-              <p className="text-[22px] font-bold">0</p>
-              <p className="text-[#FF0004] bg-[#FF00041A] text-[10px] p-1">Critical</p>
+              <p className="text-[22px] font-bold">
+                {data?.activeBreaches ?? 0}
+              </p>
+              <span className="text-[#FF0004] bg-[#FF00041A] text-[10px] p-1">
+                Critical
+              </span>
             </div>
-           
+
             <p className="text-xs font-semibold text-muted-foreground">
-              Current bird count
+              Current breaches
             </p>
           </div>
         </Card>
+
       </div>
     </div>
   );

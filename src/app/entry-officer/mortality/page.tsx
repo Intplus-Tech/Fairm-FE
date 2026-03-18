@@ -15,6 +15,7 @@ import { uploadFileService } from "../../../../services/uploadFile.service";
 import { getStoredUser } from "@/lib/auth/getUser";
 import { PenMortalityFormRow } from "@/types/mortality-form";
 import toast from "react-hot-toast"; // ✅ toast import
+import { UploadFileResponse } from "@/types/upload-file";
 
 export default function MortalityPage() {
   const { setFlow } = useEntryFlow();
@@ -139,28 +140,29 @@ export default function MortalityPage() {
     }
   };
 
-  const handlePhotoUpload = async (files: FileList | null) => {
-    if (!files || files.length === 0) return;
+ const handlePhotoUpload = async (files: FileList | null) => {
+  if (!files || files.length === 0) return;
 
-    try {
-      const uploadedFiles = await uploadFileService.create(files);
-      const uploadedIds = Array.isArray(uploadedFiles)
-        ? uploadedFiles.map((f) => f._id)
-        : [uploadedFiles._id];
-      setPhotosEvidences((prev) => [...prev, ...uploadedIds]);
-    } catch (err) {
-      console.error("Photo upload failed:", err);
+  try {
+    const uploadedFiles: UploadFileResponse[] =
+      await uploadFileService.create(files);
 
-      // ✅ Photo upload error toast
-      toast.error(
-        <div>
-          <p>Failed to upload photo(s)</p>
-        </div>,
-        { duration: 4000 }
-      );
-    }
-  };
+    const uploadedIds = uploadedFiles.map(
+      (file: UploadFileResponse) => file._id
+    );
 
+    setPhotosEvidences((prev) => [...prev, ...uploadedIds]);
+  } catch (err) {
+    console.error("Photo upload failed:", err);
+
+    toast.error(
+      <div>
+        <p>Failed to upload photo(s)</p>
+      </div>,
+      { duration: 4000 }
+    );
+  }
+};
   const handleNext = () => {
     setFlow((prev: { mortality: boolean }) => ({ ...prev, mortality: true }));
     router.push("/entry-officer/feed-consumption");

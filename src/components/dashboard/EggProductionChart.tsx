@@ -12,7 +12,7 @@ import ChartCard from "./ChartCard";
 import { eggProductionData } from "./data/mockDashboardData";
 // import { eggProductionData } from "../data/mockDashboardData";
 
-export default function EggProductionChart() {
+export default function EggProductionChart({ data }: { data: any[] }) {
   return (
     <ChartCard
       title="Egg Production"
@@ -25,7 +25,7 @@ export default function EggProductionChart() {
     >
       <div className="h-[250px] w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={eggProductionData}>
+          <LineChart data={data}>
             <XAxis dataKey="day" />
             <YAxis />
             <Tooltip />

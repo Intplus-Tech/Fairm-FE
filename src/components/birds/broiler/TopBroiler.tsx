@@ -1,90 +1,58 @@
+"use client";
+
 import { Card } from "@/components/ui/card";
-import { AlertTriangle, Bird, Info, UserPlus, } from "lucide-react";
 
+interface TopBroilerProps {
+  summary: {
+    totalBirds?: number;
+    totalMortality?: number;
+    totalAlive?: number;
+    netProfit?: number;
+  };
+  userName: string;
+}
 
-export default function TopBroiler() {
+export default function TopBroiler({ summary, userName }: TopBroilerProps) {
+  const greeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good Morning";
+    if (hour < 18) return "Good Afternoon";
+    return "Good Evening";
+  };
+
   return (
     <div className="w-full">
+      {/* Greeting */}
       <div className="pb-5">
-        <p className="font-semibold p-1">Good Morning, John.</p>
+        <p className="font-semibold p-1">
+          {greeting()}, {userName || "User"}.
+        </p>
       </div>
 
-      {/* Cards container */}
-      <div
-        className="
-          flex gap-2
-          overflow-x-auto
-          whitespace-nowrap
-          scrollbar-hide
-          md:overflow-visible
-        "
-      >
+      {/* Cards Row */}
+      <div className="flex gap-2 overflow-x-auto whitespace-nowrap scrollbar-hide md:overflow-visible">
+        {/* Total Birds */}
         <Card className="w-[218px] h-[114px] p-2 shrink-0">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1">
-              <Bird className="text-[#4A3AFF]  h-[18px] w-[18px] border border-[#4A3AFF1A] rounded-full bg-[#4A3AFF1A]"/>
-              <p className="text-[12px] font-semibold">Total Birds</p>
-            </div>
-            <Info className="h-[14px] w-[14px] text-[#141B34]"/>
-          </div>
-
-          <div>
-            <p className="text-[18px] font-bold">0</p>
-            <div className="text-[10px] font-semibold">
-              Current bird count
-            </div>
-          </div>
+          <p className="text-xs">Total Birds</p>
+          <p className="text-[18px] font-bold">{summary?.totalBirds ?? 0}</p>
         </Card>
 
+        {/* Mortality */}
         <Card className="w-[218px] h-[114px] p-2 shrink-0">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1">
-              <Bird className="text-[#4A3AFF]  h-[18px] w-[18px] border border-[#4A3AFF1A] rounded-full bg-[#4A3AFF1A]" />
-              <p className="text-[12px] font-semibold">Total Mortality</p>
-            </div>
-            <Info className="h-[14px] w-[14px] text-[#141B34]" />
-          </div>
-
-          <div>
-            <p className="text-[18px] font-bold">0</p>
-            <div className="text-[10px] font-semibold">
-              Current bird count
-            </div>
-          </div>
+          <p className="text-xs">Mortality</p>
+          <p className="text-[18px] font-bold">{summary?.totalMortality ?? 0}</p>
         </Card>
 
+        {/* Alive */}
         <Card className="w-[218px] h-[114px] p-2 shrink-0">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1">
-              <Bird className="text-[#4A3AFF]  h-[18px] w-[18px] border border-[#4A3AFF1A] rounded-full bg-[#4A3AFF1A]" />
-              <p className="text-[12px] font-semibold">Total Alive Bird</p>
-            </div>
-            <Info className="h-[14px] w-[14px] text-[#141B34]" />
-          </div>
-
-          <div>
-            <p className="text-[18px] font-bold">0</p>
-            <div className="text-[10px] font-semibold">
-              Current bird count
-            </div>
-          </div>
+          <p className="text-xs">Alive</p>
+          <p className="text-[18px] font-bold">{summary?.totalAlive ?? 0}</p>
         </Card>
 
+        {/* Net Profit */}
         <Card className="w-[218px] h-[114px] p-2 shrink-0">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1">
-              <Bird className="text-[#4A3AFF]  h-[18px] w-[18px] border border-[#4A3AFF1A] rounded-full bg-[#4A3AFF1A]" />
-              <p className="text-[12px] font-semibold">Net Profit</p>
-            </div>
-            <Info className="h-[14px] w-[14px] text-[#141B34]" />
-          </div>
-
-          <div>
-            <p className="text-[18px] font-bold">0</p>
-            <div className="text-[10px] font-semibold">
-              Current bird count
-            </div>
-          </div>
+          <p className="text-xs">Net Profit</p>
+          <p className="text-[18px] font-bold">{summary?.netProfit ?? 0}</p>
         </Card>
       </div>
     </div>

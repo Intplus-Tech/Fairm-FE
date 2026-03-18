@@ -12,7 +12,7 @@ import ChartCard from "./ChartCard";
 import { mortalityData } from "./data/mockDashboardData";
 // import { mortalityData } from "../data/mockDashboardData";
 
-export default function MortalityChart() {
+export default function MortalityChart({ data }: { data: any[] }) {
   return (
     <ChartCard
       title="Mortality Rate"

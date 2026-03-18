@@ -1,68 +1,28 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import PelletRow from "./PulletRow";
-import PelletSearchExport from "./PulletSearchExport";
+import PulletSearchExport from "./PulletSearchExport";
 import Pagination from "../broiler/Pagination";
-import { PulletRowData } from "@/types/pullet";
+import { PulletRowData } from "../../../../services/pullet.service";
 
-const data: PulletRowData[] = [
-  {
-    id: 1,
-    date: "Jan 12, 2026",
-    pens: 3,
-    stock: "12,981",
-    mortality: 81,
-    feed: 230,
-    weight: 3.45,
-    alert: "Critical",
-  },
-  {
-    id: 2,
-    date: "Jan 12, 2026",
-    pens: 5,
-    stock: "12,981",
-    mortality: 81,
-    feed: 230,
-    weight: 3.45,
-    alert: "Warning",
-  },
-  {
-    id: 3,
-    date: "Jan 12, 2026",
-    pens: 4,
-    stock: "12,981",
-    mortality: 81,
-    feed: 230,
-    weight: 3.45,
-    alert: "Critical",
-  },
-];
 
-export default function PulletTable() {
-  const [page, setPage] = useState<number>(1);
-  const [search, setSearch] = useState("");
+interface Props {
+  data: PulletRowData[];
+  onSearch: (value: string) => void;
+}
 
-  const filteredData = useMemo(() => {
-    return data.filter((row) =>
-      Object.values(row)
-        .join(" ")
-        .toLowerCase()
-        .includes(search.toLowerCase())
-    );
-  }, [search]);
+export default function PulletTable({ data, onSearch }: Props) {
+  const [page, setPage] = useState(1);
 
   return (
     <div className="bg-white rounded-xl border p-6 space-y-6">
-      <PelletSearchExport
-        onSearch={setSearch}
-        data={filteredData}
-      />
+      <PulletSearchExport onSearch={onSearch} data={data} />
 
       <div className="overflow-x-auto scrollbar-hide">
-        <table className="min-w-[1100px] w-full text-sm table-fixed ">
-          <thead className="bg-gray-50 px-2 py-6">
-            <tr className="p-6">
+        <table className="min-w-[1100px] w-full text-sm table-fixed">
+          <thead className="bg-gray-50">
+            <tr>
               <th className="py-6"></th>
               <th>Date</th>
               <th>No of Pens</th>
@@ -75,14 +35,14 @@ export default function PulletTable() {
           </thead>
 
           <tbody>
-            {filteredData.map((row) => (
+            {data.map((row) => (
               <PelletRow key={row.id} row={row} />
             ))}
           </tbody>
         </table>
       </div>
 
-      <Pagination page={page} totalPages={5} onChange={setPage} />
+      <Pagination page={page} totalPages={Math.ceil(data.length / 10)} onChange={setPage} />
     </div>
   );
 }

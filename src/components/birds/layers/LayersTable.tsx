@@ -1,43 +1,73 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import LayersRow from "./LayersRow";
 import LayersSearchExport from "./LayersSearchExport";
 import Pagination from "../broiler/Pagination";
 import { LayerRowData } from "@/types/layers";
-
-// Initial data
-const initialData: LayerRowData[] = [
-  {
-    id: 1,
-    date: "Jan 12, 2026",
-    pens: 3,
-    birdsAlive: "12,981",
-    mortality: 81,
-    feed: 230,
-    totalEggs: 6000,
-    hdp: 75,
-    status: "Optimal",
-  },
-  {
-    id: 2,
-    date: "Jan 12, 2026",
-    pens: 3,
-    birdsAlive: "12,981",
-    mortality: 81,
-    feed: 230,
-    totalEggs: 80,
-    hdp: 3,
-    status: "Critical",
-  },
-];
+import { layersService } from "../../../../services/layers.service";
 
 export default function LayersTable() {
   const [page, setPage] = useState(1);
-  const [data, setData] = useState(initialData);
-  const [filteredData, setFilteredData] = useState(initialData);
+  const [data, setData] = useState<LayerRowData[]>([]);
+  const [filteredData, setFilteredData] = useState<LayerRowData[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
-  // Handle search
+  // Replace with actual token from your auth context
+  const token = localStorage.getItem("token") || "";
+
+  useEffect(() => {
+    if (!token) {
+      setErrorMessage("Authorization token missing. Please login.");
+      return;
+    }
+
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const dashboard = await layersService.getDashboard(token);
+
+        // Map API response to LayerRowData[]
+        const mappedData: LayerRowData[] = dashboard.map((item: any, index: number) => ({
+          id: index + 1,
+          date: item.date || "",
+          pens: item.pens || 0,
+          birdsAlive: item.birdsAlive || "0",
+          mortality: item.mortality || 0,
+          feed: item.feedConsumed || 0,
+          totalEggs: item.totalEggs || 0,
+          hdp: item.hdp || 0,
+          status: item.status || "Unknown",
+        }));
+
+        setData(mappedData);
+        setFilteredData(mappedData);
+        
+        setErrorMessage("");
+      } catch (error: any) {
+        if (axios.isAxiosError(error)) {
+          console.error(
+            "Error fetching layers dashboard:",
+            error.response?.data || error.message
+          );
+          setErrorMessage(
+            error.response?.data?.message || "Error fetching layers dashboard"
+          );
+        } else {
+          console.error("Unexpected error fetching layers dashboard:", error);
+          setErrorMessage("Unexpected error fetching layers dashboard");
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [token]);
+
+  // Search functionality
   const handleSearch = (query: string) => {
     if (!query) {
       setFilteredData(data);
@@ -55,7 +85,7 @@ export default function LayersTable() {
     setFilteredData(filtered);
   };
 
-  // Handle CSV export
+  // CSV Export functionality
   const handleExport = () => {
     const headers = [
       "Date",
@@ -91,6 +121,10 @@ export default function LayersTable() {
     link.click();
     document.body.removeChild(link);
   };
+
+  if (!token) return <p className="text-red-600">{errorMessage}</p>;
+  if (loading) return <p>Loading Layers Dashboard...</p>;
+  if (errorMessage) return <p className="text-red-600">{errorMessage}</p>;
 
   return (
     <div className="bg-white rounded-xl border p-6 space-y-6">

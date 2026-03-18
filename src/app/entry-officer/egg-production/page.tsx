@@ -55,30 +55,20 @@ export default function EggProductionPage() {
     fetchPens();
   }, []);
 
-  const handlePhotoUpload = async (files: FileList | null) => {
-    if (!files || files.length === 0) return;
+ const handlePhotoUpload = async (files: FileList | null) => {
+  if (!files || files.length === 0) return;
 
-    try {
-      const uploadedUrls: string[] = [];
+  try {
+    const uploadedFiles = await uploadFileService.create(files);
 
-      for (const file of Array.from(files)) {
-        // If your backend expects base64 string:
-        const base64 = await fileToBase64(file);
+    const uploadedUrls = uploadedFiles.map((file) => file.url);
 
-        const uploaded = await uploadFileService.create({
-          file: base64,
-        });
-
-        uploadedUrls.push(uploaded.url);
-      }
-
-      setPhotosEvidences((prev) => [...prev, ...uploadedUrls]);
-    } catch (error) {
-      console.error("Photo upload failed:", error);
-      alert("Failed to upload photo(s)");
-    }
-  };
-
+    setPhotosEvidences((prev) => [...prev, ...uploadedUrls]);
+  } catch (error) {
+    console.error("Photo upload failed:", error);
+    alert("Failed to upload photo(s)");
+  }
+};
   const handleSave = async () => {
     try {
       setSaving(true);

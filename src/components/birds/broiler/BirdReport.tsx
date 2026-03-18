@@ -6,9 +6,10 @@ import SearchAndExport from "./SearchAndExport";
 interface Props {
   search: string;
   onSearch: (value: string) => void;
+  data: any[];
 }
 
-export default function BroilerReport({ search, onSearch }: Props) {
+export default function BroilerReport({ search, onSearch, data }: Props) {
   return (
     <section className="bg-white rounded-xl border p-6 space-y-6">
       {/* HEADER */}
@@ -27,7 +28,7 @@ export default function BroilerReport({ search, onSearch }: Props) {
       <SearchAndExport onSearch={onSearch} />
 
       {/* TABLE */}
-      <BroilerTable search={search} />
+      <BroilerTable search={search} data={data} />
     </section>
   );
 }

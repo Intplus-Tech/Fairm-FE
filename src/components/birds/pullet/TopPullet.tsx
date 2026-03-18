@@ -4,24 +4,38 @@ import { AlertTriangle, Bird, Info } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 
-export default function TopPullet() {
+interface SummaryProps {
+  totalBirds?: number;
+  totalMortality?: number;
+  totalAlive?: number;
+  activeBreaches?: number;
+}
+
+interface Props {
+  summary?: SummaryProps;
+}
+
+export default function TopPullet({ summary }: Props) {
   const [name, setName] = useState("User");
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
-
     if (storedUser) {
       const parsed = JSON.parse(storedUser);
       setName(parsed?.name || "User");
     }
   }, []);
 
+  const defaultSummary = summary || {};
+
   return (
     <div className="w-full">
+      {/* Greeting */}
       <div className="pb-5">
         <p className="font-semibold p-1">Good Morning, {name}.</p>
       </div>
 
+      {/* Cards Row */}
       <div
         className="
           flex gap-2
@@ -31,6 +45,7 @@ export default function TopPullet() {
           md:overflow-visible
         "
       >
+        {/* Total Birds */}
         <Card className="w-[218px] h-[114px] p-2 shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1">
@@ -41,13 +56,14 @@ export default function TopPullet() {
           </div>
 
           <div>
-            <p className="text-[18px] font-bold">0</p>
-            <div className="text-[10px] font-semibold">
-              Current bird count
-            </div>
+            <p className="text-[18px] font-bold">
+              {defaultSummary.totalBirds ?? 0}
+            </p>
+            <div className="text-[10px] font-semibold">Current bird count</div>
           </div>
         </Card>
 
+        {/* Total Mortality */}
         <Card className="w-[218px] h-[114px] p-2 shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1">
@@ -58,13 +74,14 @@ export default function TopPullet() {
           </div>
 
           <div>
-            <p className="text-[18px] font-bold">0</p>
-            <div className="text-[10px] font-semibold">
-              Current bird count
-            </div>
+            <p className="text-[18px] font-bold">
+              {defaultSummary.totalMortality ?? 0}
+            </p>
+            <div className="text-[10px] font-semibold">Current bird count</div>
           </div>
         </Card>
 
+        {/* Total Alive Bird */}
         <Card className="w-[218px] h-[114px] p-2 shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1">
@@ -75,13 +92,14 @@ export default function TopPullet() {
           </div>
 
           <div>
-            <p className="text-[18px] font-bold">0</p>
-            <div className="text-[10px] font-semibold">
-              Current bird count
-            </div>
+            <p className="text-[18px] font-bold">
+              {defaultSummary.totalAlive ?? 0}
+            </p>
+            <div className="text-[10px] font-semibold">Current bird count</div>
           </div>
         </Card>
 
+        {/* Active Breaches */}
         <Card className="w-[218px] h-[114px] p-2 shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1">
@@ -95,10 +113,10 @@ export default function TopPullet() {
           </div>
 
           <div>
-            <p className="text-[18px] font-bold">0</p>
-            <div className="text-[10px] font-semibold">
-              Current bird count
-            </div>
+            <p className="text-[18px] font-bold">
+              {defaultSummary.activeBreaches ?? 0}
+            </p>
+            <div className="text-[10px] font-semibold">Current bird count</div>
           </div>
         </Card>
       </div>
