@@ -1,11 +1,67 @@
 import ActionMenu from "./ActionMenu";
+import { useEffect, useState } from "react";
+import { usersService } from "../../../../services/user.service";
+import { User } from "@/types/user";
 
 export default function UserTable() {
-  const users = [
-    { name: "Jane Smith", role: "Manager", status: "Active", lastActive: "30m ago" },
-    { name: "John Anderson", role: "Manager", status: "Active", lastActive: "2h ago" },
-    { name: "Mike Tobe", role: "Manager", status: "Inactive", lastActive: "3 months ago" },
-  ];
+    const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchUsers = async () => {
+      try {
+        setLoading(true);
+        const data = await usersService.list();
+        setUsers(data);
+      } catch (err) {
+        console.error("Failed to fetch users:", err);
+        setError("Failed to load users");
+      } finally {
+        setLoading(false);
+      }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const formatRole = (role: User["role"]) => {
+    return role
+      .split("_")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  };
+
+  const formatStatus = (status: User["status"]) => {
+    return status
+      .split("_")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  };
+
+  const formatLastActive = (date: string | null) => {
+    if (!date) return "Never";
+
+    const now = new Date();
+    const lastActive = new Date(date);
+    const diffMs = now.getTime() - lastActive.getTime();
+
+    const minutes = Math.floor(diffMs / (1000 * 60));
+    const hours = Math.floor(diffMs / (1000 * 60 * 60));
+    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+    if (minutes < 60) return `${minutes}m ago`;
+    if (hours < 24) return `${hours}h ago`;
+    return `${days}d ago`;
+  };
+
+  if (loading) {
+    return <p className="p-4 text-sm text-gray-500">Loading users...</p>;
+  }
+
+  if (error) {
+    return <p className="p-4 text-sm text-red-500">{error}</p>;
+  }
 
   return (
     <div className="overflow-x-auto">
@@ -20,26 +76,48 @@ export default function UserTable() {
           </tr>
         </thead>
         <tbody>
-          {users.map((user) => (
-            <tr key={user.name} className="border-t">
-              <td className="px-4 py-3">{user.name}</td>
-              <td className="px-4 py-3 text-center">{user.role}</td>
-              <td className="px-4 py-3 text-center">
-                <span
-                  className={`rounded px-2 py-1 text-xs ${user.status === "Active"
-                      ? "bg-green-100 text-green-700"
-                      : "bg-red-100 text-red-700"
-                    }`}
-                >
-                  {user.status}
-                </span>
-              </td>
-              <td className="px-4 py-3 text-center">{user.lastActive}</td>
-              <td className="px-4 py-3 text-right">
-                <ActionMenu />
+          {users.length === 0 ? (
+            <tr>
+              <td colSpan={5} className="px-4 py-6 text-center text-gray-500">
+                No users found
               </td>
             </tr>
-          ))}
+          ) : (
+            users.map((user) => (
+              <tr key={user._id} className="border-t">
+                <td className="px-4 py-3">
+                  <div className="font-medium">
+                    {user.firstName} {user.lastName}
+                  </div>
+                  <div className="text-xs text-gray-500">{user.email}</div>
+                </td>
+
+                <td className="px-4 py-3 text-center">
+                  {formatRole(user.role)}
+                </td>
+
+                <td className="px-4 py-3 text-center">
+                  <span
+                    className={`rounded px-2 py-1 text-xs ${
+                      user.status === "active"
+                        ? "bg-green-100 text-green-700"
+                        : "bg-yellow-100 text-yellow-700"
+                    }`}
+                  >
+                    {formatStatus(user.status)}
+                  </span>
+                </td>
+
+                <td className="px-4 py-3 text-center">
+                  {formatLastActive(user.lastActiveAt)}
+                </td>
+
+                <td className="px-4 py-3 text-right">
+                  <ActionMenu user={user} onRefresh={fetchUsers} />
+                </td>
+              </tr>
+            ))
+          )}
         </tbody>
       </table>
     </div>

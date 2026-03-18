@@ -1,8 +1,4 @@
-export type UserRole =
-  | "super_admin"
-  | "manager"
-  | "supervisor"
-  | "staff";
+export type UserRole = "super_admin" | "manager" | "supervisor" | "staff";
 
 export interface InviteUserPayload {
   email: string;
@@ -27,6 +23,13 @@ export interface User {
   status: "active" | "pending_setup";
   departmentId: string;
   positionId: string;
+  lastLoginAt: string;
+  lastActiveAt: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface UsersListResponse {
+  ok: boolean;
+  data: User[];
 }

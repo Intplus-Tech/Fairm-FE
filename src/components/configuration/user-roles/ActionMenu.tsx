@@ -3,8 +3,14 @@
 import { useEffect, useRef, useState } from "react";
 import EditUserModal from "./EditUserModal";
 import { toast } from "sonner";
+import { User } from "@/types/user";
 
-export default function ActionMenu() {
+interface ActionMenuProps {
+  user: User;
+  onRefresh?: () => Promise<void> | void;
+}
+
+export default function ActionMenu({ user }: ActionMenuProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
@@ -73,6 +79,7 @@ export default function ActionMenu() {
       {/* Edit modal */}
       {openEdit && (
         <EditUserModal
+          user={user}
           onClose={() => setOpenEdit(false)}
           onSuccess={() => {
             toast.success("User updated");

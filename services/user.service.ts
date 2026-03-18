@@ -1,5 +1,10 @@
 import { api } from "@/lib/api/axios";
-import { InviteUserPayload, SetupAccountPayload, User } from "@/types/user";
+import {
+  InviteUserPayload,
+  SetupAccountPayload,
+  User,
+  UsersListResponse,
+} from "@/types/user";
 
 export const usersService = {
   invite(payload: InviteUserPayload) {
@@ -11,7 +16,7 @@ export const usersService = {
   },
 
   list() {
-    return api.get<{ data: User[] }>("/users").then((res) => res.data.data);
+    return api.get<UsersListResponse>("/users").then((res) => res.data.data);
   },
 
   getById(id: string) {
@@ -19,7 +24,9 @@ export const usersService = {
   },
 
   update(id: string, payload: Partial<User>) {
-    return api.put(`/users/${id}`, payload);
+    return api
+      .put<{ ok: boolean; data: User }>(`/users/${id}`, payload)
+      .then((res) => res.data.data);
   },
 
   remove(id: string) {
