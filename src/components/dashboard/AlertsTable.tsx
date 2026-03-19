@@ -16,16 +16,28 @@ export default function AlertsTable({ alerts }: { alerts: any[] }) {
         </thead>
 
         <tbody>
-          {alerts.map((alert) => (
-            <tr key={alert.id} className="border-t">
-              <td className="py-4 px-2">{alert.date}</td>
-              <td className={`py-4 px-2 ${alert.status === "Critical" ? "text-red-500" : "text-yellow-500"}`}>
-                {alert.status}
-              </td>
-              <td className="py-4 px-2">{alert.issue}</td>
-              <td className="py-4 px-2">{alert.description}</td>
-            </tr>
-          ))}
+          {alerts.map((alert, index) => {
+            const key = `${alert.date}-${alert.issue}-${index}`; // ✅ stable unique key
+
+            return (
+              <tr key={key} className="border-t">
+                <td className="py-4 px-2">{alert.date}</td>
+
+                <td
+                  className={`py-4 px-2 ${
+                    alert.status === "Critical"
+                      ? "text-red-500"
+                      : "text-yellow-500"
+                  }`}
+                >
+                  {alert.status}
+                </td>
+
+                <td className="py-4 px-2">{alert.issue}</td>
+                <td className="py-4 px-2">{alert.description}</td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

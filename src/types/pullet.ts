@@ -5,9 +5,9 @@ export interface PulletRowData {
   id: number;
   date: string;
   pens: number;
-  stock: string;
+  stock: number; // ✅ FIXED (was string before)
   mortality: number;
   feed: number;
   weight: number;
-  alert: AlertStatus;
+  alert: "Critical" | "Warning" | "Normal";
 }

@@ -169,20 +169,25 @@ export default function MortalityPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6 space-y-6">
+    <div className="min-h-screen bg-gray-100 p-6  ">
       {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
-
-      <MortalityHeader
+      
+      <div className="bg-white space-y-6 pb-9 rounded-xl shadow ">
+      <div className="">
+         <MortalityHeader
         checkedBy={checkedBy}
         checkedTime={checkedTime}
         onCheckedByChange={setCheckedBy}
         onCheckedTimeChange={setCheckedTime}
       />
 
-      <div className="bg-white rounded-xl shadow p-6">
+      <div className="bg-white rounded-b-xl shadow p-8 border-2 border-gray-200">
         <PenDataTable rows={rows} setRows={setRows} />
       </div>
 
+
+      </div>
+     
       <div className="bg-white rounded-xl shadow p-6">
         <SickBirdObservation
           symptoms={symptoms}
@@ -211,6 +216,7 @@ export default function MortalityPage() {
         >
           Next: Feed Consumption →
         </button>
+      </div>
       </div>
     </div>
   );

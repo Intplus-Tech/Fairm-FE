@@ -1,30 +1,5 @@
 import { api } from "@/lib/api/axios";
-
-export interface PenDetail {
-  penName: string;
-  age: number;
-  liveBirds: number;
-  mortality: number;
-  culls: number;
-  feed: number;
-  water: number;
-  weight: number;
-  alert: "Critical" | "Warning";
-}
-
-export interface BroilerRowData {
-  id: number;
-  date: string;
-  pens: number;
-  stock: number;
-  mortality: number;
-  culls: number;
-  feed: number;
-  water: number;
-  weight: number;
-  alert: "Critical" | "Warning";
-  penDetails?: PenDetail[];
-}
+import { BroilerRowData } from "@/types/broiler";
 
 export interface BroilerDashboardResponse {
   summary: {
@@ -37,13 +12,25 @@ export interface BroilerDashboardResponse {
 }
 
 export const broilerService = {
-  getDashboard(): Promise<BroilerDashboardResponse> {
-    return api
-      .get("/api/v1/birds/broiler/dashboard")
-      .then((res) => res.data.data);
+  async getDashboard(): Promise<BroilerDashboardResponse> {
+    const res = await api.get("/birds/broiler/dashboard");
+
+    // ✅ SAFE RESPONSE HANDLING
+    const payload = res.data?.data ?? res.data;
+
+    return {
+      summary: payload?.summary ?? {
+        totalBirds: 0,
+        totalMortality: 0,
+        totalAlive: 0,
+        netProfit: 0,
+      },
+      rows: payload?.rows ?? [],
+    };
   },
 
-  getById(id: number) {
-    return api.get(`/api/v1/birds/broiler/${id}`).then((res) => res.data.data);
+  async getById(id: number) {
+    const res = await api.get(`/birds/broiler/${id}`);
+    return res.data?.data ?? res.data;
   },
 };

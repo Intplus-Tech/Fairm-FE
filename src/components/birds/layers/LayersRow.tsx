@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import LayersDetailsTable from "./LayersDetailsTable";
-import { LayerRowData } from "@/types/layers";
+import { LayersRowData } from "@/types/layers";
 
-export default function LayersRow({ row }: { row: LayerRowData }) {
+export default function LayersRow({ row }: { row: LayersRowData }) {
   const [open, setOpen] = useState(false);
 
   return (

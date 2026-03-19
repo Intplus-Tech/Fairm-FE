@@ -45,13 +45,13 @@ export default function PenDataTable({ rows, setRows }: PenDataTableProps) {
   );
 };
   return (
-    <div>
-      <h2 className="font-semibold mb-4 text-lg">Pen Specific Data</h2>
+    <div className=" ">
+      <h2 className="font-semibold mb-4 text-[23px]">Pen Specific Data</h2>
 
       <div className="overflow-x-auto">
         <table className="w-full text-sm border-collapse">
           <thead>
-            <tr className="text-left text-gray-600">
+            <tr className="text-left text-gray-600 bg-gray-100">
               <th className="p-2">Pen</th>
               <th className="p-2">Opening Stock</th>
               <th className="p-2">Av. Bird Weight</th>

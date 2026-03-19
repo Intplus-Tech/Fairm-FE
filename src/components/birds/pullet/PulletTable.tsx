@@ -1,11 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import PelletRow from "./PulletRow";
+import PulletRow from "./PulletRow"; // ✅ FIXED NAME
 import PulletSearchExport from "./PulletSearchExport";
 import Pagination from "../broiler/Pagination";
-import { PulletRowData } from "../../../../services/pullet.service";
-
+import { PulletRowData } from "@/types/pullet"; // ✅ FIXED IMPORT
 
 interface Props {
   data: PulletRowData[];
@@ -36,13 +35,17 @@ export default function PulletTable({ data, onSearch }: Props) {
 
           <tbody>
             {data.map((row) => (
-              <PelletRow key={row.id} row={row} />
+              <PulletRow key={row.id} row={row} />
             ))}
           </tbody>
         </table>
       </div>
 
-      <Pagination page={page} totalPages={Math.ceil(data.length / 10)} onChange={setPage} />
+      <Pagination
+        page={page}
+        totalPages={Math.ceil(data.length / 10)}
+        onChange={setPage}
+      />
     </div>
   );
 }

@@ -8,7 +8,7 @@ interface BroilerRowData {
   id: number;
   date: string;
   pens: number;
-  stock: string;
+  stock: number;
   mortality: number;
   culls: number;
   feed: number;

@@ -22,7 +22,7 @@ export interface DashboardResponse {
 export const dashboardService = {
   getAdminDashboard(): Promise<DashboardResponse> {
     return api
-      .get("/api/v1/admin/dashboard")
+      .get("/admin/dashboard") // ✅ FIXED HERE
       .then((res) => res.data.data);
   },
 };

@@ -3,8 +3,8 @@
 import { useState, useMemo, useEffect } from "react";
 import BroilerRow from "./BroilerRow";
 import Pagination from "./Pagination";
-import { BroilerRowData } from "../../../../services/broiler.service";
-// import { BroilerRowData } from "../../../../../services/broiler.service";
+import { BroilerRowData } from "@/types/broiler";
+
 
 interface Props {
   search: string;

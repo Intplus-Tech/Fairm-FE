@@ -3,7 +3,9 @@
 import { useEffect, useState, useMemo } from "react";
 import TopPullet from "@/components/birds/pullet/TopPullet";
 import PulletTable from "@/components/birds/pullet/PulletTable";
-import { PulletRowData, pulletService } from "../../../../../services/pullet.service";
+import { PulletRowData } from "@/types/pullet";
+import { pulletService } from "../../../../../services/pullet.service";
+// import { PulletRowData, pulletService } from "../../../../../services/pullet.service";
 // import { pulletService, PulletRowData } from "@/services/pullet.service";
 
 export default function PulletPage() {

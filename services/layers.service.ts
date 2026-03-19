@@ -1,20 +1,19 @@
-import axios from "axios";
+import { api } from "@/lib/api/axios";
+import { LayersRowData } from "@/types/layers";
 
-const BASE_URL = "https://fairm-be.onrender.com/api/v1/birds/layer";
+export interface LayersDashboardResponse {
+  summary: {
+    totalBirds: number;
+    totalMortality: number;
+    totalAlive: number;
+    activeBreaches: number;
+  };
+  rows: LayersRowData[];
+}
 
 export const layersService = {
-  // Pass the token here
-  getDashboard: async (token: string) => {
-    const res = await axios.get(`${BASE_URL}/dashboard`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return res.data;
-  },
-
-  getLayerById: async (id: number, token: string) => {
-    const res = await axios.get(`${BASE_URL}/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return res.data;
+  getDashboard: async (): Promise<LayersDashboardResponse> => {
+    const res = await api.get("/birds/layer/dashboard"); // ✅ correct endpoint
+    return res.data.data || res.data;
   },
 };
