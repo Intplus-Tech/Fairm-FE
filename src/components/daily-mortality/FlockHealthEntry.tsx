@@ -33,7 +33,7 @@ export default function FlockHealthEntry() {
 
   // ✅ FIXED PHOTO UPLOAD (NO TYPE ERRORS)
   const handlePhotoUpload = async (files: FileList | null) => {
-    if (!files || files.length === 0) return;
+  if (!files || files.length === 0) return;
 
     try {
       // ✅ Properly typed response

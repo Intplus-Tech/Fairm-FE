@@ -140,16 +140,13 @@ export default function MortalityPage() {
     }
   };
 
- const handlePhotoUpload = async (files: FileList | null) => {
+  const handlePhotoUpload = async (files: FileList | null) => {
   if (!files || files.length === 0) return;
 
   try {
-    const uploadedFiles: UploadFileResponse[] =
-      await uploadFileService.create(files);
+    const uploadedFiles = await uploadFileService.create(files);
 
-    const uploadedIds = uploadedFiles.map(
-      (file: UploadFileResponse) => file._id
-    );
+    const uploadedIds = uploadedFiles.map((file) => file._id);
 
     setPhotosEvidences((prev) => [...prev, ...uploadedIds]);
   } catch (err) {
