@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { authService } from "../../../../services/auth.service";
+import toast from "react-hot-toast"; // ✅ import toast
+import { CheckCircle } from "lucide-react";
 
 interface InviteUserModalProps {
   onClose: () => void;
@@ -21,8 +23,8 @@ export default function InviteUserModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>(""); 
 
- async function handleSubmit(e: React.FormEvent) {
-  e.preventDefault();
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
 
     try {
       await authService.inviteUser({
@@ -40,8 +42,7 @@ export default function InviteUserModal({
   } finally {
     setLoading(false);
   }
-}
-
+  }
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
       <div className="w-full max-w-lg rounded-lg bg-white p-6">
@@ -105,7 +106,6 @@ export default function InviteUserModal({
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 className="w-full rounded-md border px-3 py-2 text-sm"
-                placeholder=""
               />
               <p className="mt-1 text-xs text-muted-foreground">
                 Used for login and notifications
@@ -142,14 +142,12 @@ export default function InviteUserModal({
               <option value="owner">Owner</option>
               <option value="admin">Admin</option>
               <option value="manager">Manager</option>
-              <option value="entry_officer">Entry Officer</option>
+              <option value="entry_officer">Entry officer</option>
             </select>
           </div>
 
           {error && (
-            <p className="text-red-500 text-sm mb-2">
-              {error}
-            </p>
+            <p className="text-red-500 text-sm mb-2">{error}</p>
           )}
 
           {/* Actions */}
