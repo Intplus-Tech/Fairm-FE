@@ -1,44 +1,57 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import UserTable from "./userTable";
-
-interface User {
-  name: string;
-  role: string;
-  status: string;
-  lastActive: string;
-}
+import { usersService } from "../../../../services/user.service";
+import { User } from "@/types/user";
 
 export default function UserManagement({ onInvite }: { onInvite: () => void }) {
   const [search, setSearch] = useState("");
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const users: User[] = [
-    { name: "Jane Smith", role: "Manager", status: "Active", lastActive: "30m ago" },
-    { name: "John Anderson", role: "Manager", status: "Active", lastActive: "2h ago" },
-    { name: "Mike Tobe", role: "Manager", status: "Inactive", lastActive: "3 months ago" },
-  ];
+  // ✅ Fetch users from backend
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        setLoading(true);
+        const data = await usersService.list();
+        setUsers(data);
+      } catch (err) {
+        console.error("Failed to fetch users:", err);
+        setError("Failed to load users");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  // 🔍 Filter users
+    fetchUsers();
+  }, []);
+
+  // ✅ Filter users
   const filteredUsers = useMemo(() => {
+    const term = search.toLowerCase();
+
     return users.filter((user) => {
-      const term = search.toLowerCase();
+      const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
+
       return (
-        user.name.toLowerCase().includes(term) ||
+        fullName.includes(term) ||
         user.role.toLowerCase().includes(term)
       );
     });
   }, [search, users]);
 
-  // 📤 Export function (CSV)
+  // ✅ Export CSV (using real API fields)
   const handleExport = () => {
     const headers = ["Name", "Role", "Status", "Last Active"];
 
     const rows = filteredUsers.map((user) => [
-      user.name,
+      `${user.firstName} ${user.lastName}`,
       user.role,
       user.status,
-      user.lastActive,
+      user.lastActiveAt || "N/A",
     ]);
 
     const csvContent =
@@ -60,6 +73,7 @@ export default function UserManagement({ onInvite }: { onInvite: () => void }) {
 
   return (
     <div className="rounded-lg border bg-white p-4 space-y-4">
+      {/* Top Controls */}
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <input
           placeholder="Search by name or role"
@@ -85,7 +99,19 @@ export default function UserManagement({ onInvite }: { onInvite: () => void }) {
         </div>
       </div>
 
-      <UserTable users={filteredUsers} />
+      {/* States */}
+      {loading && (
+        <p className="text-sm text-gray-500">Loading users...</p>
+      )}
+
+      {error && (
+        <p className="text-sm text-red-500">{error}</p>
+      )}
+
+      {/* Table */}
+      {!loading && !error && (
+        <UserTable users={filteredUsers} />
+      )}
     </div>
   );
 }

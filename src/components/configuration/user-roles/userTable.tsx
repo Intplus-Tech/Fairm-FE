@@ -1,30 +1,13 @@
-import { useEffect, useState } from "react";
-import { usersService } from "../../../../services/user.service";
+"use client";
+
 import { User } from "@/types/user";
 import ActionMenu from "./ActionMenu";
 
-export default function UserTable() {
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+interface UserTableProps {
+  users: User[];
+}
 
-  const fetchUsers = async () => {
-    try {
-      setLoading(true);
-      const data = await usersService.list();
-      setUsers(data);
-    } catch (err) {
-      console.error("Failed to fetch users:", err);
-      setError("Failed to load users");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
+export default function UserTable({ users }: UserTableProps) {
   const formatRole = (role: User["role"]) =>
     role
       .split("_")
@@ -39,6 +22,7 @@ export default function UserTable() {
 
   const formatLastActive = (date: string | null) => {
     if (!date) return "Never";
+
     const now = new Date();
     const lastActive = new Date(date);
     const diffMs = now.getTime() - lastActive.getTime();
@@ -51,9 +35,6 @@ export default function UserTable() {
     if (hours < 24) return `${hours}h ago`;
     return `${days}d ago`;
   };
-
-  if (loading) return <p className="p-4 text-sm text-gray-500">Loading users...</p>;
-  if (error) return <p className="p-4 text-sm text-red-500">{error}</p>;
 
   return (
     <div className="overflow-x-auto">
@@ -78,8 +59,14 @@ export default function UserTable() {
           ) : (
             users.map((user) => (
               <tr key={user._id} className="border-t">
-                <td className="px-4 py-3">{user.firstName} {user.lastName}</td>
-                <td className="px-4 py-3 text-center">{formatRole(user.role)}</td>
+                <td className="px-4 py-3">
+                  {user.firstName} {user.lastName}
+                </td>
+
+                <td className="px-4 py-3 text-center">
+                  {formatRole(user.role)}
+                </td>
+
                 <td className="px-4 py-3 text-center">
                   <span
                     className={`rounded px-2 py-1 text-xs ${
@@ -91,9 +78,16 @@ export default function UserTable() {
                     {formatStatus(user.status)}
                   </span>
                 </td>
-                <td className="px-4 py-3 text-center">{formatLastActive(user.lastActiveAt)}</td>
+
+                <td className="px-4 py-3 text-center">
+                  {formatLastActive(user.lastActiveAt)}
+                </td>
+
                 <td className="px-4 py-3 text-right">
-                  <ActionMenu user={user} onRefresh={fetchUsers} />
+                  <ActionMenu
+                    user={user}
+                    onRefresh={() => {}}
+                  />
                 </td>
               </tr>
             ))
