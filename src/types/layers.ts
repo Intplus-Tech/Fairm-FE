@@ -1,6 +1,6 @@
-export type LayerStatus = "Optimal" | "Critical";
+export type LayerStatus = "Optimal" | "Critical" | "Warning";
 
-export interface LayerRowData {
+export interface LayersRowData {
   id: number;
   date: string;
   pens: number;

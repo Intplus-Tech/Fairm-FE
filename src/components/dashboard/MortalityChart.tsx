@@ -9,18 +9,29 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import ChartCard from "./ChartCard";
-import { mortalityData } from "./data/mockDashboardData";
-// import { mortalityData } from "../data/mockDashboardData";
 
-export default function MortalityChart() {
+type MortalityChartItem = {
+  day: string;
+  value: number;
+};
+
+export default function MortalityChart({
+  data,
+}: {
+  data: MortalityChartItem[];
+}) {
   return (
     <ChartCard
       title="Mortality Rate"
-      actions={<select className="border rounded-md px-2 py-1 text-sm"><option>Days</option></select>}
+      actions={
+        <select className="border rounded-md px-2 py-1 text-sm">
+          <option>Days</option>
+        </select>
+      }
     >
       <div className="h-[250px] w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={mortalityData}>
+          <LineChart data={data}>
             <XAxis dataKey="day" />
             <YAxis />
             <Tooltip />

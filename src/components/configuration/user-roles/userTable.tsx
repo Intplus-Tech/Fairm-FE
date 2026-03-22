@@ -1,43 +1,24 @@
-import ActionMenu from "./ActionMenu";
-import { useEffect, useState } from "react";
-import { usersService } from "../../../../services/user.service";
+"use client";
+
 import { User } from "@/types/user";
+import ActionMenu from "./ActionMenu";
 
-export default function UserTable() {
-    const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+interface UserTableProps {
+  users: User[];
+}
 
-  const fetchUsers = async () => {
-      try {
-        setLoading(true);
-        const data = await usersService.list();
-        setUsers(data);
-      } catch (err) {
-        console.error("Failed to fetch users:", err);
-        setError("Failed to load users");
-      } finally {
-        setLoading(false);
-      }
-  };
-
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  const formatRole = (role: User["role"]) => {
-    return role
+export default function UserTable({ users }: UserTableProps) {
+  const formatRole = (role: User["role"]) =>
+    role
       .split("_")
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");
-  };
 
-  const formatStatus = (status: User["status"]) => {
-    return status
+  const formatStatus = (status: User["status"]) =>
+    status
       .split("_")
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");
-  };
 
   const formatLastActive = (date: string | null) => {
     if (!date) return "Never";
@@ -55,14 +36,6 @@ export default function UserTable() {
     return `${days}d ago`;
   };
 
-  if (loading) {
-    return <p className="p-4 text-sm text-gray-500">Loading users...</p>;
-  }
-
-  if (error) {
-    return <p className="p-4 text-sm text-red-500">{error}</p>;
-  }
-
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
@@ -75,10 +48,11 @@ export default function UserTable() {
             <th className="px-4 py-3"></th>
           </tr>
         </thead>
+
         <tbody>
           {users.length === 0 ? (
             <tr>
-              <td colSpan={5} className="px-4 py-6 text-center text-gray-500">
+              <td colSpan={5} className="text-center py-6 text-gray-500">
                 No users found
               </td>
             </tr>
@@ -86,10 +60,7 @@ export default function UserTable() {
             users.map((user) => (
               <tr key={user._id} className="border-t">
                 <td className="px-4 py-3">
-                  <div className="font-medium">
-                    {user.firstName} {user.lastName}
-                  </div>
-                  <div className="text-xs text-gray-500">{user.email}</div>
+                  {user.firstName} {user.lastName}
                 </td>
 
                 <td className="px-4 py-3 text-center">
@@ -101,7 +72,7 @@ export default function UserTable() {
                     className={`rounded px-2 py-1 text-xs ${
                       user.status === "active"
                         ? "bg-green-100 text-green-700"
-                        : "bg-yellow-100 text-yellow-700"
+                        : "bg-red-100 text-red-700"
                     }`}
                   >
                     {formatStatus(user.status)}
@@ -113,7 +84,10 @@ export default function UserTable() {
                 </td>
 
                 <td className="px-4 py-3 text-right">
-                  <ActionMenu user={user} onRefresh={fetchUsers} />
+                  <ActionMenu
+                    user={user}
+                    onRefresh={() => {}}
+                  />
                 </td>
               </tr>
             ))

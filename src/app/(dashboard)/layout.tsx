@@ -1,7 +1,10 @@
+"use client";
+
+import { useState } from "react";
 import AdminNavbar from "@/components/layout/AdminNavbar";
 import { LayoutProvider } from "../../../context/layout-context";
 import AppSidebar from "@/components/layout/AppSidebar";
-import FloatingAskAI from "@/components/dashboard/FloatingAskAI";
+import FairmAIPanel from "@/components/dashboard/FairmAiPanel";
 import AddPenModal from "@/components/modals/AddPenModal";
 import AuthGuard from "@/components/auth/AuthGuard";
 
@@ -10,6 +13,9 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+
+  const [openAI, setOpenAI] = useState(false);
+
   return (
     <AuthGuard>
       <LayoutProvider>
@@ -22,8 +28,9 @@ export default function DashboardLayout({
 
           {/* BODY */}
           <div className="flex pt-[72px] h-full">
+
             {/* FIXED SIDEBAR */}
-            <AppSidebar />
+            <AppSidebar onOpenAI={() => setOpenAI(true)} />
 
             {/* SCROLLABLE CONTENT */}
             <div
@@ -40,12 +47,16 @@ export default function DashboardLayout({
             >
               {children}
             </div>
+
           </div>
 
-          {/* FLOATING AI BUTTON */}
-          <FloatingAskAI />
+          {/* AI PANEL */}
+          {openAI && (
+            <FairmAIPanel onClose={() => setOpenAI(false)} />
+          )}
 
           <AddPenModal />
+
         </div>
       </LayoutProvider>
     </AuthGuard>

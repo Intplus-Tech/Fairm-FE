@@ -1,9 +1,10 @@
 "use client";
 
-import { X, ChevronDown } from "lucide-react";
+import { X, ChevronDown, CheckCircle } from "lucide-react";
 import { useState } from "react";
 import { rolesService } from "../../../../services/role.service";
 import { RoleFeature, RolePermission } from "@/types/role";
+import toast from "react-hot-toast"; // ✅ import toast
 
 interface CreateRoleModalProps {
   onClose: () => void;
@@ -56,6 +57,7 @@ export default function CreateRoleModal({
 
   const handleCreateRole = async () => {
     setLoading(true);
+    setError(null);
 
     try {
       const configs = MODULES.map((module) => ({
@@ -67,7 +69,27 @@ export default function CreateRoleModal({
         name: roleName,
         config: configs,
       });
-      console.log("Hey",roleRes)
+
+      // ✅ Show green success toast with white background
+      toast.custom(
+        (t) => (
+          <div
+            className={`
+              ${t.visible ? "animate-enter" : "animate-leave"}
+              flex items-center gap-3 rounded-xl bg-white p-4 shadow-lg border border-green-500
+            `}
+          >
+            <CheckCircle className="h-6 w-6 text-green-600" />
+            <span className="text-sm font-medium text-gray-900">
+              Role successfully created!
+            </span>
+          </div>
+        ),
+        {
+          duration: 4000,
+          position: "top-right",
+        }
+      );
 
       onSuccess();
       onClose();
@@ -113,9 +135,7 @@ export default function CreateRoleModal({
 
           {/* Permission Config */}
           <div className="space-y-3">
-            <h5 className="text-sm font-semibold">
-              Permission Configuration
-            </h5>
+            <h5 className="text-sm font-semibold">Permission Configuration</h5>
 
             {/* Table Header */}
             <div className="grid grid-cols-2 gap-4 border-b pb-2 text-sm font-medium text-muted-foreground">
@@ -159,9 +179,7 @@ export default function CreateRoleModal({
         </div>
 
         {error && (
-          <p className="text-red-500 text-sm mb-2">
-            {error}
-          </p>
+          <p className="text-red-500 text-sm mb-2">{error}</p>
         )}
 
         {/* Footer */}
@@ -180,7 +198,6 @@ export default function CreateRoleModal({
             disabled={loading}
             className="rounded-lg bg-blue-600 px-5 py-2 text-sm font-medium text-white hover:bg-primary/90"
           >
-            Create Role
             {loading ? "Creating..." : "Create Role"}
           </button>
         </div>
