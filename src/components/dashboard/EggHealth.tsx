@@ -12,8 +12,18 @@ import {
 import ChartCard from "./ChartCard";
 import { eggHealthData } from "./data/mockDashboardData";
 
+type EggHealthChartItem = {
+  day: string;
+  good: number;
+  cracked: number;
+  soft: number;
+};
 
-export default function EggHealthChart({ data }: { data: any[] }) {
+export default function EggHealthChart({
+  data,
+}: {
+  data: EggHealthChartItem[];
+})  {
   return (
     <ChartCard
       title="Egg Health"

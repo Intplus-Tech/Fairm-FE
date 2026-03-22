@@ -2,11 +2,12 @@
 
 import { AlertTriangle, Bird, Info, UserPlus } from "lucide-react";
 import { Card } from "../ui/card";
-import { DashboardResponse } from "../../../services/dashboard.service";
+import { DashboardData } from "../../../services/dashboard.service";
+// import { DashboardResponse } from "../../../services/dashboard.service";
 // import { DashboardResponse } from "@/services/dashboard.service";
 
 interface TopInfoProps {
-  data: DashboardResponse | null;
+  data: DashboardData | null;
   userName: string;
 }
 
@@ -18,7 +19,7 @@ export default function TopInfo({ data, userName }: TopInfoProps) {
     if (hour < 18) return "Good Afternoon";
     return "Good Evening";
   };
-
+console.log("TopInfo farmStaff:", data);
   return (
     <div className="w-full">
       {/* Greeting */}
@@ -45,7 +46,7 @@ export default function TopInfo({ data, userName }: TopInfoProps) {
 
           <div>
             <p className="text-[22px] font-bold">
-              {data?.totalLiveBirds ?? 0}
+              {data?.stats.totalLiveBirds }
             </p>
             <p className="text-xs font-semibold text-muted-foreground">
               Current bird count
@@ -67,7 +68,7 @@ export default function TopInfo({ data, userName }: TopInfoProps) {
 
           <div>
             <p className="text-[22px] font-bold">
-              {data?.totalMortality ?? 0}
+              {data?.stats.totalMortality}
             </p>
             <p className="text-xs font-semibold text-muted-foreground">
               Current mortality count
@@ -89,7 +90,7 @@ export default function TopInfo({ data, userName }: TopInfoProps) {
 
           <div>
             <p className="text-[22px] font-bold">
-              {data?.farmStaff ?? 0}
+              {data?.stats.farmStaff }
             </p>
             <p className="text-xs font-semibold text-muted-foreground">
               Total staff count
@@ -112,7 +113,7 @@ export default function TopInfo({ data, userName }: TopInfoProps) {
           <div>
             <div className="flex items-center gap-2">
               <p className="text-[22px] font-bold">
-                {data?.activeBreaches ?? 0}
+                {data?.stats.activeBreaches }
               </p>
               <span className="text-[#FF0004] bg-[#FF00041A] text-[10px] p-1">
                 Critical

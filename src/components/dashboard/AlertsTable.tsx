@@ -1,6 +1,10 @@
 "use client";
 
-export default function AlertsTable({ alerts }: { alerts: any[] }) {
+import { Alert } from "@/types/dashboard";
+
+export default function AlertsTable ({ alerts }: { alerts: Alert[] }) {
+
+  console.log("Alerts data:", alerts);
   return (
     <div className="bg-white rounded-xl p-4 shadow-sm overflow-x-auto">
       <h3 className="font-semibold mb-4">Alerts</h3>

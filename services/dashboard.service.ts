@@ -1,28 +1,76 @@
 import { api } from "@/lib/api/axios";
 
-export interface DashboardResponse {
-  totalLiveBirds: number;
-  totalMortality: number;
-  farmStaff: number;
-  activeBreaches: number;
-
-  mortalityChart: { day: string; value: number }[];
-  eggProductionChart: { day: string; value: number }[];
-  eggHealthChart: { day: string; good: number; cracked: number; soft: number }[];
-
-  alerts: {
-    id: string;
-    date: string;
-    status: "Critical" | "Warning";
-    issue: string;
-    description: string;
-  }[];
+/* =======================
+   FULL BACKEND RESPONSE
+======================= */
+export interface DashboardApiResponse {
+  ok: boolean;
+  data: DashboardData;
 }
 
+export interface DashboardData {
+  stats: {
+    totalLiveBirds: number;
+    totalMortality: number;
+    farmStaff: number;
+    activeBreaches: number;
+  };
+  charts: {
+    mortalityRate: {
+      _id: string;
+      mortalityRate: number | null;
+    }[];
+    eggProduction: {
+      _id: string;
+      penId: string;
+      eggsProduced: number;
+    }[];
+    eggHealth: {
+      _id: string;
+      penId: string;
+    }[];
+  };
+  alerts: Alert[];
+}
+
+export interface Alert {
+  _id: string;
+  farmId?: string;
+  mortalityRate: {
+    warning: number;
+    critical: number;
+  };
+  temperatureRange: {
+    min: number;
+    max: number;
+  };
+  feedConsumptionDeviation: {
+    lowerLimit: {
+      warning: number;
+      critical: number;
+    };
+    upperLimit: {
+      warning: number;
+      critical: number;
+    };
+  };
+  useIndustryBenchmarks: boolean;
+  useSystemThreshold: boolean;
+  eggProductionPerBird: {
+    ageRange: string;
+    eggsPerWeek: number;
+  }[];
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+}
+
+/* =======================
+   SERVICE
+======================= */
 export const dashboardService = {
-  getAdminDashboard(): Promise<DashboardResponse> {
-    return api
-      .get("/admin/dashboard") // ✅ FIXED HERE
-      .then((res) => res.data.data);
+  async getAdminDashboard(): Promise<DashboardData> {
+    const res = await api.get<DashboardApiResponse>("/admin/dashboard");
+    return res.data.data; // ✅ correct extraction
   },
 };

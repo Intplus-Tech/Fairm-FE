@@ -12,7 +12,16 @@ import ChartCard from "./ChartCard";
 import { eggProductionData } from "./data/mockDashboardData";
 // import { eggProductionData } from "../data/mockDashboardData";
 
-export default function EggProductionChart({ data }: { data: any[] }) {
+type EggProductionChartItem = {
+  day: string;
+  value: number;
+};
+
+export default function EggProductionChart({
+  data,
+}: {
+  data: EggProductionChartItem[];
+})  {
   return (
     <ChartCard
       title="Egg Production"
