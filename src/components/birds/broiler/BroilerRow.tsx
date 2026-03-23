@@ -3,19 +3,7 @@
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 import PenDetailsTable from "./PenDetailsTable";
-
-interface BroilerRowData {
-  id: number;
-  date: string;
-  pens: number;
-  stock: number;
-  mortality: number;
-  culls: number;
-  feed: number;
-  water: number;
-  weight: number;
-  alert: "Critical" | "Warning";
-}
+import { BroilerRowData } from "@/types/broiler";
 
 interface BroilerRowProps {
   row: BroilerRowData;

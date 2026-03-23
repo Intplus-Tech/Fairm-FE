@@ -5,7 +5,6 @@ import BroilerRow from "./BroilerRow";
 import Pagination from "./Pagination";
 import { BroilerRowData } from "@/types/broiler";
 
-
 interface Props {
   search: string;
   data: BroilerRowData[];
@@ -15,14 +14,13 @@ export default function BroilerTable({ search, data }: Props) {
   const [page, setPage] = useState(1);
   const rowsPerPage = 5;
 
-  // ✅ Reset page if search or data changes
   useEffect(() => {
     setPage(1);
   }, [search, data]);
 
   const filteredData = useMemo(() => {
     return data.filter((row) =>
-      `${row.date} ${row.pens} ${row.stock} ${row.mortality} ${row.culls} ${row.feed} ${row.water} ${row.weight} ${row.alert}`
+      `${row.id} ${row.date} ${row.pens} ${row.stock} ${row.mortality} ${row.culls} ${row.feed} ${row.water} ${row.weight} ${row.alert}`
         .toLowerCase()
         .includes(search.toLowerCase())
     );
@@ -56,7 +54,9 @@ export default function BroilerTable({ search, data }: Props) {
 
           <tbody>
             {paginatedData.length > 0 ? (
-              paginatedData.map((row) => <BroilerRow key={row.id} row={row} />)
+              paginatedData.map((row) => (
+                <BroilerRow key={row.id} row={row} />
+              ))
             ) : (
               <tr>
                 <td colSpan={10} className="text-center py-10 text-gray-400">

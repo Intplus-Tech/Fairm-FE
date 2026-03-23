@@ -7,12 +7,14 @@ import BroilerTable from "@/components/birds/broiler/BroilerTable";
 import { BroilerRowData } from "@/types/broiler";
 import { broilerService } from "../../../../../services/broiler.service";
 
-// ✅ MOCK DATA (SAFE FALLBACK)
+/* =======================
+   MOCK DATA (MATCH BACKEND)
+======================= */
 const mockBroilerData: BroilerRowData[] = [
   {
-    id: 1,
+    id: "mock-1",
     date: "2026-03-18",
-    pens: 4,
+    pens: 1,
     stock: 12981,
     mortality: 81,
     culls: 42,
@@ -35,10 +37,11 @@ export default function BroilerDashboardPage() {
       try {
         const res = await broilerService.getDashboard();
 
-        // ✅ SAFE DATA EXTRACTION
+        console.log("BROILER API:", res); // ✅ debug
+
         setSummary(res?.summary ?? {});
 
-        if (Array.isArray(res?.rows)) {
+        if (Array.isArray(res?.rows) && res.rows.length > 0) {
           setData(res.rows);
         } else {
           setData(mockBroilerData); // fallback
@@ -50,7 +53,6 @@ export default function BroilerDashboardPage() {
 
         setError(err?.message || "Failed to load dashboard");
 
-        // ✅ FALLBACK UI
         setData(mockBroilerData);
       } finally {
         setLoading(false);
@@ -60,12 +62,10 @@ export default function BroilerDashboardPage() {
     fetchDashboard();
   }, []);
 
-  // ✅ LOADING UI
   if (loading) {
     return <p className="text-gray-500">Loading broiler dashboard...</p>;
   }
 
-  // ✅ ERROR UI (still shows data)
   if (error) {
     console.warn(error);
   }
@@ -73,9 +73,7 @@ export default function BroilerDashboardPage() {
   return (
     <div className="space-y-6">
       <TopBroiler summary={summary} userName="Admin" />
-
       <SearchAndExport onSearch={setSearch} />
-
       <BroilerTable search={search} data={data} />
     </div>
   );

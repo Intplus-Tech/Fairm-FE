@@ -21,25 +21,11 @@ export default function LayersTable() {
       try {
         const dashboard = await layersService.getDashboard();
 
-        // ✅ SAFETY CHECK (fixes .map error)
-        const rows = dashboard?.rows || [];
+        // ✅ USE SERVICE DATA DIRECTLY (NO REMAPPING)
+        const rows = dashboard?.rows ?? [];
 
-        const mappedData: LayersRowData[] = rows.map(
-          (item: any, index: number) => ({
-            id: index + 1,
-            date: item.date || "",
-            pens: item.pens || 0,
-            birdsAlive: String(item.birdsAlive || 0),
-            mortality: item.mortality || 0,
-            feed: item.feedConsumed || 0,
-            totalEggs: item.totalEggs || 0,
-            hdp: item.hdp || 0,
-            status: item.status || "Optimal",
-          })
-        );
-
-        setData(mappedData);
-        setFilteredData(mappedData);
+        setData(rows);
+        setFilteredData(rows);
       } catch (error: any) {
         if (axios.isAxiosError(error)) {
           console.error(
@@ -74,7 +60,7 @@ export default function LayersTable() {
         row.status.toLowerCase().includes(q) ||
         row.pens.toString().includes(q) ||
         row.totalEggs.toString().includes(q) ||
-        row.birdsAlive.toLowerCase().includes(q)
+        row.birdsAlive.toString().includes(q)
     );
 
     setFilteredData(filtered);

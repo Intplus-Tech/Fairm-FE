@@ -1,13 +1,15 @@
-export type AlertStatus = "Critical" | "Warning";
-
+export type AlertStatus = "Critical" | "Warning" | "Normal";
 
 export interface PulletRowData {
-  id: number;
+  id: string;
+
   date: string;
   pens: number;
-  stock: number; // ✅ FIXED (was string before)
+  stock: number;
+
   mortality: number;
-  feed: number;
+  feed: number; // not in backend → default 0
   weight: number;
-  alert: "Critical" | "Warning" | "Normal";
+
+  alert: AlertStatus;
 }

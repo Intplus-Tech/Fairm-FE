@@ -1,26 +1,21 @@
 export type BroilerAlert = "Critical" | "Warning";
 
-export interface PenDetail {
-  penName: string;
-  age: number;
-  liveBirds: number;
-  mortality: number;
-  culls: number;
-  feed: number;
-  water: number;
-  weight: number;
-  alert: "Critical" | "Warning";
-}
-
+/* =======================
+   FINAL ROW DATA (UI NEEDS THIS)
+======================= */
 export interface BroilerRowData {
-  id: number;
+  id: string;
+
   date: string;
   pens: number;
   stock: number;
+
   mortality: number;
   culls: number;
   feed: number;
   water: number;
+
   weight: number;
+
   alert: BroilerAlert;
 }
