@@ -124,7 +124,7 @@ export default function FarmGateSalesPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-6xl mx-auto space-y-6">
+      <div className="max-w-6xl mx-auto">
 
       {error && (
         <p className="text-red-500 text-sm mb-2">
@@ -134,6 +134,10 @@ export default function FarmGateSalesPage() {
 
         <SaleHeader />
 
+        <div className="bg-white p-6 rounded-b-xl shadow-sm border space-y-6">
+
+        
+
       <SaleDetails saleData={saleData} updateField={updateField} />
 
       <EggSalesTable saleData={saleData} updateField={updateField} />
@@ -142,17 +146,14 @@ export default function FarmGateSalesPage() {
 
       <PaymentStatus saleData={saleData} updateField={updateField} />
 
-      <ActionButtons onSave={handleSave} loading={loading} />
+      <ActionButtons
+  onSave={handleSave}
+  onNext={handleNext}
+  loading={loading}
+/>
 
-        <div className="flex justify-end">
-          <button
-            onClick={handleNext}
-            className="bg-indigo-600 text-white px-6 py-2 rounded-lg"
-          >
-            Next: Bulk Transfer →
-          </button>
-        </div>
-
+       
+       </div>
       </div>
     </div>
   );

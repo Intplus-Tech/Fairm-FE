@@ -1,3 +1,5 @@
+import { ChangeEvent } from "react";
+
 interface EggTransferGradeValue {
   unsorted: number;
   medium: number;
@@ -14,86 +16,68 @@ export default function EggTransferGrade({
   value,
   onChange,
 }: EggTransferGradeProps) {
+  const handleChange =
+    (field: keyof EggTransferGradeValue) =>
+    (e: ChangeEvent<HTMLInputElement>) => {
+      const val = e.target.value;
+
+      onChange({
+        ...value,
+        [field]: val === "" ? 0 : Number(val),
+      });
+    };
+
+  const renderInput = (
+    label: string,
+    field: keyof EggTransferGradeValue,
+    fieldValue: number
+  ) => (
+    <div>
+      <label className="text-sm text-gray-600">{label}</label>
+
+      <div className="flex items-center border rounded-lg mt-1 overflow-hidden focus-within:ring-2 focus-within:ring-primary">
+        <input
+          type="number"
+          value={fieldValue === 0 ? "" : fieldValue}
+          onChange={handleChange(field)}
+          placeholder="0"
+          className="flex-1 p-2 outline-none bg-transparent no-spinner"
+        />
+
+        <span className="px-3 text-gray-500 text-sm bg-gray-50 border-l">
+          pcs
+        </span>
+      </div>
+    </div>
+  );
 
   return (
     <div className="bg-white p-6 rounded-xl border shadow-sm">
-
       <h2 className="font-semibold text-lg mb-4">
         Egg Transfer by Grade
       </h2>
 
       <div className="grid md:grid-cols-4 gap-4">
-
-        <div>
-          <label className="text-sm">Unsorted</label>
-          <div className="flex border rounded-lg mt-1">
-            <input
-              type="number"
-              value={value.unsorted}
-              onChange={(e) =>
-                onChange({ ...value, unsorted: Number(e.target.value) || 0 })
-              }
-              className="flex-1 p-2 outline-none"
-            />
-            <span className="px-3 flex items-center text-gray-500 text-sm">
-              Pieces
-            </span>
-          </div>
-        </div>
-
-        <div>
-          <label className="text-sm">Medium</label>
-          <div className="flex border rounded-lg mt-1">
-            <input
-              type="number"
-              value={value.medium}
-              onChange={(e) =>
-                onChange({ ...value, medium: Number(e.target.value) || 0 })
-              }
-              className="flex-1 p-2 outline-none"
-            />
-            <span className="px-3 flex items-center text-gray-500 text-sm">
-              Pieces
-            </span>
-          </div>
-        </div>
-
-        <div>
-          <label className="text-sm">Standard</label>
-          <div className="flex border rounded-lg mt-1">
-            <input
-              type="number"
-              value={value.standard}
-              onChange={(e) =>
-                onChange({ ...value, standard: Number(e.target.value) || 0 })
-              }
-              className="flex-1 p-2 outline-none"
-            />
-            <span className="px-3 flex items-center text-gray-500 text-sm">
-              Pieces
-            </span>
-          </div>
-        </div>
-
-        <div>
-          <label className="text-sm">Pullet</label>
-          <div className="flex border rounded-lg mt-1">
-            <input
-              type="number"
-              value={value.pullet}
-              onChange={(e) =>
-                onChange({ ...value, pullet: Number(e.target.value) || 0 })
-              }
-              className="flex-1 p-2 outline-none"
-            />
-            <span className="px-3 flex items-center text-gray-500 text-sm">
-              Pieces
-            </span>
-          </div>
-        </div>
-
+        {renderInput("Unsorted", "unsorted", value.unsorted)}
+        {renderInput("Medium", "medium", value.medium)}
+        {renderInput("Standard", "standard", value.standard)}
+        {renderInput("Pullet", "pullet", value.pullet)}
       </div>
 
+      {/* Spinner removal styles */}
+      <style jsx>{`
+        /* Chrome, Safari, Edge */
+        input.no-spinner::-webkit-outer-spin-button,
+        input.no-spinner::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+
+        /* Firefox */
+        input.no-spinner {
+          -moz-appearance: textfield;
+        }
+      `}</style>
     </div>
-  )
+  );
 }

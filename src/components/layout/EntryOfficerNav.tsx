@@ -51,6 +51,7 @@ export default function EntryOfficerNav() {
   const handleHome = () => {
     router.push("/dashboard");
   };
+  console.log(localStorage.getItem("fairm_user"));
 
   return (
     <nav className="w-full h-[72px] bg-[#F5F5F7] border-b border-gray-200 flex items-center justify-between px-6">

@@ -1,3 +1,5 @@
+// types/medication.ts
+
 export type MedicationTreatmentStatus = "pending" | "done";
 
 export type SicknessObserved =
@@ -65,4 +67,15 @@ export interface MedicationRequest {
     treatment: string;
     applied: AppliedType;
   };
+}
+
+// ✅ Shared TreatmentRow type for table
+export interface TreatmentRow {
+  penId: string;
+  penLabel: string;
+  medication: string;
+  purpose: string;
+  dosage: number | "";
+  method: string;
+  status: MedicationTreatmentStatus;
 }

@@ -30,7 +30,7 @@ export default function CollectionIssues({
   };
 
   return (
-    <div className="mt-6">
+    <div className="mt-6 rounded-md border p-4 ">
       <p className="mb-2 font-semibold">Collection Issues</p>
       <div className="flex flex-wrap gap-3">
         {issueOptions.map((issue) => (

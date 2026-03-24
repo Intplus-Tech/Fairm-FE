@@ -26,59 +26,61 @@ export default function DutyRosterRow({
   editable = true,
   onUpdate,
 }: DutyRosterRowProps) {
-  return (
-    <div className="grid grid-cols-4 items-center border-t p-3 text-sm">
+  const locationOptions = ["--", "Office", "Pen 2", "Pen 3", "Storage", "All Pens"];
 
-      <div>
-        <p>{employee.name}</p>
+  return (
+    <div className="grid grid-cols-4 items-center border-t p-3 text-sm hover:bg-gray-50">
+      {/* Name & Position */}
+      <div className="flex flex-col">
+        <p className="font-medium">{employee.name}</p>
         {employee.position && (
-          <span className="text-xs text-gray-500">
-            {employee.position}
-          </span>
+          <span className="text-xs text-gray-500">{employee.position}</span>
         )}
       </div>
 
+      {/* Duty Status */}
       <div>
         {editable ? (
-      <select
-        value={employee.dutyStatus}
-        onChange={(e) =>
-          onUpdate?.(employee.id, "dutyStatus", e.target.value)
-        }
-        className="border rounded px-2 py-1 w-[120px]"
-      >
-        <option value="select">Select</option>
-        <option value="on_duty">On</option>
-        <option value="off_duty">Off</option>
-      </select>
-      ) : (
+          <select
+            value={employee.dutyStatus}
+            onChange={(e) =>
+              onUpdate?.(employee.id, "dutyStatus", e.target.value)
+            }
+            className="border rounded px-2 py-1 w-[120px]"
+          >
+            <option value="select">Select</option>
+            <option value="on_duty">On</option>
+            <option value="off_duty">Off</option>
+          </select>
+        ) : (
           <span className="capitalize">
             {employee.dutyStatus === "on_duty" ? "On" : "Off"}
           </span>
         )}
       </div>
 
+      {/* Location */}
       <div>
         {editable ? (
-      <select
-        value={employee.location}
-        onChange={(e) =>
-          onUpdate?.(employee.id, "location", e.target.value)
-        }
-        className="border rounded px-2 py-1 w-[150px]"
-      >
-        <option>--</option>
-        <option>Office</option>
-        <option>Pen 2</option>
-        <option>Pen 3</option>
-        <option>Storage</option>
-        <option>All Pens</option>
-      </select>
-              ) : (
+          <select
+            value={employee.location}
+            onChange={(e) =>
+              onUpdate?.(employee.id, "location", e.target.value)
+            }
+            className="border rounded px-2 py-1 w-[150px]"
+          >
+            {locationOptions.map((loc) => (
+              <option key={loc} value={loc}>
+                {loc}
+              </option>
+            ))}
+          </select>
+        ) : (
           <span>{employee.location || "--"}</span>
         )}
       </div>
 
+      {/* Task Assigned */}
       <div>
         {editable ? (
           <input

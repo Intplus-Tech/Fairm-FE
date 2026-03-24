@@ -1,36 +1,24 @@
 "use client";
 
-import { DutyStatus } from "@/types/duty-roaster";
-import DutyRosterRow from "./DutyRoasterRow";
+import DutyRosterRow, { Employee } from "./DutyRoasterRow";
 
-type EmployeeRow = {
-  id: string;
-  name: string;
-  position: string;
-  dutyStatus: DutyStatus;
-  location: string;
-  taskAssigned: string;
-};
+// import DutyRosterRow, { Employee } from "./DutyRosterRow";
 
 interface Props {
   title: string;
-  employees: EmployeeRow[];
+  employees: Employee[];
   editable?: boolean;
-  onUpdate?: (
-    id: string,
-    field: keyof EmployeeRow,
-    value: string
-  ) => void;
+  onUpdate?: (id: string, field: keyof Employee, value: string) => void;
 }
 
 export default function DutyRosterSection({
   title,
   employees,
-    editable,
+  editable,
   onUpdate,
 }: Props) {
   return (
-    <div className="border rounded-lg overflow-hidden">
+    <div className="border rounded-lg overflow-hidden shadow-sm">
       <div className="bg-gray-50 px-4 py-3 font-semibold text-gray-700">
         {title}
       </div>
@@ -43,12 +31,12 @@ export default function DutyRosterSection({
       </div>
 
       {employees.map((employee) => (
-        <DutyRosterRow 
+        <DutyRosterRow
           key={employee.id}
           employee={employee}
           editable={editable}
-          onUpdate={onUpdate} 
-           />
+          onUpdate={onUpdate}
+        />
       ))}
     </div>
   );

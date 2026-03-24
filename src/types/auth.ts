@@ -5,16 +5,12 @@ export interface LoginRequest {
 
 export interface AuthUser {
   _id: string;
-  firstName: string;
-  lastName: string;
   email: string;
   role: string;
   status: string;
-  departmentId: string;
-  positionId: string;
+  departmentId: string | null;
+  positionId: string | null;
 }
-
-
 
 export interface LoginResponse {
   ok: true;
@@ -84,6 +80,7 @@ export interface ChangePasswordResponse {
 }
 
 export type UserRole = "super_admin" | "manager" | "supervisor" | "staff";
+
 export interface InviteUser {
   email: string;
   firstName: string;
@@ -96,7 +93,7 @@ export interface InviteUser {
 export interface InviteUserResponse {
   ok: true;
   data: {
-    userId: "65f1b9b0e9d3f2c2c0a0f111";
-    email: "staff1@fairm.test";
+    userId: string;
+    email: string;
   };
 }

@@ -16,7 +16,12 @@ import {
 export default function Dashboard() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [userName, setUserName] = useState("");
+
+  // ✅ Initialize userName from localStorage immediately
+  const [userName, setUserName] = useState(() => {
+    const storedUser = getStoredUser();
+    return storedUser?.fullName ?? "";
+  });
 
   useEffect(() => {
     const fetchDashboard = async () => {
@@ -33,8 +38,16 @@ export default function Dashboard() {
 
     fetchDashboard();
 
-    const user = getStoredUser();
-    if (user?.fullName) setUserName(user.fullName);
+    // Optional: subscribe to storage events if user changes elsewhere
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === "fairm_user") {
+        const updatedUser = getStoredUser();
+        setUserName(updatedUser?.fullName ?? "");
+      }
+    };
+    window.addEventListener("storage", handleStorage);
+
+    return () => window.removeEventListener("storage", handleStorage);
   }, []);
 
   if (loading) return <p className="p-4">Loading dashboard...</p>;
@@ -63,23 +76,19 @@ export default function Dashboard() {
       soft: 0,
     })) || [];
 
-   
-
-const alertsData: Alert[] =
-  data?.alerts.map((alert) => ({
-    id: alert._id,
-    date: new Date(alert.createdAt).toLocaleDateString(),
-
-    status:
-      alert.mortalityRate.critical > 10 ? "Critical" : "Warning",
-
-    issue: "Mortality Rate",
-
-    description: `Warning at ${alert.mortalityRate.warning}%, Critical at ${alert.mortalityRate.critical}%`,
-  })) || [];
+  const alertsData: Alert[] =
+    data?.alerts.map((alert) => ({
+      id: alert._id,
+      date: new Date(alert.createdAt).toLocaleDateString(),
+      status:
+        alert.mortalityRate.critical > 10 ? "Critical" : "Warning",
+      issue: "Mortality Rate",
+      description: `Warning at ${alert.mortalityRate.warning}%, Critical at ${alert.mortalityRate.critical}%`,
+    })) || [];
 
   return (
     <div className="space-y-6 p-4">
+      {/* ✅ Pass correct userName */}
       <TopInfo data={data} userName={userName} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -89,8 +98,7 @@ const alertsData: Alert[] =
 
       <EggHealthChart data={eggHealthChartData} />
 
-      {/* ✅ FIXED HERE */}
-    <AlertsTable alerts={alertsData} />
+      <AlertsTable alerts={alertsData} />
     </div>
   );
 }

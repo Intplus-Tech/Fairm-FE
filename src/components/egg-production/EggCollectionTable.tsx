@@ -68,6 +68,7 @@ export default function EggCollectionTable({
             ))}
           </tr>
         </thead>
+
         <tbody>
           {data.map((row, rowIdx) => (
             <tr key={row.penId}>
@@ -78,9 +79,9 @@ export default function EggCollectionTable({
                   <input
                     type="number"
                     min={0}
-                    placeholder="0"
-                    className="border rounded px-2 py-1 w-16 mr-1"
-                    value={row[col.key].goodEggs}
+                    placeholder=""
+                    className="border rounded px-2 py-1 w-16 mr-1 appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    value={row[col.key].goodEggs === 0 ? "" : row[col.key].goodEggs}
                     onChange={(e) =>
                       handleChange(rowIdx, col.key, "goodEggs", e.target.value)
                     }
@@ -89,9 +90,9 @@ export default function EggCollectionTable({
                   <input
                     type="number"
                     min={0}
-                    placeholder="0"
-                    className="border rounded px-2 py-1 w-16 ml-1"
-                    value={row[col.key].defectEggs}
+                    placeholder=""
+                    className="border rounded px-2 py-1 w-16 ml-1 appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    value={row[col.key].defectEggs === 0 ? "" : row[col.key].defectEggs}
                     onChange={(e) =>
                       handleChange(rowIdx, col.key, "defectEggs", e.target.value)
                     }

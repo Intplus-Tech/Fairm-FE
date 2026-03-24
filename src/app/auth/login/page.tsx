@@ -25,7 +25,7 @@ import { authService } from "../../../../services/auth.service";
 import { tokenStorage } from "@/lib/api/token";
 import { storeUser } from "@/lib/auth/getUser";
 
-import toast, { Toaster } from "react-hot-toast"; // ✅ import toast
+import toast, { Toaster } from "react-hot-toast";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -45,12 +45,12 @@ export default function LoginPage() {
     setErrorMessage(null);
 
     if (!email.trim()) {
-      toast.error("Email is required."); // ✅ toast for empty email
+      toast.error("Email is required.");
       return;
     }
 
     if (!password.trim()) {
-      toast.error("Password is required."); // ✅ toast for empty password
+      toast.error("Password is required.");
       return;
     }
 
@@ -67,33 +67,33 @@ export default function LoginPage() {
         throw new Error("Invalid login response from server");
       }
 
-      // store tokens
       tokenStorage.set(token);
       tokenStorage.setRefresh(refreshToken);
 
-      // transform API user to app user
+      // ✅ Fix undefined issue
+      const fullName = apiUser.email;
+
       const user = {
         id: apiUser._id,
         email: apiUser.email,
         role: apiUser.role,
-        fullName: `${apiUser.firstName} ${apiUser.lastName}`,
+        fullName,
       };
 
       storeUser(user);
 
-     toast.success("Login successful!", {
-  duration: 10000, // stays for 10 seconds
-});
+      toast.success("Login successful!", {
+        duration: 10000,
+      });
 
       const role = apiUser.role?.toLowerCase();
 
-      // role-based redirect
       if (role === "entry-officer") {
         router.replace("/entry-officer");
         return;
       }
 
-      if (role === "admin" || role === "owner" || role === "manager") {
+      if (role === "admin" || role === "owner" || role === "manager" || role === "super_admin") {
         router.replace("/dashboard");
         return;
       }
@@ -105,7 +105,7 @@ export default function LoginPage() {
 
       const message = error.response?.data?.message || "Login failed";
       setErrorMessage(message);
-      toast.error(message); // ✅ show error toast
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }
@@ -113,7 +113,7 @@ export default function LoginPage() {
 
   return (
     <>
-      <Toaster /> {/* ✅ required for toast messages */}
+      <Toaster />
       <main className="flex min-h-screen flex-col items-center justify-center bg-transparent px-4">
         <div className="flex items-center gap-2 mb-6">
           <Logo className="h-[23px] w-[23px]" />
@@ -158,7 +158,6 @@ export default function LoginPage() {
                     type="button"
                     onClick={() => setShowPassword((prev) => !prev)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                    aria-label="Toggle password visibility"
                   >
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
@@ -170,7 +169,7 @@ export default function LoginPage() {
                   <input
                     type="checkbox"
                     id="remember"
-                    className="w-4 h-4 rounded border-gray-300 focus:ring-2 focus:ring-[#4A3AFF]"
+                    className="w-4 h-4 rounded border-gray-300"
                   />
                   <Label htmlFor="remember" className="text-sm">
                     Remember
@@ -179,7 +178,7 @@ export default function LoginPage() {
 
                 <Link
                   href="/auth/forgot-password"
-                  className="text-sm text-gray-600 hover:text-[#4A3AFF] transition-colors"
+                  className="text-sm text-gray-600 hover:text-[#4A3AFF]"
                 >
                   Forgot Password?
                 </Link>
@@ -193,12 +192,12 @@ export default function LoginPage() {
             <Button
               onClick={handleLogin}
               disabled={!isFormValid}
-              className="w-full py-5 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-5 text-white"
               style={{ backgroundColor: "#4A3AFF" }}
             >
               {isLoading ? "Logging in..." : "Login"}
             </Button>
-            
+
           </CardContent>
         </Card>
       </main>

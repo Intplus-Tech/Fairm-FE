@@ -7,7 +7,7 @@ import HealthObservation from "@/components/medication/HealthObservation";
 import MedicationActions from "@/components/medication/MedicationActions";
 import MedicationDetails from "@/components/medication/MedicationDetails";
 import MedicationHeader from "@/components/medication/MedicationHeader";
-import TreatmentsTable from "@/components/medication/TreatmentsTable";
+// import TreatmentsTable from "@/components/medication/TreatmentsTable";
 import VaccinationSchedule from "@/components/medication/VaccinationSchedule";
 import type {
   AppliedType,
@@ -22,6 +22,7 @@ import { medicationService } from "../../../../services/medication.service";
 import { useEntryFlow } from "../../../../context/entry-flow-context";
 import { pensService } from "../../../../services/pen.service";
 import { PenResponse } from "@/types/pen";
+import TreatmentsTable from "@/components/medication/TreatmentsTable";
 
 type TreatmentRow = {
   penId: string;
@@ -143,14 +144,14 @@ export default function MedicationPage() {
     }
   };
 
-    const handleNext = () => {
-    setFlow((prev: {medication: boolean}) => ({
-      ...prev,
-      medication: true,
-    }));
+  //   const handleNext = () => {
+  //   setFlow((prev: {medication: boolean}) => ({
+  //     ...prev,
+  //     medication: true,
+  //   }));
 
-    router.push("/entry-officer/duty-roaster");
-  };
+  //   router.push("/entry-officer/duty-roaster");
+  // };
 
   
   return (
@@ -163,15 +164,15 @@ export default function MedicationPage() {
       )}
 
 
-      <div className="max-w-6xl mx-auto space-y-6">
+      <div className="max-w-6xl mx-auto ">
         <MedicationHeader
           administeredBy={administeredBy}
           setAdministeredBy={setAdministeredBy}
           time={time}
           setTime={setTime}
         />
-
-        <TreatmentsTable rows={rows} setRows={setRows} />
+        <div className="bg-white space-y-6 p-6 rounded-b-md border">
+      <TreatmentsTable rows={rows} setRows={setRows} />
 
         <MedicationDetails
           medicationName={medicationName}
@@ -201,14 +202,14 @@ export default function MedicationPage() {
         />
 
         <MedicationActions onSave={handleSave} loading={loading} />
-
+         </div>
         <div className="flex justify-end">
-          <button
+          {/* <button
             onClick={handleNext}
             className="bg-indigo-600 text-white px-6 py-2 rounded-lg"
           >
             Next: Duty Roaster →
-          </button>
+          </button> */}
         </div>
 
       </div>
