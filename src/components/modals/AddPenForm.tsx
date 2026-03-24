@@ -9,8 +9,16 @@ import type {
   SensorType,
   BreedType,
 } from "@/types/pen";
-import { BIRD_TYPES, BREED_TYPES, FEEDER_TYPES, HOUSE_TYPES, SENSOR_TYPES } from "../../../constants/pen.constants";
+import {
+  BIRD_TYPES,
+  BREED_TYPES,
+  FEEDER_TYPES,
+  HOUSE_TYPES,
+  SENSOR_TYPES,
+} from "../../../constants/pen.constants";
 import { formatLabel } from "@/utils";
+
+import toast from "react-hot-toast";
 
 export default function AddPenForm({
   onNext,
@@ -20,27 +28,24 @@ export default function AddPenForm({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-    // Form state
+  // Form state
   const [name, setName] = useState("");
   const [maxCapacity, setMaxCapacity] = useState<number>(0);
-  const [houseType, setHouseType] =
-    useState<HouseType>("deep_litter");
-  const [feeder, setFeeder] =
-    useState<FeederType>("auto_feeders");
+  const [houseType, setHouseType] = useState<HouseType>("deep_litter");
+  const [feeder, setFeeder] = useState<FeederType>("auto_feeders");
   const [sensors, setSensors] = useState<SensorType[]>([]);
-  const [birdType, setBirdType] =
-    useState<BirdType>("broiler");
-  const [breed, setBreed] =
-    useState<BreedType>("cobb_500");
+  const [birdType, setBirdType] = useState<BirdType>("broiler");
+  const [breed, setBreed] = useState<BreedType>("cobb_500");
   const [noOfBirds, setNoOfBirds] = useState<number>(0);
   const [ageInWeeks, setAgeInWeeks] = useState<number>(0);
   const [startDate, setStartDate] = useState("");
 
-    const handleSubmit = async () => {
+  const handleSubmit = async () => {
     setError(null);
 
     if (!name || !maxCapacity || !noOfBirds || !ageInWeeks || !startDate) {
       setError("Please fill all required fields.");
+      toast.error("Please fill all required fields.");
       return;
     }
 
@@ -60,11 +65,20 @@ export default function AddPenForm({
         startDate: new Date(startDate),
       });
 
-      onNext(createdPen.farmId);
+      toast.success("Pen created successfully. Proceeding to alert configuration...", {
+        duration: 4000,
+      });
+
+      // slight delay so user sees the toast
+      setTimeout(() => {
+        onNext(createdPen.farmId);
+      }, 800);
     } catch (err: unknown) {
       const message =
-          err instanceof Error ? err.message : "An unexpected error occurred";
+        err instanceof Error ? err.message : "An unexpected error occurred";
+
       setError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -100,9 +114,7 @@ export default function AddPenForm({
             <input
               type="number"
               value={maxCapacity}
-              onChange={(e) =>
-                setMaxCapacity(Number(e.target.value))
-              }
+              onChange={(e) => setMaxCapacity(Number(e.target.value))}
               className="w-full mt-1 rounded-lg border px-3 py-2 text-sm"
             />
           </div>
@@ -114,15 +126,14 @@ export default function AddPenForm({
             </label>
             <select
               value={houseType}
-              onChange={(e) =>
-                setHouseType(e.target.value as HouseType)
-              }
-             className="w-full mt-1 rounded-lg border px-3 py-2 text-sm">
-                {HOUSE_TYPES.map((type) => (
-                  <option key={type} value={type}>
-                    {formatLabel(type)}
-                  </option>
-                ))}
+              onChange={(e) => setHouseType(e.target.value as HouseType)}
+              className="w-full mt-1 rounded-lg border px-3 py-2 text-sm"
+            >
+              {HOUSE_TYPES.map((type) => (
+                <option key={type} value={type}>
+                  {formatLabel(type)}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -131,34 +142,34 @@ export default function AddPenForm({
             <label className="text-sm font-medium">
               Feeder <span className="text-red-500">*</span>
             </label>
-            <select 
+            <select
               value={feeder}
-              onChange={(e) =>
-                setFeeder(e.target.value as FeederType)
-              }
-            className="w-full mt-1 rounded-lg border px-3 py-2 text-sm">
-                {FEEDER_TYPES.map((type) => (
-                  <option key={type} value={type}>
-                    {formatLabel(type)}
-                  </option>
-                ))}
+              onChange={(e) => setFeeder(e.target.value as FeederType)}
+              className="w-full mt-1 rounded-lg border px-3 py-2 text-sm"
+            >
+              {FEEDER_TYPES.map((type) => (
+                <option key={type} value={type}>
+                  {formatLabel(type)}
+                </option>
+              ))}
             </select>
           </div>
 
           {/* Sensors */}
           <div>
             <label className="text-sm font-medium">Sensors</label>
-            <select 
-                multiple
-                value={sensors}
-                onChange={(e) =>
-                  setSensors(
-                    Array.from(e.target.selectedOptions, (opt) =>
-                      opt.value as SensorType
-                    )
+            <select
+              multiple
+              value={sensors}
+              onChange={(e) =>
+                setSensors(
+                  Array.from(e.target.selectedOptions, (opt) =>
+                    opt.value as SensorType
                   )
-                }
-            className="w-full mt-1 rounded-lg border px-3 py-2 text-sm">
+                )
+              }
+              className="w-full mt-1 rounded-lg border px-3 py-2 text-sm"
+            >
               {SENSOR_TYPES.map((type) => (
                 <option key={type} value={type}>
                   {formatLabel(type)}
@@ -174,15 +185,15 @@ export default function AddPenForm({
             </label>
             <div className="flex items-center gap-4 mt-2 text-sm">
               {BIRD_TYPES.map((type) => (
-                  <label key={type}>
-                    <input
-                      type="radio"
-                      checked={birdType === type}
-                      onChange={() => setBirdType(type)}
-                    />
-                    {formatLabel(type)}
-                  </label>
-                ))}
+                <label key={type}>
+                  <input
+                    type="radio"
+                    checked={birdType === type}
+                    onChange={() => setBirdType(type)}
+                  />
+                  {formatLabel(type)}
+                </label>
+              ))}
             </div>
           </div>
 
@@ -202,16 +213,16 @@ export default function AddPenForm({
             <label className="text-sm font-medium">
               Breed <span className="text-red-500">*</span>
             </label>
-            <select   value={breed}
-              onChange={(e) =>
-                setBreed(e.target.value as BreedType)
-              }
-              className="w-full mt-1 rounded-lg border px-3 py-2 text-sm">
-                {BREED_TYPES.map((type) => (
-                  <option key={type} value={type}>
-                    {formatLabel(type)}
-                  </option>
-                ))}
+            <select
+              value={breed}
+              onChange={(e) => setBreed(e.target.value as BreedType)}
+              className="w-full mt-1 rounded-lg border px-3 py-2 text-sm"
+            >
+              {BREED_TYPES.map((type) => (
+                <option key={type} value={type}>
+                  {formatLabel(type)}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -223,9 +234,7 @@ export default function AddPenForm({
             <input
               type="number"
               value={noOfBirds}
-              onChange={(e) =>
-                setNoOfBirds(Number(e.target.value))
-              }
+              onChange={(e) => setNoOfBirds(Number(e.target.value))}
               className="w-full mt-1 rounded-lg border px-3 py-2 text-sm"
             />
           </div>
@@ -238,9 +247,7 @@ export default function AddPenForm({
             <input
               type="number"
               value={ageInWeeks}
-              onChange={(e) =>
-                setAgeInWeeks(Number(e.target.value))
-              }
+              onChange={(e) => setAgeInWeeks(Number(e.target.value))}
               className="w-full mt-1 rounded-lg border px-3 py-2 text-sm"
             />
           </div>
@@ -253,20 +260,14 @@ export default function AddPenForm({
             <input
               type="date"
               value={startDate}
-              onChange={(e) =>
-                setStartDate(e.target.value)
-              }
-                className="w-full mt-1 rounded-lg border px-3 py-2 text-sm"
+              onChange={(e) => setStartDate(e.target.value)}
+              className="w-full mt-1 rounded-lg border px-3 py-2 text-sm"
             />
           </div>
         </div>
       </div>
 
-      {error && (
-        <p className="text-red-500 text-sm mb-2">
-          {error}
-        </p>
-      )}
+      {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
 
       {/* FOOTER (STATIC) */}
       <div className="flex justify-between items-center border-t pt-4">

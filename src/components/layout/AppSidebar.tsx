@@ -15,9 +15,13 @@ import { useEffect, useState } from "react";
 
 import { getStoredUser } from "@/lib/auth/getUser";
 import { isAdmin } from "@/lib/auth/role";
-// import { isAdmin } from "@/lib/auth/roles";
+import AskFairmAIButton from "../dashboard/AskFairmAIButton";
 
 const ACTIVE_COLOR = "#4A3AFF";
+
+type Props = {
+  onOpenAI: () => void;
+};
 
 const menu = [
   { label: "Inventory & Stocks", icon: User, href: "/inventory" },
@@ -32,7 +36,7 @@ const birdSubMenu = [
   { label: "Historical Archives", href: "/bird/archives" },
 ];
 
-export default function AppSidebar() {
+export default function AppSidebar({ onOpenAI }: Props) {
   const pathname = usePathname();
   const router = useRouter();
   const { state, dispatch } = useLayout();
@@ -190,6 +194,11 @@ export default function AppSidebar() {
             </button>
           )}
         </nav>
+
+        {/* ASK FAIRM AI BUTTON */}
+        <div className="pt-4">
+          <AskFairmAIButton onClick={onOpenAI} />
+        </div>
       </aside>
     </>
   );

@@ -14,7 +14,7 @@ export default function MortalityHeader({
   onCheckedTimeChange,
 }: MortalityHeaderProps) {
   return (
-    <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-6 rounded-xl">
+    <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-6 py-8 rounded-t-xl">
       <h1 className="text-2xl font-semibold">
         Daily Mortality & Health Entry
       </h1>
@@ -37,7 +37,7 @@ export default function MortalityHeader({
             type="time"
             value={checkedTime}
             onChange={(e) => onCheckedTimeChange(e.target.value)}
-            className="text-black rounded px-2 py-1"
+            className="text-black rounded px-2 py-1 bg-white p-2"
           />
         </div>
 
@@ -46,7 +46,7 @@ export default function MortalityHeader({
           <input
             value={checkedBy}
             onChange={(e) => onCheckedByChange(e.target.value)}
-            className="text-black rounded px-2 py-1"
+            className="text-black rounded px-2 py-1 bg-white p-2"
           />
         </div>
       </div>

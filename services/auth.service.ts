@@ -52,4 +52,3 @@ export const authService = {
       .then((res) => res.data);
   },
 };
-

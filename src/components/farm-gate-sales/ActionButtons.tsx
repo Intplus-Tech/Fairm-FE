@@ -1,13 +1,31 @@
+  "use client";
+
+  import { useRouter } from "next/navigation";
+
+
 interface Props {
   onSave: () => void;
+  onNext: () => void;
   loading?: boolean;
 }
 
-export default function ActionButtons({ onSave, loading = false }: Props) {
+export default function ActionButtons({
+  onSave,
+  onNext,
+  loading = false,
+}: Props) {
+  
+  const router = useRouter();
+
   return (
     <div className="flex justify-between items-center pt-4">
 
-      <button className="border px-4 py-2 rounded-lg">
+      <button
+        onClick={() =>
+          router.push("/entry-officer/feed-consumption")
+        }
+        className="px-6 py-2 border rounded-md text-gray-700"
+      >
         ← Back
       </button>
 
@@ -21,12 +39,14 @@ export default function ActionButtons({ onSave, loading = false }: Props) {
           {loading ? "Saving..." : "Save Farm Sale"}
         </button>
 
-        <button className="bg-indigo-600 text-white px-4 py-2 rounded-lg">
+        <button
+          onClick={onNext}
+          className="bg-indigo-600 text-white px-4 py-2 rounded-lg"
+        >
           Next: Bulk Transfer →
         </button>
 
       </div>
-
     </div>
   );
 }

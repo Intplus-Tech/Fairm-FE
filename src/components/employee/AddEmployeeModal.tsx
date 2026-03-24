@@ -10,15 +10,15 @@ import { EmployeeRequest } from "@/types/employee";
 import { DepartmentResponse } from "@/types/department";
 import { PositionResponse } from "@/types/position";
 import { employeeService } from "../../../services/employee.service";
-
+import { toast } from "react-hot-toast";
 
 export default function AddEmployeeModal({
   onClose,
 }: {
   onClose: () => void;
 }) {
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const [form, setForm] = useState<EmployeeRequest>({
     firstName: "",
@@ -27,7 +27,7 @@ export default function AddEmployeeModal({
     age: 0,
     departmentId: "",
     positionId: "",
-    dob: new Date,
+    dob: new Date(),
     phoneNumber: 0,
     salary: 0,
   });
@@ -46,10 +46,12 @@ export default function AddEmployeeModal({
         setDepartments(deptRes);
         setPositions(posRes);
       } catch (err) {
-        console.error();
-              const message =
-        err instanceof Error ? err.message : "Failed to load departments/positions";
-      setError(message);
+        const message =
+          err instanceof Error
+            ? err.message
+            : "Failed to load departments/positions";
+
+        setError(message);
       }
     };
 
@@ -57,13 +59,13 @@ export default function AddEmployeeModal({
   }, []);
 
   const handleChange = (
-      field: keyof EmployeeRequest,
-      value: string | number
-    ) => {
-      setForm((prev) => ({
-        ...prev,
-        [field]: field === "dob" ? new Date(value) : value,
-      }));
+    field: keyof EmployeeRequest,
+    value: string | number | Date
+  ) => {
+    setForm((prev) => ({
+      ...prev,
+      [field]: field === "dob" ? new Date(value as string) : value,
+    }));
   };
 
   const handleSubmit = async () => {
@@ -73,11 +75,20 @@ export default function AddEmployeeModal({
 
       await employeeService.create(form);
 
-      onClose();
+      toast.success("Employee added successfully 🎉", {
+        duration: 3000,
+      });
+
+      setTimeout(() => {
+        onClose();
+      }, 1200);
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Failed to create employee";
-      setError(message);
+
+      toast.error(message, {
+        duration: 4000,
+      });
     } finally {
       setLoading(false);
     }
@@ -87,13 +98,10 @@ export default function AddEmployeeModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
       {/* Modal container */}
       <div className="bg-white w-full max-w-2xl rounded-2xl shadow-lg flex flex-col max-h-[90vh]">
-
         {/* Header */}
         <div className="flex items-start justify-between px-6 py-4 border-b">
           <div>
-            <h2 className="text-xl font-semibold">
-              Create New Farm Employee
-            </h2>
+            <h2 className="text-xl font-semibold">Create New Farm Employee</h2>
             <p className="text-sm text-muted-foreground">
               Set up workers and their roles for your farm.
             </p>
@@ -109,7 +117,6 @@ export default function AddEmployeeModal({
 
         {/* Scrollable content */}
         <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6">
-
           {/* Basic Information */}
           <section className="space-y-4">
             <h3 className="font-semibold text-sm">Basic Information</h3>
@@ -117,41 +124,51 @@ export default function AddEmployeeModal({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1">
                 <Label>First Name</Label>
-                <Input placeholder="John" 
+                <Input
+                  placeholder="John"
                   value={form.firstName}
                   onChange={(e) => handleChange("firstName", e.target.value)}
-                   />
+                />
               </div>
 
               <div className="space-y-1">
                 <Label>Last Name</Label>
-                <Input placeholder="Doe"
-                value={form.lastName}
+                <Input
+                  placeholder="Doe"
+                  value={form.lastName}
                   onChange={(e) => handleChange("lastName", e.target.value)}
-                   />
+                />
               </div>
 
               <div className="space-y-1">
                 <Label>Email</Label>
-                <Input type="email" placeholder="john@farm.com"
+                <Input
+                  type="email"
+                  placeholder="john@farm.com"
                   value={form.email}
-                  onChange={(e) => handleChange("email", (e.target.value))}
-                  />
+                  onChange={(e) => handleChange("email", e.target.value)}
+                />
               </div>
 
               <div className="space-y-1">
                 <Label>Phone Number</Label>
-                <Input placeholder="080xxxxxxxx" 
+                <Input
+                  placeholder="080xxxxxxxx"
                   value={form.phoneNumber}
-                  onChange={(e) => handleChange("phoneNumber", Number(e.target.value))}/>
+                  onChange={(e) =>
+                    handleChange("phoneNumber", Number(e.target.value))
+                  }
+                />
               </div>
 
               <div className="space-y-1">
                 <Label>Age</Label>
-                <Input type="number" placeholder="35" 
+                <Input
+                  type="number"
+                  placeholder="35"
                   value={form.age}
                   onChange={(e) => handleChange("age", Number(e.target.value))}
-                 />
+                />
               </div>
             </div>
           </section>
@@ -166,7 +183,9 @@ export default function AddEmployeeModal({
                 <select
                   className="w-full border rounded-md p-2"
                   value={form.departmentId}
-                  onChange={(e) => handleChange("departmentId", e.target.value)}
+                  onChange={(e) =>
+                    handleChange("departmentId", e.target.value)
+                  }
                 >
                   <option value="">Select Department</option>
                   {departments.map((dept) => (
@@ -195,9 +214,13 @@ export default function AddEmployeeModal({
 
               <div className="space-y-1">
                 <Label>Salary</Label>
-                <Input placeholder="₦120,000"
+                <Input
+                  placeholder="₦120,000"
                   value={form.salary}
-                  onChange={(e) => handleChange("salary", Number(e.target.value))} />
+                  onChange={(e) =>
+                    handleChange("salary", Number(e.target.value))
+                  }
+                />
               </div>
 
               <div className="space-y-1">
@@ -208,22 +231,20 @@ export default function AddEmployeeModal({
           </section>
         </div>
 
-        {error && (
-          <p className="text-red-500 text-sm mb-2">
-            {error}
-          </p>
-        )}
+        {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
 
         {/* Footer */}
         <div className="px-6 py-4 border-t flex justify-end gap-3">
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button 
+
+          <Button
             onClick={handleSubmit}
             disabled={loading}
-            className="bg-[#5B5AF7] hover:bg-[#4a49e6]">
-              {loading ? "Creating..." : "Add Employee"}
+            className="bg-[#5B5AF7] hover:bg-[#4a49e6]"
+          >
+            {loading ? "Creating..." : "Add Employee"}
           </Button>
         </div>
       </div>

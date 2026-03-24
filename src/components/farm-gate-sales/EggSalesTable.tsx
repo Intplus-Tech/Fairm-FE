@@ -25,20 +25,18 @@ export default function EggSalesTable({ saleData, updateField }: Props) {
       ...saleData.eggSalesGrade,
       [gradeKey]: {
         ...saleData.eggSalesGrade[gradeKey],
-         [field]: field === "notes" ? value : Number(value) || 0,
+        [field]: field === "notes" ? value : Number(value) || 0,
       },
     });
   };
 
   return (
     <div className="bg-white p-6 rounded-xl shadow-sm border">
-
       <h2 className="font-semibold text-lg mb-4">
         Egg Sales by Grade
       </h2>
 
       <table className="w-full text-sm">
-
         <thead className="text-left text-gray-500">
           <tr>
             <th>Grade</th>
@@ -60,33 +58,35 @@ export default function EggSalesTable({ saleData, updateField }: Props) {
                 <td>
                   <input
                     type="number"
-                    value={grade.quantity}
+                    value={grade.quantity || ""}
                     onChange={(e) =>
                       handleGradeChange(row.key, "quantity", e.target.value)
                     }
-                    className="border rounded p-1 w-24"
+                    className="border rounded p-1 w-24 no-spinner"
                   />
                 </td>
 
                 <td>
                   <input
-                    value={grade.price}
+                    type="number"
+                    value={grade.price || ""}
                     onChange={(e) =>
                       handleGradeChange(row.key, "price", e.target.value)
                     }
-                    className="border rounded p-1 w-28"
-                    placeholder="5500"
+                    className="border rounded p-1 w-28 no-spinner"
+                    
                   />
                 </td>
 
                 <td>
                   <input
-                    value={grade.total}
+                    type="number"
+                    value={grade.total || ""}
                     onChange={(e) =>
                       handleGradeChange(row.key, "total", e.target.value)
                     }
-                    className="border rounded p-1 w-32"
-                    placeholder="467500"
+                    className="border rounded p-1 w-32 no-spinner"
+                    
                   />
                 </td>
 
@@ -104,9 +104,7 @@ export default function EggSalesTable({ saleData, updateField }: Props) {
             );
           })}
         </tbody>
-
       </table>
-
     </div>
   );
 }

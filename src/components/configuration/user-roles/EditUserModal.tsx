@@ -3,6 +3,9 @@
 import { UserRole } from "@/types/auth";
 import { User } from "@/types/user";
 import { useState } from "react";
+// import { usersService } from "@/services/user.service";
+
+import toast from "react-hot-toast";
 import { usersService } from "../../../../services/user.service";
 
 interface EditUserModalProps {
@@ -16,37 +19,38 @@ export default function EditUserModal({
   onSuccess,
   user,
 }: EditUserModalProps) {
-  const [firstName, setFirstName] = useState(user.firstName);
-  const [lastName, setLastName] = useState(user.lastName);
-  const [email, setEmail] = useState(user.email);
-  const [role, setRole] = useState<UserRole>(user.role);
-  const [status, setStatus] = useState<User["status"]>(user.status);
+  const [fullName, setFullName] = useState(user?.fullName ?? "");
+  const [email, setEmail] = useState(user?.email ?? "");
+  const [phone, setPhone] = useState(user?.phone ?? "");
+  const [role, setRole] = useState<UserRole>(user?.role ?? "staff");
+  const [status, setStatus] = useState<User["status"]>(user?.status ?? "active");
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setLoading(true);
+    setError(null);
 
     try {
-      setLoading(true);
-      setError(null);
-
       const payload: Partial<User> = {
-        firstName,
-        lastName,
+        fullName,
         email,
+        phone,
         role,
         status,
       };
 
       await usersService.update(user._id, payload);
 
+      toast.success("User updated successfully!");
       onSuccess();
       onClose();
-    } catch (err) {
+    } catch (err: any) {
       console.error("Failed to update user:", err);
       setError("Failed to update user. Please try again.");
+      toast.error("Failed to update user");
     } finally {
       setLoading(false);
     }
@@ -58,10 +62,7 @@ export default function EditUserModal({
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
           <h2 className="text-lg font-semibold">Edit User</h2>
-          <button
-            onClick={onClose}
-            className="text-muted-foreground hover:text-foreground"
-          >
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground">
             ✕
           </button>
         </div>
@@ -74,25 +75,12 @@ export default function EditUserModal({
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-5">
-          {/* First Name */}
+          {/* Full Name */}
           <div>
-            <label className="mb-1 block text-sm font-medium">First Name</label>
+            <label className="mb-1 block text-sm font-medium">Full Name</label>
             <input
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              required
-              className="w-full rounded-md border px-3 py-2 text-sm"
-            />
-          </div>
-
-          {/* Last Name */}
-          <div>
-            <label className="mb-1 block text-sm font-medium">
-              Last Name
-            </label>
-            <input
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
               required
               className="w-full rounded-md border px-3 py-2 text-sm"
             />
@@ -100,9 +88,7 @@ export default function EditUserModal({
 
           {/* Email */}
           <div>
-            <label className="mb-1 block text-sm font-medium">
-              Email Address
-            </label>
+            <label className="mb-1 block text-sm font-medium">Email Address</label>
             <input
               type="email"
               value={email}
@@ -112,11 +98,19 @@ export default function EditUserModal({
             />
           </div>
 
+          {/* Phone */}
+          <div>
+            <label className="mb-1 block text-sm font-medium">Phone Number</label>
+            <input
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className="w-full rounded-md border px-3 py-2 text-sm"
+            />
+          </div>
+
           {/* Role */}
           <div>
-            <label className="mb-1 block text-sm font-medium">
-              User Role
-            </label>
+            <label className="mb-1 block text-sm font-medium">User Role</label>
             <select
               value={role}
               onChange={(e) => setRole(e.target.value as UserRole)}
@@ -131,14 +125,10 @@ export default function EditUserModal({
 
           {/* Status */}
           <div>
-            <label className="mb-1 block text-sm font-medium">
-              Status
-            </label>
+            <label className="mb-1 block text-sm font-medium">Status</label>
             <select
               value={status}
-              onChange={(e) =>
-                setStatus(e.target.value as User["status"])
-              }
+              onChange={(e) => setStatus(e.target.value as User["status"])}
               className="w-full rounded-md border px-3 py-2 text-sm"
             >
               <option value="active">Active</option>

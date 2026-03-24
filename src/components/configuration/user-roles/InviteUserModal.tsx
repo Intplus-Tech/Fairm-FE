@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { authService } from "../../../../services/auth.service";
+import toast from "react-hot-toast"; // ✅ import toast
+import { CheckCircle } from "lucide-react";
 
 interface InviteUserModalProps {
   onClose: () => void;
@@ -21,21 +23,48 @@ export default function InviteUserModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>(""); 
 
- async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
   e.preventDefault();
+  setLoading(true);
+  setError("");
 
-    try {
-      await authService.inviteUser({
-        firstName,
-        lastName,
-        email,
-        role: "staff",
-      })
+  try {
+    await authService.inviteUser({
+      firstName,
+      lastName,
+      email,
+      role: "staff", // or use role variable if dynamic
+    });
 
-      onSuccess();
-    } catch (err: unknown) {
+    // ✅ Call onSuccess
+    onSuccess();
+
+    // ✅ Show success toast with CheckCircle
+    toast.custom(
+      (t) => (
+        <div
+          className={`
+            ${t.visible ? "animate-enter" : "animate-leave"}
+            flex gap-3 rounded-xl bg-white p-4 shadow-lg border border-green-500
+          `}
+        >
+          <CheckCircle className="h-6 w-6 text-green-600" />
+          <div className="flex flex-col text-sm text-gray-900">
+            <div>Invitation Sent</div>
+            <div>User has been successfully invited!</div>
+          </div>
+        </div>
+      ),
+      {
+        duration: 4000,
+        position: "top-right",
+      }
+    );
+
+    onClose();
+  } catch (err: unknown) {
     const message =
-        err instanceof Error ? err.message : "An unexpected error occurred";
+      err instanceof Error ? err.message : "An unexpected error occurred";
     setError(message);
   } finally {
     setLoading(false);
@@ -105,7 +134,6 @@ export default function InviteUserModal({
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 className="w-full rounded-md border px-3 py-2 text-sm"
-                placeholder=""
               />
               <p className="mt-1 text-xs text-muted-foreground">
                 Used for login and notifications
@@ -142,14 +170,12 @@ export default function InviteUserModal({
               <option value="owner">Owner</option>
               <option value="admin">Admin</option>
               <option value="manager">Manager</option>
-              <option value="entry_officer">Entry Officer</option>
+              <option value="entry_officer">Entry officer</option>
             </select>
           </div>
 
           {error && (
-            <p className="text-red-500 text-sm mb-2">
-              {error}
-            </p>
+            <p className="text-red-500 text-sm mb-2">{error}</p>
           )}
 
           {/* Actions */}

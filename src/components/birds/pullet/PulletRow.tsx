@@ -22,13 +22,13 @@ export default function PulletRow({ row }: { row: PulletRowData }) {
             {open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
           </button>
         </td>
-        <td className="px-6 py-4">{row.date}</td>
-        <td className="px-6 py-4">{row.pens}</td>
-        <td className="px-6 py-4">{row.stock}</td>
-        <td className="px-6 py-4">{row.mortality}</td>
-        <td className="px-6 py-4">{row.feed}</td>
-        <td className="px-6 py-4">{row.weight}</td>
-        <td className="px-6 py-4">
+        <td className="px-12 py-6">{row.date}</td>
+        <td className="px-12 py-6">{row.pens}</td>
+        <td className="px-12 py-6">{row.stock}</td>
+        <td className="px-12 py-6">{row.mortality}</td>
+        <td className="px-12 py-6">{row.feed}</td>
+        <td className="px-12 py-6">{row.weight}</td>
+        <td className="px-12 py-6">
           <span className="flex items-center gap-2">
             <span
               className={`w-3 h-3 rounded-full ${row.alert === "Critical" ? "bg-red-500" : "bg-yellow-400"}`}

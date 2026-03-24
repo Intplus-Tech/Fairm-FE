@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-
+import { useState } from "react";
 
 import DestinationSection from "@/components/bulk-transfer/DestinationSection";
 import Documentation from "@/components/bulk-transfer/Documentation";
@@ -12,14 +12,15 @@ import QualityControl from "@/components/bulk-transfer/QualityControl";
 import TransferActions from "@/components/bulk-transfer/TransferActions";
 import TransferDetails from "@/components/bulk-transfer/TransferDetails";
 import TransferHeader from "@/components/bulk-transfer/TransferHeader";
+
 import { bulkTransferService } from "../../../../services/bulk-transfer.service";
 import { BulkTransferRequest } from "@/types/bulk-transfer";
 import { useEntryFlow } from "../../../../context/entry-flow-context";
-import { useState } from "react";
 
 export default function BulkTransferPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
   const { setFlow } = useEntryFlow();
   const router = useRouter();
 
@@ -68,18 +69,19 @@ export default function BulkTransferPage() {
       await bulkTransferService.create(form);
 
       alert("Bulk transfer saved successfully!");
-      router.push("/entry-officer/medication");
     } catch (err: unknown) {
       const message =
-          err instanceof Error ? err.message : "An unexpected error occurred";
+        err instanceof Error
+          ? err.message
+          : "An unexpected error occurred";
       setError(message);
     } finally {
       setLoading(false);
     }
   };
 
-    const handleNext = () => {
-    setFlow((prev: {lagos: boolean}) => ({
+  const handleNext = () => {
+    setFlow((prev: { lagos: boolean }) => ({
       ...prev,
       lagos: true,
     }));
@@ -89,92 +91,86 @@ export default function BulkTransferPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
-
-      <div className="max-w-6xl mx-auto space-y-6">
-
-      {error && (
-        <p className="text-red-500 text-sm mb-2">
-          {error}
-        </p>
-      )}
+      <div className="max-w-6xl mx-auto">
+        {error && (
+          <p className="text-red-500 text-sm mb-2">
+            {error}
+          </p>
+        )}
 
         <TransferHeader />
 
-        <DestinationSection
-          value={form.destination}
-          onChange={(value) =>
-            setForm((prev) => ({
-              ...prev,
-              destination: value,
-            }))
-          }
-         />
+        <div className="bg-white p-6 rounded-b-md space-y-6">
+          <DestinationSection
+            value={form.destination}
+            onChange={(value) =>
+              setForm((prev) => ({
+                ...prev,
+                destination: value,
+              }))
+            }
+          />
 
-        <TransferDetails
-          value={form.transferDetails}
-          onChange={(value) =>
-            setForm((prev) => ({
-              ...prev,
-              transferDetails: value,
-            }))
-          }
-         />
+          <TransferDetails
+            value={form.transferDetails}
+            onChange={(value) =>
+              setForm((prev) => ({
+                ...prev,
+                transferDetails: value,
+              }))
+            }
+          />
 
-        <EggTransferGrade
-          value={form.eggTransferGrade}
-          onChange={(value) =>
-            setForm((prev) => ({
-              ...prev,
-              eggTransferGrade: value,
-            }))
-          }
-        />
+          <EggTransferGrade
+            value={form.eggTransferGrade}
+            onChange={(value) =>
+              setForm((prev) => ({
+                ...prev,
+                eggTransferGrade: value,
+              }))
+            }
+          />
 
-        <LoadingDetails
-          value={form.loadingDetails}
-          onChange={(value) =>
-            setForm((prev) => ({
-              ...prev,
-              loadingDetails: value,
-            }))
-          }
-        />
+          <LoadingDetails
+            value={form.loadingDetails}
+            onChange={(value) =>
+              setForm((prev) => ({
+                ...prev,
+                loadingDetails: value,
+              }))
+            }
+          />
 
-        <QualityControl
-          value={form.qualityControlLoading}
-          onChange={(value) =>
-            setForm((prev) => ({
-              ...prev,
-              qualityControlLoading: value,
-            }))
-          }
-        />
+          <QualityControl
+            value={form.qualityControlLoading}
+            onChange={(value) =>
+              setForm((prev) => ({
+                ...prev,
+                qualityControlLoading: value,
+              }))
+            }
+          />
 
-        <PackagingTransport
-          value={form.packagingTransport}
-          onChange={(value) =>
-            setForm((prev) => ({
-              ...prev,
-              packagingTransport: value,
-            }))
-          }
-        />
+          <PackagingTransport
+            value={form.packagingTransport}
+            onChange={(value) =>
+              setForm((prev) => ({
+                ...prev,
+                packagingTransport: value,
+              }))
+            }
+          />
 
-        <Documentation />
+          <Documentation />
 
-        <TransferActions onSave={handleSubmit} loading={loading} />
-
-        <div className="flex justify-end">
-          <button
-            onClick={handleNext}
-            className="bg-indigo-600 text-white px-6 py-2 rounded-lg"
-          >
-            Next: Medication →
-          </button>
+          {/* ✅ Only one action section */}
+          <TransferActions
+            onSave={handleSubmit}
+            onNext={handleNext}
+            loading={loading}
+          />
         </div>
-
       </div>
-
     </div>
   );
 }

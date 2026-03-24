@@ -38,21 +38,21 @@ export default function PackagingDetails({ saleData, updateField, users  }: Prop
           <label className="text-sm">Crates Used</label>
           <input
           type="number"
-            value={saleData.packingDetails.cratesUsed}
+            value={saleData.packingDetails.cratesUsed || ""}
             onChange={(e) => handlePackingChange("cratesUsed", e.target.value)}
             className="border rounded-lg p-2 w-full mt-1"
           />
         </div>
 
         <div>
-          <label className="text-sm">Sacks Used</label>
-          <input
-            type="number"
-            value={saleData.packingDetails.sacksUsed}
-            onChange={(e) => handlePackingChange("sacksUsed", e.target.value)}
-            className="border rounded-lg p-2 w-full mt-1"
-          />
-        </div>
+   <label className="text-sm">Sacks Used</label>
+       <input
+    type="number"
+    value={saleData.packingDetails.sacksUsed || ""}
+    onChange={(e) => handlePackingChange("sacksUsed", e.target.value)}
+    className="border rounded-lg p-2 w-full mt-1 no-spinner"
+  />
+</div>
 
         <div>
           <label className="text-sm">Vehicle</label>
@@ -64,6 +64,7 @@ export default function PackagingDetails({ saleData, updateField, users  }: Prop
         </div>
 
         <div>
+          
           <label className="text-sm">Loading Time</label>
           <input
             type="time"

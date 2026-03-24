@@ -27,6 +27,8 @@ export interface User {
   lastActiveAt: string;
   createdAt: string;
   updatedAt: string;
+  fullName?: string;
+  phone?: string;
 }
 
 export interface UsersListResponse {

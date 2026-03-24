@@ -1,13 +1,11 @@
-// import { BroilerRowData } from "@/types/broiler";
-
 import { BroilerRowData } from "../../../types/broiler";
 
 export const broilerData: BroilerRowData[] = [
   {
-    id: 1,
+    id: "1",
     date: "Jan 12, 2026",
     pens: 3,
-    stock: "12,981",
+    stock: 12981,
     mortality: 81,
     culls: 42,
     feed: 230,
@@ -16,10 +14,10 @@ export const broilerData: BroilerRowData[] = [
     alert: "Critical",
   },
   {
-    id: 2,
+    id: "2",
     date: "Jan 13, 2026",
     pens: 5,
-    stock: "13,210",
+    stock: 13210,
     mortality: 64,
     culls: 31,
     feed: 245,
@@ -28,10 +26,10 @@ export const broilerData: BroilerRowData[] = [
     alert: "Warning",
   },
   {
-    id: 3,
+    id: "3",
     date: "Jan 14, 2026",
     pens: 4,
-    stock: "13,080",
+    stock: 13080,
     mortality: 42,
     culls: 28,
     feed: 260,
@@ -40,10 +38,10 @@ export const broilerData: BroilerRowData[] = [
     alert: "Warning",
   },
   {
-    id: 4,
+    id: "4",
     date: "Jan 15, 2026",
     pens: 6,
-    stock: "13,450",
+    stock: 13450,
     mortality: 95,
     culls: 55,
     feed: 280,
@@ -52,10 +50,10 @@ export const broilerData: BroilerRowData[] = [
     alert: "Critical",
   },
   {
-    id: 5,
+    id: "5",
     date: "Jan 16, 2026",
     pens: 7,
-    stock: "13,720",
+    stock: 13720,
     mortality: 38,
     culls: 19,
     feed: 300,
