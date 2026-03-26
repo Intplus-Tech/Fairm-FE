@@ -114,7 +114,7 @@ export default function EggProductionPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
+    <div className=" mx-auto p-6 max-h-screen">
       {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
 
       {/* HEADER */}

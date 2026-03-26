@@ -1,22 +1,18 @@
-export default function PenDetailsTable() {
+// import { Pen } from "@/services/broiler.service";
+
+import { Pen } from "../../../../services/broiler.service";
+
+interface Props {
+  pens: Pen[];
+}
+
+export default function PenDetailsTable({ pens }: Props) {
   return (
     <div className="border rounded-xl p-4 bg-white">
       <h4 className="font-medium mb-4">Pen Details</h4>
 
       <div className="overflow-x-auto scrollbar-hide">
         <table className="min-w-[900px] w-full text-sm table-fixed border-collapse">
-          <colgroup>
-            <col className="w-[120px]" />
-            <col className="w-[100px]" />
-            <col className="w-[120px]" />
-            <col className="w-[110px]" />
-            <col className="w-[120px]" />
-            <col className="w-[140px]" />
-            <col className="w-[160px]" />
-            <col className="w-[150px]" />
-            <col className="w-[120px]" />
-          </colgroup>
-
           <thead className="bg-gray-50 text-[#1C155F]">
             <tr>
               <th className="px-4 py-3 text-left">Pen Name</th>
@@ -32,25 +28,27 @@ export default function PenDetailsTable() {
           </thead>
 
           <tbody>
-            {["Pen 1", "Pen 2", "Pen 3", "Pen 4"].map((pen, i) => (
-              <tr key={pen} className="border-t">
-                <td className="px-10 py-6 align-middle">{pen}</td>
-                <td className="px-10 py-6 align-middle">3</td>
-                <td className="px-10 py-6 align-middle">12,981</td>
-                <td className="px-10 py-6 align-middle">81</td>
-                <td className="px-10 py-6 align-middle">42</td>
-                <td className="px-10 py-6 align-middle">230</td>
-                <td className="px-10 py-6 align-middle">0</td>
-                <td className="px-10 py-6 align-middle">3.45</td>
+            {pens.map((pen) => (
+              <tr key={pen.penId} className="border-t">
+                <td className="px-10 py-6">{pen.penName}</td>
+                <td className="px-10 py-6">{pen.ageInDays}</td>
+                <td className="px-10 py-6">{pen.liveBirds}</td>
+                <td className="px-10 py-6">{pen.mortality}</td>
+                <td className="px-10 py-6">{pen.culls}</td>
+                <td className="px-10 py-6">{pen.feedConsumed}</td>
+                <td className="px-10 py-6">{pen.waterConsumed}</td>
+                <td className="px-10 py-6">{pen.averageWeight}</td>
 
-                <td className="px-4 py-3 align-middle">
+                <td className="px-4 py-3">
                   <span className="flex items-center gap-2">
                     <span
                       className={`w-3 h-3 rounded-full ${
-                        i % 2 === 0 ? "bg-red-500" : "bg-yellow-400"
+                        pen.mortality > 10
+                          ? "bg-red-500"
+                          : "bg-yellow-400"
                       }`}
                     />
-                    {i % 2 === 0 ? "Critical" : "Warning"}
+                    {pen.mortality > 10 ? "Critical" : "Warning"}
                   </span>
                 </td>
               </tr>

@@ -90,8 +90,8 @@ export default function BulkTransferPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen p-6">
+      <div className=" mx-auto">
         {error && (
           <p className="text-red-500 text-sm mb-2">
             {error}

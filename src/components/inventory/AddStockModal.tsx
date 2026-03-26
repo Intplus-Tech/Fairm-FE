@@ -6,7 +6,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { inventoriesService } from "../../../services/inventory.service";
 import { InventoryRequest } from "@/types/inventory";
-import { categories, units } from "../../../constants/inventory.constants";
+import {
+  categories,
+  units,
+} from "../../../constants/inventory.constants";
 import toast, { Toaster } from "react-hot-toast";
 
 export default function AddStockModal({
@@ -15,21 +18,31 @@ export default function AddStockModal({
   onClose: () => void;
 }) {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(
+    null
+  );
 
-  const [form, setForm] = useState<InventoryRequest>({
-    name: "",
-    category: "feed",
-    description: "",
-    unitOfMeasurement: "bags",
-    supplier: "",
-    expiryDate: new Date(),
-  });
+  const [form, setForm] =
+    useState<InventoryRequest>({
+      name: "",
+      batchNumber: "76890", // ✅ required by backend
+      category: "feed",
+      description: "",
+      unitOfMeasurement: "bags",
+      supplier: "",
+      expiryDate: new Date(),
+    });
 
-  const handleChange = (field: keyof InventoryRequest, value: string) => {
+  const handleChange = (
+    field: keyof InventoryRequest,
+    value: string
+  ) => {
     setForm((prev) => ({
       ...prev,
-      [field]: field === "expiryDate" ? new Date(value) : value,
+      [field]:
+        field === "expiryDate"
+          ? new Date(value)
+          : value,
     }));
   };
 
@@ -38,19 +51,27 @@ export default function AddStockModal({
       setLoading(true);
       setError(null);
 
-      await inventoriesService.create(form);
+      await inventoriesService.create({
+        ...form,
+        expiryDate: new Date(
+          form.expiryDate
+        ).toISOString(), // ✅ ensure backend format
+      });
 
-      // ✅ show success toast
-      toast.success("Stock item added successfully!");
+      toast.success(
+        "Stock item added successfully!"
+      );
 
-      // Delay closing modal to let toast show
       setTimeout(() => {
         onClose();
-      }, 3000); // 300ms delay is enough
+      }, 300);
 
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : "Failed to create inventory item";
+        err instanceof Error
+          ? err.message
+          : "Failed to create inventory item";
+
       setError(message);
       toast.error(message);
     } finally {
@@ -60,13 +81,17 @@ export default function AddStockModal({
 
   return (
     <>
-      <Toaster /> {/* keep this here for now, but ideally move to _app.tsx */}
+      <Toaster />
 
       <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
         <div className="bg-white w-full max-w-2xl rounded-2xl p-6 space-y-4">
           <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold">Add/Edit Inventory Item</h2>
-            <button onClick={onClose}>✕</button>
+            <h2 className="text-xl font-semibold">
+              Add/Edit Inventory Item
+            </h2>
+            <button onClick={onClose}>
+              ✕
+            </button>
           </div>
 
           <div className="space-y-3">
@@ -75,10 +100,18 @@ export default function AddStockModal({
               <select
                 className="w-full border rounded-md p-2"
                 value={form.category}
-                onChange={(e) => handleChange("category", e.target.value)}
+                onChange={(e) =>
+                  handleChange(
+                    "category",
+                    e.target.value
+                  )
+                }
               >
                 {categories.map((cat) => (
-                  <option key={cat} value={cat}>
+                  <option
+                    key={cat}
+                    value={cat}
+                  >
                     {cat}
                   </option>
                 ))}
@@ -86,45 +119,83 @@ export default function AddStockModal({
             </div>
 
             <div>
-              <Label>Batch/Lot Number</Label>
-              <Input disabled value="76890" />
+              <Label>
+                Batch/Lot Number
+              </Label>
+              <Input
+                disabled
+                value={
+                  form.batchNumber
+                }
+              />
             </div>
 
             <div>
               <Label>Item Name</Label>
               <Input
                 value={form.name}
-                onChange={(e) => handleChange("name", e.target.value)}
+                onChange={(e) =>
+                  handleChange(
+                    "name",
+                    e.target.value
+                  )
+                }
               />
             </div>
 
             <div>
-              <Label>Description</Label>
+              <Label>
+                Description
+              </Label>
               <Input
-                value={form.description}
-                onChange={(e) => handleChange("description", e.target.value)}
+                value={
+                  form.description
+                }
+                onChange={(e) =>
+                  handleChange(
+                    "description",
+                    e.target.value
+                  )
+                }
               />
             </div>
 
             <div>
               <Label>Supplier</Label>
               <Input
-                value={form.supplier}
-                onChange={(e) => handleChange("supplier", e.target.value)}
+                value={
+                  form.supplier
+                }
+                onChange={(e) =>
+                  handleChange(
+                    "supplier",
+                    e.target.value
+                  )
+                }
               />
             </div>
 
             <div>
-              <Label>Unit Of Measurement</Label>
+              <Label>
+                Unit Of Measurement
+              </Label>
               <select
                 className="w-full border rounded-md p-2"
-                value={form.unitOfMeasurement}
+                value={
+                  form.unitOfMeasurement
+                }
                 onChange={(e) =>
-                  handleChange("unitOfMeasurement", e.target.value)
+                  handleChange(
+                    "unitOfMeasurement",
+                    e.target.value
+                  )
                 }
               >
                 {units.map((unit) => (
-                  <option key={unit} value={unit}>
+                  <option
+                    key={unit}
+                    value={unit}
+                  >
                     {unit}
                   </option>
                 ))}
@@ -132,28 +203,43 @@ export default function AddStockModal({
             </div>
 
             <div>
-              <Label>Expiry Date</Label>
+              <Label>
+                Expiry Date
+              </Label>
               <Input
                 type="date"
-                onChange={(e) => handleChange("expiryDate", e.target.value)}
+                onChange={(e) =>
+                  handleChange(
+                    "expiryDate",
+                    e.target.value
+                  )
+                }
               />
             </div>
           </div>
 
           {error && (
-            <p className="text-red-500 text-sm mb-2">{error}</p>
+            <p className="text-red-500 text-sm mb-2">
+              {error}
+            </p>
           )}
 
           <div className="flex justify-end gap-3 pt-4">
-            <Button variant="outline" onClick={onClose}>
+            <Button
+              variant="outline"
+              onClick={onClose}
+            >
               Cancel
             </Button>
+
             <Button
               onClick={handleSubmit}
               disabled={loading}
               className="bg-[#5B5AF7]"
             >
-              {loading ? "Adding..." : "Add Stock"}
+              {loading
+                ? "Adding..."
+                : "Add Stock"}
             </Button>
           </div>
         </div>
