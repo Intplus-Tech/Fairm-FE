@@ -92,7 +92,7 @@ export default function Dashboard() {
       <TopInfo data={data} userName={userName} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <MortalityChart data={mortalityChartData} />
+        <MortalityChart  />
         <EggProductionChart data={eggProductionChartData} />
       </div>
 

@@ -7,15 +7,19 @@ import CollectionIssues from "@/components/egg-production/CollectionIssues";
 import EggCollectionTable from "@/components/egg-production/EggCollectionTable";
 import PageNavigation from "@/components/egg-production/PageNavigation";
 import PhotosEvidence from "@/components/egg-production/PhotosEvidence";
+
 import { useEffect, useState } from "react";
 import { uploadFileService } from "../../../../services/uploadFile.service";
 import {
   CollectionIssuesType,
   EggProductionRequest,
 } from "@/types/egg-production";
+
 import { eggProductionService } from "../../../../services/egg-production.service";
 import { pensService } from "../../../../services/pen.service";
 import { PenResponse } from "@/types/pen";
+
+import { toast } from "sonner";
 
 type EggSlot = { goodEggs: number; defectEggs: number };
 
@@ -36,9 +40,9 @@ export default function EggProductionPage() {
   >([]);
   const [photosEvidences, setPhotosEvidences] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
+
   const { setFlow } = useEntryFlow();
   const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchPens = async () => {
@@ -54,29 +58,36 @@ export default function EggProductionPage() {
             twoPm: emptySlot(),
           }))
         );
-      } catch (err) {
-        console.error("Failed to fetch pens:", err);
-        setError("Failed to load pens");
+      } catch (err: any) {
+        toast.error(err.message || "Failed to load pens");
       }
     };
 
     fetchPens();
   }, []);
 
-  const handlePhotoUpload = async (files: FileList | null) => {
-    if (!files || files.length === 0) return;
+  // ✅ PHOTO UPLOAD
+const handlePhotoUpload = async (files: FileList | null) => {
+  if (!files || files.length === 0) return;
 
-    try {
-      const uploadedFiles = await uploadFileService.create(files);
-      const uploadedUrls = uploadedFiles.map((file) => file.url);
+  try {
+    const uploadedFiles = await uploadFileService.create(files);
 
-      setPhotosEvidences((prev) => [...prev, ...uploadedUrls]);
-    } catch (error) {
-      console.error("Photo upload failed:", error);
-      alert("Failed to upload photo(s)");
-    }
-  };
+    // Ensure uploadedFiles is always treated as an array
+    const uploadedArray = Array.isArray(uploadedFiles)
+      ? uploadedFiles
+      : [uploadedFiles];
 
+    const uploadedUrls = uploadedArray.map((file) => file.url);
+
+    setPhotosEvidences((prev) => [...prev, ...uploadedUrls]);
+
+    toast.success(`${uploadedUrls.length} file(s) uploaded successfully`);
+  } catch (error: any) {
+    toast.error(error.message || "Failed to upload photo(s)");
+  }
+};
+  // ✅ SAVE
   const handleSave = async () => {
     try {
       setSaving(true);
@@ -94,11 +105,11 @@ export default function EggProductionPage() {
         payloads.map((payload) => eggProductionService.create(payload))
       );
 
-      alert("Egg production data saved successfully!");
+      toast.success("Egg production saved successfully");
+
       router.push("/entry-officer/farm-gate-sales");
-    } catch (error) {
-      console.error("Failed to save egg production data:", error);
-      alert("Failed to save egg production data");
+    } catch (error: any) {
+      toast.error(error.message || "Failed to save data");
     } finally {
       setSaving(false);
     }
@@ -114,12 +125,10 @@ export default function EggProductionPage() {
   };
 
   return (
-    <div className=" mx-auto p-6 max-h-screen">
-      {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
-
-      {/* HEADER */}
+    <div className="mx-auto p-6 max-h-screen">
       <header className="bg-purple-600 text-white p-4 rounded-t-xl">
         <h1 className="text-xl font-bold">Daily Egg Production</h1>
+
         <p className="text-sm">
           {new Date().toLocaleDateString("en-US", {
             weekday: "long",
@@ -131,12 +140,10 @@ export default function EggProductionPage() {
       </header>
 
       <div className="bg-white rounded-b-2xl shadow-md p-6">
-        {/* TABLE */}
         <section className="mb-6 bg-white">
           <EggCollectionTable data={rows} onChange={setRows} />
         </section>
 
-        {/* FORM */}
         <section>
           <CollectionIssues
             value={collectionIssues}
@@ -148,7 +155,6 @@ export default function EggProductionPage() {
             onUpload={handlePhotoUpload}
           />
 
-          {/* ✅ UPDATED NAVIGATION */}
           <PageNavigation
             onSave={handleSave}
             loading={saving}

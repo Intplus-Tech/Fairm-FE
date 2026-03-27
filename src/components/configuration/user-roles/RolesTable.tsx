@@ -1,9 +1,9 @@
 export default function RolesTable() {
   const rows = [
     { feature: "Threshold Config", owner: "Full Access", admin: "Full Access", entry: "View Only" },
-    { feature: "Financial/Sales", owner: "Full Access", admin: "Edit / View", entry: "No Access" },
-    { feature: "Employee Management", owner: "Full Access", admin: "Edit / View", entry: "No Access" },
-    { feature: "Daily Farm Logs", owner: "View Only", admin: "Edit / View", entry: "Full Access" },
+    { feature: "Financial/Sales", owner: "Full Access", admin: "Edit", entry: "No Access" },
+    { feature: "Employee Management", owner: "Full Access", admin: "Edit", entry: "No Access" },
+    { feature: "Daily Farm Logs", owner: "View Only", admin: "Edit", entry: "Full Access" },
     { feature: "Inventory/Stock", owner: "View Only", admin: "Full Access", entry: "No Access" },
   ];
 

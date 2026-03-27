@@ -1,14 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-// import { useEntryFlow } from "@/context/entry-flow-context";
 
 import HealthObservation from "@/components/medication/HealthObservation";
 import MedicationActions from "@/components/medication/MedicationActions";
 import MedicationDetails from "@/components/medication/MedicationDetails";
 import MedicationHeader from "@/components/medication/MedicationHeader";
-// import TreatmentsTable from "@/components/medication/TreatmentsTable";
 import VaccinationSchedule from "@/components/medication/VaccinationSchedule";
+
 import type {
   AppliedType,
   MedicationRequest,
@@ -17,12 +16,14 @@ import type {
   VaccinationMethod,
   VaccinationType,
 } from "@/types/medication";
+
 import { useEffect, useMemo, useState } from "react";
 import { medicationService } from "../../../../services/medication.service";
 import { useEntryFlow } from "../../../../context/entry-flow-context";
 import { pensService } from "../../../../services/pen.service";
 import { PenResponse } from "@/types/pen";
 import TreatmentsTable from "@/components/medication/TreatmentsTable";
+import AddAnotherSales from "@/components/brand/AddAnotherSales";
 
 type TreatmentRow = {
   penId: string;
@@ -34,186 +35,243 @@ type TreatmentRow = {
   status: MedicationTreatmentStatus;
 };
 
+type MedicationForm = {
+  rows: TreatmentRow[];
+  medicationName: string;
+  expiryAt: string;
+  vaccineTypes: VaccinationType[];
+  otherVaccine: string;
+  vaccineDosage: number | "";
+  vaccineMethod: VaccinationMethod;
+  sicknessObserved: SicknessObserved[];
+  treatmentName: string;
+  applied: AppliedType;
+};
+
 export default function MedicationPage() {
   const [administeredBy, setAdministeredBy] = useState("");
   const [time, setTime] = useState("08:00");
-  const [rows, setRows] = useState<TreatmentRow[]>([]);
-  const [medicationName, setMedicationName] = useState("");
-  const [expiryAt, setExpiryAt] = useState("");
-  const [vaccineTypes, setVaccineTypes] = useState<VaccinationType[]>([]);
-  const [otherVaccine, setOtherVaccine] = useState("");
-  const [vaccineDosage, setVaccineDosage] = useState<number | "">(0);
-  const [vaccineMethod, setVaccineMethod] = useState<VaccinationMethod>("water");
-  const [sicknessObserved, setSicknessObserved] = useState<SicknessObserved[]>([]);
-  const [treatmentName, setTreatmentName] = useState("");
-  const [applied, setApplied] = useState<AppliedType>("no");
+
+  const [forms, setForms] = useState<MedicationForm[]>([]);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-    const { setFlow } = useEntryFlow();
+  const { setFlow } = useEntryFlow();
   const router = useRouter();
+
+  // Fetch pens once
+  const [pens, setPens] = useState<PenResponse[]>([]);
 
   useEffect(() => {
     const fetchPens = async () => {
       try {
         const penRes = await pensService.list();
-        setRows(
-          penRes.map((pen: PenResponse) => ({
-            penId: pen._id,
-            penLabel: pen.name ?? pen._id,
-            medication: "",
-            purpose: "",
-            dosage: 0,
-            method: "",
-            status: "pending" as MedicationTreatmentStatus,
-          }))
-        );
+        setPens(penRes);
+
+        // create first form
+        setForms([
+          {
+            rows: penRes.map((pen) => ({
+              penId: pen._id,
+              penLabel: pen.name ?? pen._id,
+              medication: "",
+              purpose: "",
+              dosage: 0,
+              method: "",
+              status: "pending",
+            })),
+            medicationName: "",
+            expiryAt: "",
+            vaccineTypes: [],
+            otherVaccine: "",
+            vaccineDosage: 0,
+            vaccineMethod: "water",
+            sicknessObserved: [],
+            treatmentName: "",
+            applied: "no",
+          },
+        ]);
       } catch (err) {
         console.error("Failed to fetch pens:", err);
         setError("Failed to load pens");
       }
     };
+
     fetchPens();
   }, []);
 
-  const validRows = useMemo(() => {
-    return rows.filter(
-      (row) =>
-        row.penId &&
-        row.medication.trim() &&
-        row.purpose.trim() &&
-        row.dosage !== "" &&
-        row.method.trim()
+  const handleAddSales = () => {
+    setForms((prev) => [
+      ...prev,
+      {
+        rows: pens.map((pen) => ({
+          penId: pen._id,
+          penLabel: pen.name ?? pen._id,
+          medication: "",
+          purpose: "",
+          dosage: 0,
+          method: "",
+          status: "pending",
+        })),
+        medicationName: "",
+        expiryAt: "",
+        vaccineTypes: [],
+        otherVaccine: "",
+        vaccineDosage: 0,
+        vaccineMethod: "water",
+        sicknessObserved: [],
+        treatmentName: "",
+        applied: "no",
+      },
+    ]);
+  };
+
+  const updateForm = (index: number, field: keyof MedicationForm, value: any) => {
+    setForms((prev) =>
+      prev.map((form, i) =>
+        i === index ? { ...form, [field]: value } : form
+      )
     );
-  }, [rows]);
+  };
 
   const handleSave = async () => {
-    if (validRows.length === 0) {
-      alert("Please complete at least one treatment row.");
-      return;
-    }
-
-    if (!medicationName.trim()) {
-      alert("Please enter medication name.");
-      return;
-    }
-
-    if (!expiryAt) {
-      alert("Please select medication expiry date.");
-      return;
-    }
-
     try {
       setLoading(true);
 
-      await Promise.all(
-        validRows.map((row) => {
-          const payload: MedicationRequest = {
-            penId: row.penId,
-            medication: row.medication,
-            purpose: row.purpose,
-            dosage: Number(row.dosage),
-            method: row.method,
-            status: row.status,
-            medicationDetails: {
-              name: medicationName,
-              expiryAt: new Date(expiryAt).toISOString(),
-            },
-            vaccinationSchedule: {
-              vaccineType: vaccineTypes,
-              dosage: Number(vaccineDosage || 0),
-              method: vaccineMethod,
-            },
-            treatment: {
-              sicknessObserved,
-              treatment: treatmentName,
-              applied,
-            },
-          };
+      for (const form of forms) {
+        const validRows = form.rows.filter(
+          (row) =>
+            row.penId &&
+            row.medication.trim() &&
+            row.purpose.trim() &&
+            row.dosage !== "" &&
+            row.method.trim()
+        );
 
-          return medicationService.create(payload);
-        })
-      );
+        await Promise.all(
+          validRows.map((row) => {
+            const payload: MedicationRequest = {
+              penId: row.penId,
+              medication: row.medication,
+              purpose: row.purpose,
+              dosage: Number(row.dosage),
+              method: row.method,
+              status: row.status,
+              medicationDetails: {
+                name: form.medicationName,
+                expiryAt: new Date(form.expiryAt).toISOString(),
+              },
+              vaccinationSchedule: {
+                vaccineType: form.vaccineTypes,
+                dosage: Number(form.vaccineDosage || 0),
+                method: form.vaccineMethod,
+              },
+              treatment: {
+                sicknessObserved: form.sicknessObserved,
+                treatment: form.treatmentName,
+                applied: form.applied,
+              },
+            };
 
-      alert("Medication treatment saved successfully!");
+            return medicationService.create(payload);
+          })
+        );
+      }
+
+      alert("Medication saved successfully!");
     } catch (error) {
-      console.error("Failed to save medication treatment:", error);
-      alert("Failed to save medication treatment.");
+      console.error(error);
+      alert("Failed to save medication");
     } finally {
       setLoading(false);
     }
   };
 
-  //   const handleNext = () => {
-  //   setFlow((prev: {medication: boolean}) => ({
-  //     ...prev,
-  //     medication: true,
-  //   }));
-
-  //   router.push("/entry-officer/duty-roaster");
-  // };
-
-  
   return (
-    <div className="min-h-screen  p-6">
-
-       {error && (
+    <div className="min-h-screen p-6">
+      {error && (
         <p className="text-red-500 text-sm mb-2">
           {error}
         </p>
       )}
 
-
-      <div className=" mx-auto ">
+      <div className="mx-auto">
         <MedicationHeader
           administeredBy={administeredBy}
           setAdministeredBy={setAdministeredBy}
           time={time}
           setTime={setTime}
         />
+
         <div className="bg-white space-y-6 p-6 rounded-b-md border">
-      <TreatmentsTable rows={rows} setRows={setRows} />
 
-        <MedicationDetails
-          medicationName={medicationName}
-          setMedicationName={setMedicationName}
-          expiryAt={expiryAt}
-          setExpiryAt={setExpiryAt}
-        />
+          {forms.map((form, index) => (
+            <div key={index} className="space-y-6">
 
-        <VaccinationSchedule
-          vaccineTypes={vaccineTypes}
-          setVaccineTypes={setVaccineTypes}
-          otherVaccine={otherVaccine}
-          setOtherVaccine={setOtherVaccine}
-          vaccineDosage={vaccineDosage}
-          setVaccineDosage={setVaccineDosage}
-          vaccineMethod={vaccineMethod}
-          setVaccineMethod={setVaccineMethod}
-        />
+              <TreatmentsTable
+                rows={form.rows}
+                setRows={(rows) => updateForm(index, "rows", rows)}
+              />
 
-        <HealthObservation
-          sicknessObserved={sicknessObserved}
-          setSicknessObserved={setSicknessObserved}
-          treatmentName={treatmentName}
-          setTreatmentName={setTreatmentName}
-          applied={applied}
-          setApplied={setApplied}
-        />
+              <MedicationDetails
+                medicationName={form.medicationName}
+                setMedicationName={(value) =>
+                  updateForm(index, "medicationName", value)
+                }
+                expiryAt={form.expiryAt}
+                setExpiryAt={(value) =>
+                  updateForm(index, "expiryAt", value)
+                }
+              />
 
-        <MedicationActions onSave={handleSave} loading={loading} />
-         </div>
-        <div className="flex justify-end">
-          {/* <button
-            onClick={handleNext}
-            className="bg-indigo-600 text-white px-6 py-2 rounded-lg"
-          >
-            Next: Duty Roaster →
-          </button> */}
+              <VaccinationSchedule
+                vaccineTypes={form.vaccineTypes}
+                setVaccineTypes={(value) =>
+                  updateForm(index, "vaccineTypes", value)
+                }
+                otherVaccine={form.otherVaccine}
+                setOtherVaccine={(value) =>
+                  updateForm(index, "otherVaccine", value)
+                }
+                vaccineDosage={form.vaccineDosage}
+                setVaccineDosage={(value) =>
+                  updateForm(index, "vaccineDosage", value)
+                }
+                vaccineMethod={form.vaccineMethod}
+                setVaccineMethod={(value) =>
+                  updateForm(index, "vaccineMethod", value)
+                }
+              />
+
+              <HealthObservation
+                sicknessObserved={form.sicknessObserved}
+                setSicknessObserved={(value) =>
+                  updateForm(index, "sicknessObserved", value)
+                }
+                treatmentName={form.treatmentName}
+                setTreatmentName={(value) =>
+                  updateForm(index, "treatmentName", value)
+                }
+                applied={form.applied}
+                setApplied={(value) =>
+                  updateForm(index, "applied", value)
+                }
+              />
+
+            </div>
+          ))}
+
+          <div className="flex items-center justify-center">
+            <AddAnotherSales onClick={handleAddSales} />
+          </div>
+
+          <MedicationActions
+            onSave={handleSave}
+            loading={loading}
+          />
         </div>
-
       </div>
-
     </div>
   );
 }
