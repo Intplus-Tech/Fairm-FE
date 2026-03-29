@@ -13,26 +13,32 @@ export interface DashboardData {
     totalLiveBirds: number;
     totalMortality: number;
     farmStaff: number;
-    activeBreaches: number;
+    activeThresholds: number;
   };
   charts: {
     mortalityRate: {
       _id: string;
+      date: string;
       mortalityRate: number | null;
     }[];
     eggProduction: {
       _id: string;
-      penId: string;
-      eggsProduced: number;
+      totalEggs: number;
+      date: string;
     }[];
     eggHealth: {
       _id: string;
-      penId: string;
+      goodEggs: number;
+      defectEggs: number;
+      date: string;
     }[];
   };
-  alerts: Alert[];
+  alerts: Alert[] | null;
 }
 
+/* =======================
+   ALERT (BACKEND)
+======================= */
 export interface Alert {
   _id: string;
   farmId?: string;
@@ -71,6 +77,6 @@ export interface Alert {
 export const dashboardService = {
   async getAdminDashboard(): Promise<DashboardData> {
     const res = await api.get<DashboardApiResponse>("/admin/dashboard");
-    return res.data.data; // ✅ correct extraction
+    return res.data.data;
   },
 };

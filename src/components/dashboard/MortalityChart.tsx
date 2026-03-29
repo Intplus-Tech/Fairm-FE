@@ -12,7 +12,6 @@ import {
 
 import ChartCard from "./ChartCard";
 import { dashboardService } from "../../../services/dashboard.service";
-// import { dashboardService } from "@/services/dashboard.service";
 
 type MortalityChartItem = {
   day: string;
@@ -22,26 +21,21 @@ type MortalityChartItem = {
 export default function MortalityChart() {
   const [data, setData] = useState<MortalityChartItem[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
         setLoading(true);
-        setError(null);
 
         const res = await dashboardService.getAdminDashboard();
 
-        const formatted: MortalityChartItem[] =
-          res.charts.mortalityRate.map((item) => ({
-            day: item._id,
+        const formatted =
+          (res.charts?.mortalityRate ?? []).map((item) => ({
+            day: item.date,
             value: item.mortalityRate ?? 0,
           }));
 
         setData(formatted);
-      } catch (err) {
-        console.error("Failed to fetch mortality chart:", err);
-        setError("Failed to load mortality chart");
       } finally {
         setLoading(false);
       }
@@ -63,10 +57,6 @@ export default function MortalityChart() {
         {loading ? (
           <div className="flex items-center justify-center h-full">
             Loading...
-          </div>
-        ) : error ? (
-          <div className="flex items-center justify-center h-full text-red-500">
-            {error}
           </div>
         ) : (
           <ResponsiveContainer width="100%" height="100%">

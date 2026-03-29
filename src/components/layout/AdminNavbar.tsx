@@ -1,12 +1,23 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Bell, Search, Menu, User, LogOut, Plus, ChevronDown } from "lucide-react";
+import {
+  Bell,
+  Search,
+  Menu,
+  User,
+  LogOut,
+  Plus,
+  ChevronDown,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { useLayout } from "../../../context/layout-context";
 import Logo from "@/components/brand/logo";
 import Word from "../brand/word";
+
+import { Flock } from "@/types/flock.types";
+import { flockService } from "../../../services/flock.service";
 
 export default function AdminNavbar() {
   const { dispatch } = useLayout();
@@ -20,27 +31,26 @@ export default function AdminNavbar() {
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const farmDropdownRef = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLDivElement>(null);
 
-  // Mock farms (until endpoint is ready)
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<Flock[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+
+  // Mock farms
   const farms = ["Abuja farm", "Lagos farm", "Ibadan farm"];
-
-  
 
   // Close dropdowns when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsDropdownOpen(false);
       }
-
-      if (
-        farmDropdownRef.current &&
-        !farmDropdownRef.current.contains(event.target as Node)
-      ) {
+      if (farmDropdownRef.current && !farmDropdownRef.current.contains(event.target as Node)) {
         setIsFarmDropdownOpen(false);
+      }
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setSearchResults([]);
       }
     }
 
@@ -48,10 +58,31 @@ export default function AdminNavbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Debounced search
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setIsSearching(true);
+      try {
+        const res = await flockService.searchFlocks(searchQuery, 1, 5);
+        setSearchResults(res.data);
+      } catch (err) {
+        console.error("Search error:", err);
+        setSearchResults([]);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
   const handleLogout = () => {
     setIsLoggingOut(true);
-
-    // simulate logout cleanup
     setTimeout(() => {
       router.push("/auth/login");
     }, 500);
@@ -60,7 +91,6 @@ export default function AdminNavbar() {
   const handleAddNewPen = () => {
     window.dispatchEvent(new CustomEvent("open-add-pen-modal"));
   };
-
 
   const handleFarmSelect = (farm: string) => {
     setSelectedFarm(farm);
@@ -86,16 +116,44 @@ export default function AdminNavbar() {
       </div>
 
       {/* SEARCH */}
-      <div className="hidden md:flex flex-1 px-4 max-w-[290px]">
+      <div className="hidden md:flex flex-1 px-4 max-w-[290px]" ref={searchRef}>
         <div className="relative w-full">
           <Search
             className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground"
             size={18}
           />
           <input
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search for Flocks , Pen or Inventory"
             className="w-full h-[44px] pl-12 pr-4 rounded-xl bg-[#EFEFEF] outline-none transition-all focus:ring-2 focus:ring-primary/50"
           />
+
+          {/* Search results dropdown */}
+          {searchResults.length > 0 && (
+            <div className="absolute top-full mt-1 w-full bg-white border rounded-lg shadow z-50 max-h-60 overflow-auto">
+              {searchResults.map((flock) => (
+                <div
+                  key={flock._id}
+                  className="px-3 py-2 hover:bg-gray-100 cursor-pointer truncate"
+                  onClick={() => {
+                    console.log("Selected:", flock);
+                    setSearchQuery("");
+                    setSearchResults([]);
+                  }}
+                >
+                  {flock.name} - {flock.birdType} ({flock.noOfBirds})
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Searching state */}
+          {isSearching && (
+            <div className="absolute top-full mt-1 w-full bg-white border rounded-lg shadow z-50 px-3 py-2 text-sm text-gray-500">
+              Searching...
+            </div>
+          )}
         </div>
       </div>
 
