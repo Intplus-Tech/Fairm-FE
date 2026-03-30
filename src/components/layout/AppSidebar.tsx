@@ -9,6 +9,8 @@ import {
   Wallet,
   Settings,
   ChevronDown,
+ 
+  // MessageCircle,
 } from "lucide-react";
 import { useLayout } from "../../../context/layout-context";
 import { useEffect, useState } from "react";
@@ -16,11 +18,14 @@ import { useEffect, useState } from "react";
 import { getStoredUser } from "@/lib/auth/getUser";
 import { isAdmin } from "@/lib/auth/role";
 import AskFairmAIButton from "../dashboard/AskFairmAIButton";
+import { FaWhatsapp } from "react-icons/fa6";
+
 
 const ACTIVE_COLOR = "#4A3AFF";
 
 type Props = {
   onOpenAI: () => void;
+  onOpenWhatsApp: () => void;
 };
 
 const menu = [
@@ -36,7 +41,7 @@ const birdSubMenu = [
   { label: "Historical Archives", href: "/bird/archives" },
 ];
 
-export default function AppSidebar({ onOpenAI }: Props) {
+export default function AppSidebar({ onOpenAI, onOpenWhatsApp }: Props) {
   const pathname = usePathname();
   const router = useRouter();
   const { state, dispatch } = useLayout();
@@ -115,14 +120,10 @@ export default function AppSidebar({ onOpenAI }: Props) {
             style={{ color: birdOpen ? ACTIVE_COLOR : undefined }}
           >
             <Users size={18} />
-            <span className="flex-1 text-sm font-medium">
-              Bird Management
-            </span>
+            <span className="flex-1 text-sm font-medium">Bird Management</span>
             <ChevronDown
               size={16}
-              className={`transition-transform ${
-                birdOpen ? "rotate-180" : ""
-              }`}
+              className={`transition-transform ${birdOpen ? "rotate-180" : ""}`}
             />
           </button>
 
@@ -130,16 +131,13 @@ export default function AppSidebar({ onOpenAI }: Props) {
             <div className="ml-8 space-y-1">
               {birdSubMenu.map((item) => {
                 const isActive = pathname === item.href;
-
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
                     onClick={() => dispatch({ type: "CLOSE" })}
                     className="block px-3 py-2 text-sm text-gray-600"
-                    style={{
-                      color: isActive ? ACTIVE_COLOR : undefined,
-                    }}
+                    style={{ color: isActive ? ACTIVE_COLOR : undefined }}
                   >
                     {item.label}
                   </Link>
@@ -153,26 +151,21 @@ export default function AppSidebar({ onOpenAI }: Props) {
             const isActive =
               pathname === item.href ||
               pathname.startsWith(item.href + "/");
-
             return (
               <Link
                 key={item.href}
                 href={item.href}
                 onClick={() => dispatch({ type: "CLOSE" })}
                 className="flex items-center gap-3 px-3 py-3 rounded-md text-gray-600"
-                style={{
-                  color: isActive ? ACTIVE_COLOR : undefined,
-                }}
+                style={{ color: isActive ? ACTIVE_COLOR : undefined }}
               >
                 <item.icon size={18} />
-                <span className="text-sm font-medium">
-                  {item.label}
-                </span>
+                <span className="text-sm font-medium">{item.label}</span>
               </Link>
             );
           })}
 
-          {/* ADMIN ONLY ENTRY OFFICER PAGE */}
+          {/* ADMIN ONLY — ENTRY OFFICER */}
           {isAdminUser && (
             <button
               onClick={() => {
@@ -182,17 +175,27 @@ export default function AppSidebar({ onOpenAI }: Props) {
               className="flex items-center gap-3 px-3 py-3 rounded-md text-gray-600 w-full text-left"
               style={{
                 color:
-                  pathname === "/entry-officer"
-                    ? ACTIVE_COLOR
-                    : undefined,
+                  pathname === "/entry-officer" ? ACTIVE_COLOR : undefined,
               }}
             >
               <User size={18} />
-              <span className="text-sm font-medium">
-                Entry Officer
-              </span>
+              <span className="text-sm font-medium">Entry Officer</span>
             </button>
           )}
+
+          {/* WHATSAPP CONNECT BUTTON */}
+          <button
+            onClick={() => {
+              dispatch({ type: "CLOSE" });
+              onOpenWhatsApp();
+            }}
+            className="w-full flex items-center gap-3 px-3 py-3 rounded-md text-gray-600 hover:text-[#25D366] transition-colors"
+          >
+            {/* <MessageCircle size={18} /> */}
+          <FaWhatsapp size={24} className="text-green-500" />
+            <span className="text-sm font-medium">Connect WhatsApp</span>
+          </button>
+
         </nav>
 
         {/* ASK FAIRM AI BUTTON */}
