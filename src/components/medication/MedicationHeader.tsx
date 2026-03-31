@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { getStoredUser } from "@/lib/auth/getUser";
 
 type Props = { 
   administeredBy: string;
@@ -16,16 +17,26 @@ export default function MedicationHeader({
   setTime,
 }: Props) {
 
-  // Update time every second in HH:MM format
   useEffect(() => {
-    const timer = setInterval(() => {
+    // Auto set logged in user (backend)
+    const user = getStoredUser();
+    if (user?.fullName) {
+      setAdministeredBy(user.fullName);
+    }
+
+    // Update time automatically
+    const updateTime = () => {
       const now = new Date();
-      const formattedTime = now.toTimeString().slice(0,5); // "HH:MM"
+      const formattedTime = now.toTimeString().slice(0, 5); // HH:MM
       setTime(formattedTime);
-    }, 1000);
+    };
+
+    updateTime();
+
+    const timer = setInterval(updateTime, 60000);
 
     return () => clearInterval(timer);
-  }, [setTime]);
+  }, []); // ✅ FIXED
 
   return (
     <div className="rounded-t-xl bg-gradient-to-r from-indigo-600 to-purple-600 p-6 text-white shadow">
@@ -52,6 +63,7 @@ export default function MedicationHeader({
               onChange={(e) => setAdministeredBy(e.target.value)}
               className="text-black bg-white rounded px-2 py-1 text-sm"
             >
+              <option>{administeredBy}</option>
               <option>Ajewole Iyanuloluwa</option>
             </select>
           </div>

@@ -1,14 +1,24 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { getStoredUser } from "@/lib/auth/getUser";
 
 export default function DutyRosterHeader() {
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [administeredBy, setAdministeredBy] = useState("");
 
   // Update the date/time every second
   useEffect(() => {
     const timer = setInterval(() => setCurrentDate(new Date()), 1000);
     return () => clearInterval(timer);
+  }, []);
+
+  // Get logged-in user from backend
+  useEffect(() => {
+    const user = getStoredUser();
+    if (user?.fullName) {
+      setAdministeredBy(user.fullName);
+    }
   }, []);
 
   // Format date like "Saturday, January 31, 2026"
@@ -34,8 +44,12 @@ export default function DutyRosterHeader() {
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2">
           <span>Administered By</span>
-          <select className="text-black bg-white rounded px-2 py-1">
-            <option>Select</option>
+          <select
+            value={administeredBy}
+            onChange={(e) => setAdministeredBy(e.target.value)}
+            className="text-black bg-white rounded px-2 py-1"
+          >
+            <option>{administeredBy || "Select"}</option>
           </select>
         </div>
 

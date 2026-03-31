@@ -24,12 +24,12 @@ export default function AddEmployeeModal({
     firstName: "",
     lastName: "",
     email: "",
-    age: 0,
+    age: "" as unknown as number,
     departmentId: "",
     positionId: "",
     dob: new Date(),
-    phoneNumber: 0,
-    salary: 0,
+    phoneNumber: "" as unknown as number,
+    salary: "" as unknown as number,
   });
 
   const [departments, setDepartments] = useState<DepartmentResponse[]>([]);
@@ -73,7 +73,12 @@ export default function AddEmployeeModal({
       setLoading(true);
       setError(null);
 
-      await employeeService.create(form);
+      await employeeService.create({
+        ...form,
+        age: Number(form.age),
+        salary: Number(form.salary),
+        phoneNumber: Number(form.phoneNumber),
+      });
 
       toast.success("Employee added successfully 🎉", {
         duration: 3000,
@@ -122,7 +127,7 @@ export default function AddEmployeeModal({
             <h3 className="font-semibold text-sm">Basic Information</h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1">
+              <div className="space-y-2">
                 <Label>First Name</Label>
                 <Input
                   placeholder="John"
@@ -131,7 +136,7 @@ export default function AddEmployeeModal({
                 />
               </div>
 
-              <div className="space-y-1">
+              <div className="space-y-2">
                 <Label>Last Name</Label>
                 <Input
                   placeholder="Doe"
@@ -140,7 +145,7 @@ export default function AddEmployeeModal({
                 />
               </div>
 
-              <div className="space-y-1">
+              <div className="space-y-2">
                 <Label>Email</Label>
                 <Input
                   type="email"
@@ -150,26 +155,27 @@ export default function AddEmployeeModal({
                 />
               </div>
 
-              <div className="space-y-1">
+              <div className="space-y-2">
                 <Label>Phone Number</Label>
                 <Input
                   placeholder="080xxxxxxxx"
-                  value={form.phoneNumber}
+                  value={form.phoneNumber || ""}
                   onChange={(e) =>
-                    handleChange("phoneNumber", Number(e.target.value))
+                    handleChange("phoneNumber", e.target.value)
                   }
                 />
               </div>
 
-              <div className="space-y-1">
-                <Label>Age</Label>
+             <div className="space-y-2">
+               <Label>Age</Label>
                 <Input
-                  type="number"
-                  placeholder="35"
-                  value={form.age}
-                  onChange={(e) => handleChange("age", Number(e.target.value))}
-                />
-              </div>
+                type="number"
+               placeholder="Enter age"
+              value={form.age || ""}
+              className="no-spinner"
+             onChange={(e) => handleChange("age", e.target.value)}
+               />
+          </div>
             </div>
           </section>
 
@@ -178,7 +184,7 @@ export default function AddEmployeeModal({
             <h3 className="font-semibold text-sm">Role Information</h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1">
+              <div className="space-y-2">
                 <Label>Department</Label>
                 <select
                   className="w-full border rounded-md p-2"
@@ -196,7 +202,7 @@ export default function AddEmployeeModal({
                 </select>
               </div>
 
-              <div className="space-y-1">
+              <div className="space-y-2">
                 <Label>Position</Label>
                 <select
                   className="w-full border rounded-md p-2"
@@ -212,18 +218,16 @@ export default function AddEmployeeModal({
                 </select>
               </div>
 
-              <div className="space-y-1">
+              <div className="space-y-2">
                 <Label>Salary</Label>
                 <Input
-                  placeholder="₦120,000"
-                  value={form.salary}
-                  onChange={(e) =>
-                    handleChange("salary", Number(e.target.value))
-                  }
+                  placeholder="Amount in Naira"
+                  value={form.salary || ""}
+                  onChange={(e) => handleChange("salary", e.target.value)}
                 />
               </div>
 
-              <div className="space-y-1">
+              <div className="space-y-2">
                 <Label>Employee ID</Label>
                 <Input disabled value="Auto-generated" />
               </div>

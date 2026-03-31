@@ -4,13 +4,16 @@ import { useState, useMemo, useEffect } from "react";
 import BroilerRow from "./BroilerRow";
 import Pagination from "./Pagination";
 import { BroilerRowData } from "@/types/broiler";
+import { Pen } from "../../../../services/broiler.service";
+// import { Pen } from "@/services/broiler.service";
 
 interface Props {
   search: string;
   data: BroilerRowData[];
+  pens: Pen[];
 }
 
-export default function BroilerTable({ search, data }: Props) {
+export default function BroilerTable({ search, data, pens }: Props) {
   const [page, setPage] = useState(1);
   const rowsPerPage = 5;
 
@@ -20,9 +23,7 @@ export default function BroilerTable({ search, data }: Props) {
 
   const filteredData = useMemo(() => {
     return data.filter((row) =>
-      `${row.id} ${row.date} ${row.pens} ${row.stock} ${row.mortality} ${row.culls} ${row.feed} ${row.water} ${row.weight} ${row.alert}`
-        .toLowerCase()
-        .includes(search.toLowerCase())
+      `${row.id} ${row.date}`.toLowerCase().includes(search.toLowerCase())
     );
   }, [search, data]);
 
@@ -53,17 +54,9 @@ export default function BroilerTable({ search, data }: Props) {
           </thead>
 
           <tbody>
-            {paginatedData.length > 0 ? (
-              paginatedData.map((row) => (
-                <BroilerRow key={row.id} row={row} />
-              ))
-            ) : (
-              <tr>
-                <td colSpan={10} className="text-center py-10 text-gray-400">
-                  No results found
-                </td>
-              </tr>
-            )}
+            {paginatedData.map((row) => (
+              <BroilerRow key={row.id} row={row} pens={pens} />
+            ))}
           </tbody>
         </table>
       </div>

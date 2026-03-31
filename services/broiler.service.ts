@@ -46,6 +46,7 @@ export interface BroilerDashboardResponse {
     netProfit: number;
   };
   rows: BroilerRowData[];
+  pens: Pen[];
 }
 
 /* =======================
@@ -67,23 +68,19 @@ export const broilerService = {
         netProfit: 0,
       },
 
+      pens: payload?.pens ?? [],
+
       rows:
         payload?.pens.map((pen): BroilerRowData => ({
           id: pen.penId,
-
-          // ✅ Backend DOES NOT GIVE THESE → derive safely
           date: new Date().toISOString().split("T")[0],
           pens: payload.pens.length,
           stock: pen.liveBirds,
-
           mortality: pen.mortality,
           culls: pen.culls,
           feed: pen.feedConsumed,
           water: pen.waterConsumed,
-
           weight: pen.averageWeight,
-
-          // ✅ SIMPLE LOGIC (you can improve later)
           alert: pen.mortality > 10 ? "Critical" : "Warning",
         })) ?? [],
     };

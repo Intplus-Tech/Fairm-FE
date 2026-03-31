@@ -16,8 +16,11 @@ export default function StockReport() {
     const fetchInventory = async () => {
       try {
         setLoading(true);
-        const data = await inventoriesService.list();
-        setRows(data);
+
+        const res = await inventoriesService.list();
+
+        // ✅ FIXED HERE
+        setRows(res.data);
       } catch (error) {
         console.error("Failed to fetch inventory", error);
       } finally {
@@ -31,7 +34,11 @@ export default function StockReport() {
   const filteredRows =
     filter === "All"
       ? rows
-      : rows.filter((row) => row.category?.toLowerCase() === filter.toLowerCase());
+      : rows.filter(
+          (row) =>
+            row.category?.toLowerCase() ===
+            filter.toLowerCase()
+        );
 
   const handleExport = () => {
     const headers = [
@@ -54,16 +61,19 @@ export default function StockReport() {
       "230000",
     ]);
 
-    const csvContent =
-      [headers, ...csvRows]
-        .map((e) => e.join(","))
-        .join("\n");
+    const csvContent = [headers, ...csvRows]
+      .map((e) => e.join(","))
+      .join("\n");
 
-    const blob = new Blob([csvContent], { type: "text/csv" });
+    const blob = new Blob([csvContent], {
+      type: "text/csv",
+    });
 
-    const url = window.URL.createObjectURL(blob);
+    const url =
+      window.URL.createObjectURL(blob);
 
-    const a = document.createElement("a");
+    const a =
+      document.createElement("a");
     a.href = url;
     a.download = "stock-report.csv";
     a.click();
@@ -81,9 +91,12 @@ export default function StockReport() {
 
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="font-semibold">Stock Report</h2>
+          <h2 className="font-semibold">
+            Stock Report
+          </h2>
           <p className="text-sm text-muted-foreground">
-            This table allows you to audit the movement of resources.
+            This table allows you to audit the
+            movement of resources.
           </p>
         </div>
       </div>
@@ -120,7 +133,10 @@ export default function StockReport() {
           </button>
         </div>
 
-        <Button variant="outline" onClick={handleExport}>
+        <Button
+          variant="outline"
+          onClick={handleExport}
+        >
           Export CSV
         </Button>
       </div>
@@ -129,7 +145,9 @@ export default function StockReport() {
         <table className="w-full text-sm">
           <thead className="border-b">
             <tr className="text-left text-muted-foreground">
-              <th className="py-3">Category</th>
+              <th className="py-3">
+                Category
+              </th>
               <th>Item Name</th>
               <th>Opening Stock</th>
               <th>Stock In</th>
@@ -141,8 +159,13 @@ export default function StockReport() {
 
           <tbody>
             {filteredRows.map((row) => (
-              <tr key={row._id} className="border-b last:border-0">
-                <td className="py-3">{row.category}</td>
+              <tr
+                key={row._id}
+                className="border-b last:border-0"
+              >
+                <td className="py-3">
+                  {row.category}
+                </td>
                 <td>{row.name}</td>
                 <td>-</td>
                 <td>-</td>
@@ -154,7 +177,11 @@ export default function StockReport() {
           </tbody>
         </table>
 
-        <Pagination page={page} totalPages={5} onChange={setPage} />
+        <Pagination
+          page={page}
+          totalPages={5}
+          onChange={setPage}
+        />
       </div>
     </div>
   );

@@ -1,7 +1,6 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-// import { useEntryFlow } from "@/context/entry-flow-context";
 
 import ActionButtons from "@/components/farm-gate-sales/ActionButtons";
 import EggSalesTable from "@/components/farm-gate-sales/EggSalesTable";
@@ -16,60 +15,69 @@ import { farmGateSaleService } from "../../../../services/farm-gate-sales.servic
 import { useEntryFlow } from "../../../../context/entry-flow-context";
 import { usersService } from "../../../../services/user.service";
 import { User } from "@/types/user";
+import AddAnotherSales from "@/components/brand/AddAnotherSales";
+
+const defaultSale: FarmGateSaleRequest = {
+  customerType: "manager",
+  customerName: "",
+  contact: "",
+  paymentMethod: "cash",
+  eggSalesGrade: {
+    pulletGradeA: {
+      quantity: Number(0),
+      price: Number(0),
+      total: Number(0),
+      notes: "",
+    },
+    mediumGradeB: {
+      quantity: Number(0),
+      price: Number(0),
+      total: Number(0),
+      notes: "",
+    },
+    smallGradeC: {
+      quantity: Number(0),
+      price: Number(0),
+      total: Number(0),
+      notes: "",
+    },
+    crackedDiscount: {
+      quantity: Number(0),
+      price: Number(0),
+      total: Number(0),
+      notes: "",
+    },
+  },
+  packingDetails: {
+    cratesUsed: Number(0),
+    sacksUsed: Number(0),
+    vehicle: "",
+    loadedAt: new Date(),
+    loadedBy: "",
+    verifiedBy: "",
+  },
+  paymentStatus: {
+    amountReceived: "",
+    balanceDue: "",
+    receipt: false,
+  },
+};
 
 export default function FarmGateSalesPage() {
   const [loading, setLoading] = useState(false);
-  const { setFlow } =useEntryFlow();
+  const { setFlow } = useEntryFlow();
   const router = useRouter();
-  const [users, setEmployees] = useState<User[]>([])
-    const [error, setError] = useState<string | null>(null);
 
-  const [saleData, setSaleData] = useState<FarmGateSaleRequest>({
-    customerType: "manager",
-    customerName: "",
-    contact: "",
-    paymentMethod: "cash",
-    eggSalesGrade: {
-      pulletGradeA: {
-        quantity: Number(0),
-        price: Number(0),
-        total: Number(0),
-        notes: "",
-      },
-      mediumGradeB: {
-        quantity: Number(0),
-        price: Number(0),
-        total: Number(0),
-        notes: "",
-      },
-      smallGradeC: {
-        quantity: Number(0),
-        price: Number(0),
-        total: Number(0),
-        notes: "",
-      },
-      crackedDiscount: {
-        quantity: Number(0),
-        price: Number(0),
-        total: Number(0),
-        notes: "",
-      },
-    },
-    packingDetails: {
-      cratesUsed: Number(0),
-      sacksUsed: Number(0),
-      vehicle: "",
-      loadedAt: new Date(),
-      loadedBy: "",
-      verifiedBy: "",
-    },
-    paymentStatus: {
-      amountReceived: "",
-      balanceDue: "",
-      receipt: false,
-    },
-  });
-  
+  const [users, setEmployees] = useState<User[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  // ✅ Dynamic Sales
+  const [sales, setSales] = useState<FarmGateSaleRequest[]>([defaultSale]);
+
+  const handleAddSales = () => {
+    setSales((prev) => [...prev, defaultSale]);
+  };
+
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -79,29 +87,30 @@ export default function FarmGateSalesPage() {
         console.error(err);
       }
     };
-  
+
     fetchUsers();
   }, []);
 
-  const updateField = <K extends keyof FarmGateSaleRequest>(
-    field: K,
-    value: FarmGateSaleRequest[K]
+  const updateField = (
+    index: number,
+    field: keyof FarmGateSaleRequest,
+    value: any
   ) => {
-    setSaleData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+    setSales((prev) =>
+      prev.map((sale, i) =>
+        i === index ? { ...sale, [field]: value } : sale
+      )
+    );
   };
 
   const handleSave = async () => {
     try {
       setLoading(true);
 
-      console.log(saleData)
+      for (const sale of sales) {
+        await farmGateSaleService.create(sale);
+      }
 
-      const createdSale = await farmGateSaleService.create(saleData);
-
-      console.log("Farm Sale Saved:", createdSale);
       alert("Farm gate sale created successfully");
       router.push("/entry-officer/lagos-transfer");
     } catch (error) {
@@ -114,7 +123,7 @@ export default function FarmGateSalesPage() {
   };
 
   function handleNext() {
-    setFlow((prev: {farm: boolean}) => ({
+    setFlow((prev: { farm: boolean }) => ({
       ...prev,
       farm: true,
     }));
@@ -123,37 +132,65 @@ export default function FarmGateSalesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen p-6">
+      <div className="mx-auto">
 
-      {error && (
-        <p className="text-red-500 text-sm mb-2">
-          {error}
-        </p>
-      )}
+        {error && (
+          <p className="text-red-500 text-sm mb-2">
+            {error}
+          </p>
+        )}
 
         <SaleHeader />
 
         <div className="bg-white p-6 rounded-b-xl shadow-sm border space-y-6">
 
-        
+          {sales.map((saleData, index) => (
+            <div key={index} className="space-y-6">
 
-      <SaleDetails saleData={saleData} updateField={updateField} />
+              <SaleDetails
+                saleData={saleData}
+                updateField={(field, value) =>
+                  updateField(index, field, value)
+                }
+              />
 
-      <EggSalesTable saleData={saleData} updateField={updateField} />
+              <EggSalesTable
+                saleData={saleData}
+                updateField={(field, value) =>
+                  updateField(index, field, value)
+                }
+              />
 
-      <PackagingDetails saleData={saleData} updateField={updateField} users={users} />
+              <PackagingDetails
+                saleData={saleData}
+                updateField={(field, value) =>
+                  updateField(index, field, value)
+                }
+                users={users}
+              />
 
-      <PaymentStatus saleData={saleData} updateField={updateField} />
+              <PaymentStatus
+                saleData={saleData}
+                updateField={(field, value) =>
+                  updateField(index, field, value)
+                }
+              />
 
-      <ActionButtons
-  onSave={handleSave}
-  onNext={handleNext}
-  loading={loading}
-/>
+            </div>
+          ))}
 
-       
-       </div>
+          <div className="flex items-center justify-center">
+            <AddAnotherSales onClick={handleAddSales} />
+          </div>
+
+          <ActionButtons
+            onSave={handleSave}
+            onNext={handleNext}
+            loading={loading}
+          />
+
+        </div>
       </div>
     </div>
   );

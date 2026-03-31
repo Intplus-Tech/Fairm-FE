@@ -1,43 +1,54 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState, Fragment } from "react";
 import { Button } from "@/components/ui/button";
 import Pagination from "../birds/broiler/Pagination";
+import { ChevronDown, ChevronUp } from "lucide-react";
+// import { inventoriesService } from "@/services/inventory.service";
+import { InventoryResponse } from "@/types/inventory";
+import { inventoriesService } from "../../../services/inventory.service";
 
 export default function DailyStockOutReport() {
-  const [open, setOpen] = useState<number | null>(1);
+  const [open, setOpen] = useState<string | null>(null);
   const [page, setPage] = useState(1);
-  const [filter, setFilter] = useState("All");
+  const [data, setData] = useState<InventoryResponse[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const data = [
-    { id: 1, name: "Disinfectant (5L)", category: "Product" },
-    { id: 2, name: "Starter Feed", category: "Feed" },
-    { id: 3, name: "Lasota Vaccine", category: "Vaccine" },
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await inventoriesService.dailyStockOut();
+        setData(res);
+      } catch (error) {
+        console.error("Stock out error:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const filteredData =
-    filter === "All"
-      ? data
-      : data.filter((item) => item.category === filter);
+    fetchData();
+  }, []);
 
   const handleExport = () => {
     const headers = [
       "Item Name",
-      "Batch",
+      "Batch/Lot#",
       "Category",
       "Unit Price",
-      "Total",
+      "Total Price",
       "Destination",
+      "Time Out",
     ];
 
-    const rows = filteredData.flatMap((item) =>
-      [1, 2, 3].map(() => [
+    const rows = data.flatMap((item) =>
+      [1, 2, 3, 4].map((i) => [
         item.name,
-        "3",
+        item.batchNumber,
         item.category,
-        "81",
-        "42",
-        "230",
+        "0",
+        "0",
+        "Farm",
+        new Date(item.createdAt).toLocaleTimeString(),
       ])
     );
 
@@ -55,96 +66,198 @@ export default function DailyStockOutReport() {
     window.URL.revokeObjectURL(url);
   };
 
+  if (loading) {
+    return <p>Loading stock out report...</p>;
+  }
+
   return (
     <div className="bg-white rounded-2xl p-6 space-y-4">
+      {/* header */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="font-semibold">Daily Stock Out Report</h2>
-          <p className="text-sm text-muted-foreground">
+          <h2 className="font-semibold text-lg">
+            Daily Stock Out Report
+          </h2>
+
+          <p className="text-sm text-gray-500">
             Track all outgoing inventory transactions
           </p>
         </div>
-      </div>
 
-      {/* filter and export section */}
-      <div className="flex justify-between items-center">
-        <div className="flex justify-between items-center bg-[#F1F1F1] p-2 gap-4">
-          <button
-            onClick={() => setFilter("All")}
-            className="text-sm text-[#000000] hover:bg-white p-2"
-          >
-            All
-          </button>
-
-          <button
-            onClick={() => setFilter("Feed")}
-            className="text-sm text-[#000000] hover:bg-white p-2"
-          >
-            Feed
-          </button>
-
-          <button
-            onClick={() => setFilter("Vaccine")}
-            className="text-sm text-[#000000] hover:bg-white p-2"
-          >
-            Vaccine
-          </button>
-
-          <button
-            onClick={() => setFilter("Product")}
-            className="text-sm text-[#000000] hover:bg-white p-2"
-          >
-            Product
-          </button>
-        </div>
-
-        <Button variant="outline" onClick={handleExport}>
+        <Button
+          variant="outline"
+          onClick={handleExport}
+          className="gap-2"
+        >
           Export CSV
         </Button>
       </div>
 
-      {filteredData.map((item) => (
-        <div key={item.id} className="border rounded-xl">
-          <button
-            onClick={() => setOpen(open === item.id ? null : item.id)}
-            className="w-full flex justify-between px-4 py-3"
-          >
-            <span>{item.name}</span>
-          </button>
+      {/* table */}
+      <div className="border rounded-xl overflow-hidden">
+        <table className="w-full text-sm">
+          <thead className="bg-gray-50 text-gray-600">
+            <tr>
+              <th className="px-4 py-3"></th>
+              <th className="text-left px-4 py-3">Date</th>
+              <th className="text-left px-4 py-3">
+                Item Dispatched
+              </th>
+              <th className="text-left px-4 py-3">
+                Total Value (₦)
+              </th>
+              <th className="text-left px-4 py-3">
+                Recipient Type
+              </th>
+              <th className="text-left px-4 py-3">
+                Authorised By
+              </th>
+            </tr>
+          </thead>
 
-          {open === item.id && (
-            <div className="max-h-48 overflow-y-auto scrollbar-hide">
-              <table className="w-full table-fixed text-sm">
-                <thead>
-                  <tr className="text-muted-foreground border-b">
-                    <th className="text-left px-6 py-3">Item Name</th>
-                    <th className="text-left px-6 py-3">Batch</th>
-                    <th className="text-left px-6 py-3">Category</th>
-                    <th className="text-left px-6 py-3">Unit Price</th>
-                    <th className="text-left px-6 py-3">Total</th>
-                    <th className="text-left px-6 py-3">Destination</th>
+          <tbody>
+            {data.map((row) => (
+              <Fragment key={row._id}>
+                <tr
+                  className={`border-t ${
+                    open === row._id ? "bg-[#F7F8FF]" : ""
+                  }`}
+                >
+                  <td className="px-4 py-3">
+                    <button
+                      onClick={() =>
+                        setOpen(
+                          open === row._id
+                            ? null
+                            : row._id
+                        )
+                      }
+                      className={`p-1 rounded ${
+                        open === row._id
+                          ? "bg-[#4A3AFF] text-white"
+                          : "bg-gray-100"
+                      }`}
+                    >
+                      {open === row._id ? (
+                        <ChevronUp size={16} />
+                      ) : (
+                        <ChevronDown size={16} />
+                      )}
+                    </button>
+                  </td>
+
+                  <td className="px-4 py-3">
+                    {new Date(
+                      row.createdAt
+                    ).toLocaleDateString()}
+                  </td>
+
+                  <td className="px-4 py-3">
+                    {row.name}
+                  </td>
+
+                  <td className="px-4 py-3">
+                    ₦0
+                  </td>
+
+                  <td className="px-4 py-3">
+                    Store
+                  </td>
+
+                  <td className="px-4 py-3">
+                    Admin
+                  </td>
+                </tr>
+
+                {/* expanded row */}
+                {open === row._id && (
+                  <tr className="bg-[#F7F8FF]">
+                    <td colSpan={6} className="p-4">
+                      <div className="bg-white rounded-xl border">
+                        <div className="px-4 py-3 font-medium border-b">
+                          Transaction Details
+                        </div>
+
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-sm">
+                            <thead className="bg-gray-50 text-gray-600">
+                              <tr>
+                                <th className="px-4 py-3 text-left">
+                                  Item Name
+                                </th>
+                                <th className="px-4 py-3 text-left">
+                                  Batch/Lot#
+                                </th>
+                                <th className="px-4 py-3 text-left">
+                                  Category
+                                </th>
+                                <th className="px-4 py-3 text-left">
+                                  Unit Price (₦)
+                                </th>
+                                <th className="px-4 py-3 text-left">
+                                  Total Price(₦)
+                                </th>
+                                <th className="px-4 py-3 text-left">
+                                  Destination
+                                </th>
+                                <th className="px-4 py-3 text-left">
+                                  Time Out
+                                </th>
+                              </tr>
+                            </thead>
+
+                            <tbody>
+                              {[1, 2, 3, 4].map((pen) => (
+                                <tr
+                                  key={pen}
+                                  className="border-t"
+                                >
+                                  <td className="px-4 py-3">
+                                    {row.name}
+                                  </td>
+                                  <td className="px-4 py-3">
+                                    {row.batchNumber}
+                                  </td>
+                                  <td className="px-4 py-3">
+                                    {row.category}
+                                  </td>
+                                  <td className="px-4 py-3">
+                                    0
+                                  </td>
+                                  <td className="px-4 py-3">
+                                    0
+                                  </td>
+                                  <td className="px-4 py-3">
+                                    Store
+                                  </td>
+                                  <td className="px-4 py-3">
+                                    {new Date(
+                                      row.createdAt
+                                    ).toLocaleTimeString()}
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </td>
                   </tr>
-                </thead>
+                )}
+              </Fragment>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-                <tbody>
-                  {[1, 2, 3].map((p) => (
-                    <tr key={p} className="border-b last:border-0">
-                      <td className="px-6 py-3">{item.name}</td>
-                      <td className="px-6 py-3">3</td>
-                      <td className="px-6 py-3">{item.category}</td>
-                      <td className="px-6 py-3">81</td>
-                      <td className="px-6 py-3">42</td>
-                      <td className="px-6 py-3">230</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      ))}
-
-      <Pagination page={page} totalPages={5} onChange={setPage} />
+      {/* pagination */}
+      <div className="flex justify-center">
+        <Pagination
+          page={page}
+          totalPages={5}
+          onChange={setPage}
+        />
+      </div>
     </div>
   );
 }

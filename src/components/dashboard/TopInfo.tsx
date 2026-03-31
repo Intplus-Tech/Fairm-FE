@@ -113,7 +113,7 @@ console.log("TopInfo farmStaff:", data);
           <div>
             <div className="flex items-center gap-2">
               <p className="text-[22px] font-bold">
-                {data?.stats.activeBreaches }
+                {data?.stats.activeThresholds}
               </p>
               <span className="text-[#FF0004] bg-[#FF00041A] text-[10px] p-1">
                 Critical

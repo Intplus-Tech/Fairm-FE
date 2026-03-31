@@ -17,7 +17,6 @@ export default function Dashboard() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // ✅ Initialize userName from localStorage immediately
   const [userName, setUserName] = useState(() => {
     const storedUser = getStoredUser();
     return storedUser?.fullName ?? "";
@@ -27,7 +26,6 @@ export default function Dashboard() {
     const fetchDashboard = async () => {
       try {
         const res = await dashboardService.getAdminDashboard();
-        console.log("Dashboard data:", res);
         setData(res);
       } catch (err) {
         console.error("Dashboard error:", err);
@@ -38,15 +36,14 @@ export default function Dashboard() {
 
     fetchDashboard();
 
-    // Optional: subscribe to storage events if user changes elsewhere
     const handleStorage = (e: StorageEvent) => {
       if (e.key === "fairm_user") {
         const updatedUser = getStoredUser();
         setUserName(updatedUser?.fullName ?? "");
       }
     };
-    window.addEventListener("storage", handleStorage);
 
+    window.addEventListener("storage", handleStorage);
     return () => window.removeEventListener("storage", handleStorage);
   }, []);
 
@@ -57,48 +54,47 @@ export default function Dashboard() {
   ======================= */
 
   const mortalityChartData =
-    data?.charts.mortalityRate.map((item, index) => ({
-      day: `Day ${index + 1}`,
+    (data?.charts?.mortalityRate ?? []).map((item) => ({
+      day: item.date,
       value: item.mortalityRate ?? 0,
-    })) || [];
+    }));
 
   const eggProductionChartData =
-    data?.charts.eggProduction.map((item, index) => ({
-      day: `Day ${index + 1}`,
-      value: item.eggsProduced,
-    })) || [];
+    (data?.charts?.eggProduction ?? []).map((item) => ({
+      day: item.date,
+      value: item.totalEggs,
+    }));
 
   const eggHealthChartData =
-    data?.charts.eggHealth.map((_, index) => ({
-      day: `Day ${index + 1}`,
-      good: 0,
-      cracked: 0,
+    (data?.charts?.eggHealth ?? []).map((item) => ({
+      day: item.date,
+      good: item.goodEggs,
+      cracked: item.defectEggs,
       soft: 0,
-    })) || [];
+    }));
 
   const alertsData: Alert[] =
-    data?.alerts.map((alert) => ({
+    (data?.alerts ?? []).map((alert) => ({
       id: alert._id,
       date: new Date(alert.createdAt).toLocaleDateString(),
       status:
         alert.mortalityRate.critical > 10 ? "Critical" : "Warning",
       issue: "Mortality Rate",
       description: `Warning at ${alert.mortalityRate.warning}%, Critical at ${alert.mortalityRate.critical}%`,
-    })) || [];
+    }));
 
   return (
     <div className="space-y-6 p-4">
-      {/* ✅ Pass correct userName */}
       <TopInfo data={data} userName={userName} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <MortalityChart data={mortalityChartData} />
+        <MortalityChart />
         <EggProductionChart data={eggProductionChartData} />
       </div>
 
       <EggHealthChart data={eggHealthChartData} />
 
-      <AlertsTable alerts={alertsData} />
+      <AlertsTable alerts={data?.alerts ?? null} />
     </div>
   );
 }

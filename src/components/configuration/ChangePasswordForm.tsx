@@ -84,36 +84,38 @@ export default function ChangePasswordForm() {
   const rules = checkRules(form.newPassword);
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off">
       <div>
         <h2 className="text-lg font-semibold">Change Password</h2>
       </div>
 
       {/* Email */}
-      <div className="space-y-1">
-        <label className="text-sm font-medium">Email</label>
-        <input
-          type="email"
-          placeholder="Enter your email address"
-          required
-          value={form.email}
-          onChange={(e) => handleChange("email", e.target.value)}
-          className="w-full rounded-lg border px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-        />
-      </div>
+      <div className="space-y-2">
+       <label className="text-sm font-medium">Email</label>
+  <input
+    type="email"
+    placeholder="Enter your email address"
+    required
+    autoComplete="off"
+    value={form.email}
+    onChange={(e) => handleChange("email", e.target.value)}
+    className="w-full rounded-lg border px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+  />
+</div>
 
       {/* Old Password */}
-      <div className="space-y-1">
-        <label className="text-sm font-medium">Old Password</label>
-        <div className="relative">
-          <input
-            type={showNew ? "text" : "password"}
-            placeholder="Enter your old password"
-            required
-            value={form.password}
-            onChange={(e) => handleChange("password", e.target.value)}
-            className="w-full rounded-lg border px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-          />
+      <div className="space-y-2">
+  <label className="text-sm font-medium">Old Password</label>
+  <div className="relative">
+    <input
+      type={showNew ? "text" : "password"}
+      placeholder="Enter your old password"
+      required
+      autoComplete="new-password"
+      value={form.password}
+      onChange={(e) => handleChange("password", e.target.value)}
+      className="w-full rounded-lg border px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+    />
           <button
             type="button"
             onClick={() => setShowNew(!showNew)}

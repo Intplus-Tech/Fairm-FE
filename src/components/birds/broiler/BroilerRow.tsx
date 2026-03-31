@@ -4,12 +4,15 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 import PenDetailsTable from "./PenDetailsTable";
 import { BroilerRowData } from "@/types/broiler";
+import { Pen } from "../../../../services/broiler.service";
+// import { Pen } from "@/services/broiler.service";
 
 interface BroilerRowProps {
   row: BroilerRowData;
+  pens: Pen[];
 }
 
-export default function BroilerRow({ row }: BroilerRowProps) {
+export default function BroilerRow({ row, pens }: BroilerRowProps) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -39,7 +42,9 @@ export default function BroilerRow({ row }: BroilerRowProps) {
           <span className="flex items-center gap-2">
             <span
               className={`w-3 h-3 rounded-full ${
-                row.alert === "Critical" ? "bg-red-500" : "bg-yellow-400"
+                row.alert === "Critical"
+                  ? "bg-red-500"
+                  : "bg-yellow-400"
               }`}
             />
             {row.alert}
@@ -50,7 +55,7 @@ export default function BroilerRow({ row }: BroilerRowProps) {
       {open && (
         <tr>
           <td colSpan={10} className="px-4 py-4">
-            <PenDetailsTable />
+            <PenDetailsTable pens={pens} />
           </td>
         </tr>
       )}

@@ -14,8 +14,7 @@ import { PenResponse } from "@/types/pen";
 import { uploadFileService } from "../../../../services/uploadFile.service";
 import { getStoredUser } from "@/lib/auth/getUser";
 import { PenMortalityFormRow } from "@/types/mortality-form";
-import toast from "react-hot-toast"; // ✅ toast import
-import { UploadFileResponse } from "@/types/upload-file";
+import toast from "react-hot-toast"; 
 
 export default function MortalityPage() {
   const { setFlow } = useEntryFlow();
@@ -107,28 +106,26 @@ export default function MortalityPage() {
               symptoms,
               additionalNotes,
             },
-            photosEvidences,
+            photosEvidences, // now stores URLs correctly
           };
 
           return mortalityService.create(payload);
         })
       );
 
-      // ✅ Success toast
       toast.success(
         <div>
           <p>Mortality data saved successfully!</p>
           <p>Checked By: {checkedBy}</p>
           <p>Time: {checkedTime}</p>
         </div>,
-        { duration: 4000 } // auto-dismiss
+        { duration: 4000 }
       );
     } catch (err: any) {
       console.error("Failed to save mortality data:", err);
       const message = err?.response?.data?.message || "Failed to save mortality data";
       setError(message);
 
-      // ✅ Error toast
       toast.error(
         <div>
           <p>{message}</p>
@@ -140,80 +137,80 @@ export default function MortalityPage() {
     }
   };
 
+  // ✅ PHOTO UPLOAD FIXED LIKE EGG-PRODUCTION
   const handlePhotoUpload = async (files: FileList | null) => {
-  if (!files || files.length === 0) return;
+    if (!files || files.length === 0) return;
 
-  try {
-    const uploadedFiles = await uploadFileService.create(files);
+    try {
+      const uploadedFiles = await uploadFileService.create(files);
 
-    const uploadedIds = uploadedFiles.map((file) => file._id);
+      // ✅ Ensure always array
+      const uploadedArray = Array.isArray(uploadedFiles)
+        ? uploadedFiles
+        : [uploadedFiles];
 
-    setPhotosEvidences((prev) => [...prev, ...uploadedIds]);
-  } catch (err) {
-    console.error("Photo upload failed:", err);
+      // ✅ Use URLs for display
+      const uploadedUrls = uploadedArray.map((file) => file.url);
 
-    toast.error(
-      <div>
-        <p>Failed to upload photo(s)</p>
-      </div>,
-      { duration: 4000 }
-    );
-  }
-};
+      setPhotosEvidences((prev) => [...prev, ...uploadedUrls]);
+
+      toast.success(`${uploadedUrls.length} file(s) uploaded successfully`);
+    } catch (err: any) {
+      console.error("Photo upload failed:", err);
+      toast.error(err.message || "Failed to upload photo(s)");
+    }
+  };
+
   const handleNext = () => {
     setFlow((prev: { mortality: boolean }) => ({ ...prev, mortality: true }));
     router.push("/entry-officer/feed-consumption");
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6  ">
+    <div className="min-h-screen bg-gray-100 p-6">
       {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
-      
-      <div className="bg-white space-y-6 pb-9 rounded-xl shadow ">
-      <div className="">
-         <MortalityHeader
-        checkedBy={checkedBy}
-        checkedTime={checkedTime}
-        onCheckedByChange={setCheckedBy}
-        onCheckedTimeChange={setCheckedTime}
-      />
 
-      <div className="bg-white rounded-b-xl shadow p-8 border-2 border-gray-200">
-        <PenDataTable rows={rows} setRows={setRows} />
-      </div>
-
-
-      </div>
-     
-      <div className="bg-white rounded-xl shadow p-6">
-        <SickBirdObservation
-          symptoms={symptoms}
-          setSymptoms={setSymptoms}
-          additionalNotes={additionalNotes}
-          setAdditionalNotes={setAdditionalNotes}
+      <div className="bg-white space-y-6 pb-9 rounded-xl shadow">
+        <MortalityHeader
+          checkedBy={checkedBy}
+          checkedTime={checkedTime}
+          onCheckedByChange={setCheckedBy}
+          onCheckedTimeChange={setCheckedTime}
         />
-      </div>
 
-      <div className="bg-white rounded-xl shadow p-6">
-        <PhotoEvidence onUpload={handlePhotoUpload} />
-      </div>
+        <div className="bg-white rounded-b-xl shadow p-8 border-2 border-gray-200">
+          <PenDataTable rows={rows} setRows={setRows} />
+        </div>
 
-      <div className="flex justify-end gap-4">
-        <button
-          onClick={handleSave}
-          disabled={loading}
-          className="border border-indigo-500 text-indigo-600 px-6 py-2 rounded-lg disabled:opacity-50"
-        >
-          {loading ? "Saving..." : "Save Flock Health Data"}
-        </button>
+        <div className="bg-white rounded-xl shadow p-6">
+          <SickBirdObservation
+            symptoms={symptoms}
+            setSymptoms={setSymptoms}
+            additionalNotes={additionalNotes}
+            setAdditionalNotes={setAdditionalNotes}
+          />
+        </div>
 
-        <button
-          onClick={handleNext}
-          className="bg-indigo-600 text-white px-6 py-2 rounded-lg"
-        >
-          Next: Feed Consumption →
-        </button>
-      </div>
+        <div className="bg-white rounded-xl shadow p-6">
+          <PhotoEvidence value={photosEvidences} onUpload={handlePhotoUpload} />
+        </div>
+
+        <div className="flex justify-end gap-4">
+          <button
+            onClick={handleSave}
+            disabled={loading}
+            className="border border-indigo-500 text-indigo-600 px-6 py-2 rounded-lg disabled:opacity-50"
+          >
+            {loading ? "Saving..." : "Save Flock Health Data"}
+          </button>
+
+          <button
+            onClick={handleNext}
+            className="bg-indigo-600 text-white px-6 py-2 rounded-lg"
+          >
+            Next: Feed Consumption →
+          </button>
+        </div>
       </div>
     </div>
   );
