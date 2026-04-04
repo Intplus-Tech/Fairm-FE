@@ -125,7 +125,7 @@ const handlePhotoUpload = async (files: FileList | null) => {
   };
 
   return (
-    <div className="mx-auto p-6 max-h-screen">
+   <div className="mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6">
       <header className="bg-purple-600 text-white p-4 rounded-t-xl">
         <h1 className="text-xl font-bold">Daily Egg Production</h1>
 

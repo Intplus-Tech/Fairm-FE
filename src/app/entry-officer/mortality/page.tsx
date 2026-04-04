@@ -166,52 +166,52 @@ export default function MortalityPage() {
     router.push("/entry-officer/feed-consumption");
   };
 
-  return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
+ return (
+  <div className="min-h-screen bg-gray-100 px-3 sm:px-4 md:px-6 py-4 sm:py-6">
+    {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
 
-      <div className="bg-white space-y-6 pb-9 rounded-xl shadow">
-        <MortalityHeader
-          checkedBy={checkedBy}
-          checkedTime={checkedTime}
-          onCheckedByChange={setCheckedBy}
-          onCheckedTimeChange={setCheckedTime}
+    <div className="bg-white space-y-6 pb-9 rounded-xl shadow w-full overflow-hidden">
+      <MortalityHeader
+        checkedBy={checkedBy}
+        checkedTime={checkedTime}
+        onCheckedByChange={setCheckedBy}
+        onCheckedTimeChange={setCheckedTime}
+      />
+
+      <div className="bg-white rounded-b-xl shadow p-3 sm:p-6 md:p-8 border-2 border-gray-200 overflow-x-auto">
+        <PenDataTable rows={rows} setRows={setRows} />
+      </div>
+
+      <div className="bg-white rounded-xl shadow p-3 sm:p-6">
+        <SickBirdObservation
+          symptoms={symptoms}
+          setSymptoms={setSymptoms}
+          additionalNotes={additionalNotes}
+          setAdditionalNotes={setAdditionalNotes}
         />
+      </div>
 
-        <div className="bg-white rounded-b-xl shadow p-8 border-2 border-gray-200">
-          <PenDataTable rows={rows} setRows={setRows} />
-        </div>
+      <div className="bg-white rounded-xl shadow p-3 sm:p-6">
+        <PhotoEvidence value={photosEvidences} onUpload={handlePhotoUpload} />
+      </div>
 
-        <div className="bg-white rounded-xl shadow p-6">
-          <SickBirdObservation
-            symptoms={symptoms}
-            setSymptoms={setSymptoms}
-            additionalNotes={additionalNotes}
-            setAdditionalNotes={setAdditionalNotes}
-          />
-        </div>
+      <div className="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4 px-3 sm:px-6">
+        <button
+          onClick={handleSave}
+          disabled={loading}
+          className="border border-indigo-500 text-indigo-600 px-6 py-2 rounded-lg disabled:opacity-50 w-full sm:w-auto"
+        >
+          {loading ? "Saving..." : "Save Flock Health Data"}
+        </button>
 
-        <div className="bg-white rounded-xl shadow p-6">
-          <PhotoEvidence value={photosEvidences} onUpload={handlePhotoUpload} />
-        </div>
-
-        <div className="flex justify-end gap-4">
-          <button
-            onClick={handleSave}
-            disabled={loading}
-            className="border border-indigo-500 text-indigo-600 px-6 py-2 rounded-lg disabled:opacity-50"
-          >
-            {loading ? "Saving..." : "Save Flock Health Data"}
-          </button>
-
-          <button
-            onClick={handleNext}
-            className="bg-indigo-600 text-white px-6 py-2 rounded-lg"
-          >
-            Next: Feed Consumption →
-          </button>
-        </div>
+        <button
+          onClick={handleNext}
+          className="bg-indigo-600 text-white px-6 py-2 rounded-lg w-full sm:w-auto"
+        >
+          Next: Feed Consumption →
+        </button>
       </div>
     </div>
-  );
+  </div>
+);
 }

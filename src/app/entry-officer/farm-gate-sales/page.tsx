@@ -132,8 +132,8 @@ export default function FarmGateSalesPage() {
   }
 
   return (
-    <div className="min-h-screen p-6">
-      <div className="mx-auto">
+    <div className="min-h-screen px-3 sm:px-4 md:px-6 py-4 sm:py-6">
+    <div className="bg-white p-3 sm:p-6 rounded-b-xl shadow-sm border space-y-6">
 
         {error && (
           <p className="text-red-500 text-sm mb-2">
