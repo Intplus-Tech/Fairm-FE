@@ -143,7 +143,7 @@ export default function Page() {
   };
   
   return (
-    <div className="min-h-screen  p-6 space-y-6">
+    <div className="min-h-screen px-3 sm:px-4 md:px-6 py-4 sm:py-6 space-y-6">
       {error && (
         <p className="text-red-500 text-sm mb-2">
           {error}

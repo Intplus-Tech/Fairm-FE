@@ -188,90 +188,90 @@ export default function MedicationPage() {
     }
   };
 
-  return (
-    <div className="min-h-screen p-6">
-      {error && (
-        <p className="text-red-500 text-sm mb-2">
-          {error}
-        </p>
-      )}
+ return (
+  <div className="min-h-screen px-3 sm:px-4 md:px-6 py-4 sm:py-6">
+    {error && (
+      <p className="text-red-500 text-sm mb-2">
+        {error}
+      </p>
+    )}
 
-      <div className="mx-auto">
-        <MedicationHeader
-          administeredBy={administeredBy}
-          setAdministeredBy={setAdministeredBy}
-          time={time}
-          setTime={setTime}
-        />
+    <div className="mx-auto w-full">
+      <MedicationHeader
+        administeredBy={administeredBy}
+        setAdministeredBy={setAdministeredBy}
+        time={time}
+        setTime={setTime}
+      />
 
-        <div className="bg-white space-y-6 p-6 rounded-b-md border">
+      <div className="bg-white space-y-6 p-3 sm:p-6 rounded-b-md border">
 
-          {forms.map((form, index) => (
-            <div key={index} className="space-y-6">
+        {forms.map((form, index) => (
+          <div key={index} className="space-y-6 overflow-x-auto">
 
-              <TreatmentsTable
-                rows={form.rows}
-                setRows={(rows) => updateForm(index, "rows", rows)}
-              />
+            <TreatmentsTable
+              rows={form.rows}
+              setRows={(rows) => updateForm(index, "rows", rows)}
+            />
 
-              <MedicationDetails
-                medicationName={form.medicationName}
-                setMedicationName={(value) =>
-                  updateForm(index, "medicationName", value)
-                }
-                expiryAt={form.expiryAt}
-                setExpiryAt={(value) =>
-                  updateForm(index, "expiryAt", value)
-                }
-              />
+            <MedicationDetails
+              medicationName={form.medicationName}
+              setMedicationName={(value) =>
+                updateForm(index, "medicationName", value)
+              }
+              expiryAt={form.expiryAt}
+              setExpiryAt={(value) =>
+                updateForm(index, "expiryAt", value)
+              }
+            />
 
-              <VaccinationSchedule
-                vaccineTypes={form.vaccineTypes}
-                setVaccineTypes={(value) =>
-                  updateForm(index, "vaccineTypes", value)
-                }
-                otherVaccine={form.otherVaccine}
-                setOtherVaccine={(value) =>
-                  updateForm(index, "otherVaccine", value)
-                }
-                vaccineDosage={form.vaccineDosage}
-                setVaccineDosage={(value) =>
-                  updateForm(index, "vaccineDosage", value)
-                }
-                vaccineMethod={form.vaccineMethod}
-                setVaccineMethod={(value) =>
-                  updateForm(index, "vaccineMethod", value)
-                }
-              />
+            <VaccinationSchedule
+              vaccineTypes={form.vaccineTypes}
+              setVaccineTypes={(value) =>
+                updateForm(index, "vaccineTypes", value)
+              }
+              otherVaccine={form.otherVaccine}
+              setOtherVaccine={(value) =>
+                updateForm(index, "otherVaccine", value)
+              }
+              vaccineDosage={form.vaccineDosage}
+              setVaccineDosage={(value) =>
+                updateForm(index, "vaccineDosage", value)
+              }
+              vaccineMethod={form.vaccineMethod}
+              setVaccineMethod={(value) =>
+                updateForm(index, "vaccineMethod", value)
+              }
+            />
 
-              <HealthObservation
-                sicknessObserved={form.sicknessObserved}
-                setSicknessObserved={(value) =>
-                  updateForm(index, "sicknessObserved", value)
-                }
-                treatmentName={form.treatmentName}
-                setTreatmentName={(value) =>
-                  updateForm(index, "treatmentName", value)
-                }
-                applied={form.applied}
-                setApplied={(value) =>
-                  updateForm(index, "applied", value)
-                }
-              />
+            <HealthObservation
+              sicknessObserved={form.sicknessObserved}
+              setSicknessObserved={(value) =>
+                updateForm(index, "sicknessObserved", value)
+              }
+              treatmentName={form.treatmentName}
+              setTreatmentName={(value) =>
+                updateForm(index, "treatmentName", value)
+              }
+              applied={form.applied}
+              setApplied={(value) =>
+                updateForm(index, "applied", value)
+              }
+            />
 
-            </div>
-          ))}
-
-          <div className="flex items-center justify-center">
-            <AddAnotherSales onClick={handleAddSales} />
           </div>
+        ))}
 
-          <MedicationActions
-            onSave={handleSave}
-            loading={loading}
-          />
+        <div className="flex items-center justify-center">
+          <AddAnotherSales onClick={handleAddSales} />
         </div>
+
+        <MedicationActions
+          onSave={handleSave}
+          loading={loading}
+        />
       </div>
     </div>
-  );
+  </div>
+);
 }
