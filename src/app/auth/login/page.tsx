@@ -70,7 +70,6 @@ export default function LoginPage() {
       tokenStorage.set(token);
       tokenStorage.setRefresh(refreshToken);
 
-      // ✅ Fix undefined issue
       const fullName = apiUser.email;
 
       const user = {
@@ -93,7 +92,12 @@ export default function LoginPage() {
         return;
       }
 
-      if (role === "admin" || role === "owner" || role === "manager" || role === "super_admin") {
+      if (
+        role === "admin" ||
+        role === "owner" ||
+        role === "manager" ||
+        role === "super_admin"
+      ) {
         router.replace("/dashboard");
         return;
       }
@@ -197,6 +201,17 @@ export default function LoginPage() {
             >
               {isLoading ? "Logging in..." : "Login"}
             </Button>
+
+            {/* SIGN UP SECTION */}
+            <p className="text-center text-sm text-gray-600 mt-4">
+              Don’t have an account?{" "}
+              <Link
+                href="/auth/signup/step1"
+                className="text-[#4A3AFF] font-medium hover:underline"
+              >
+                Sign up
+              </Link>
+            </p>
 
           </CardContent>
         </Card>
